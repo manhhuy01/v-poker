@@ -11,6 +11,7 @@ module.exports = {
       lg: '1024px',
       xl: '1280px',
       '2xl': '1536px',
+
     },
     colors: {
       transparent: 'transparent',
@@ -147,6 +148,7 @@ module.exports = {
       '2xl': '1rem',
       '3xl': '1.5rem',
       full: '9999px',
+      large: '10rem',
     },
     borderWidth: {
       DEFAULT: '1px',
@@ -443,6 +445,10 @@ module.exports = {
       '-2/4': '-50%',
       '-3/4': '-75%',
       '-full': '-100%',
+      '1/6': '16.666667%',
+      '1/5': '20%',
+      '2/5': '40%',
+      '4/5': '60%'
     }),
     keyframes: {
       spin: {
@@ -686,7 +692,13 @@ module.exports = {
       1: '1',
       2: '2',
     },
-    textColor: (theme) => theme('colors'),
+    textColor: (theme) => ({
+      ...theme('colors'),
+      'spade': '#000000',
+      'club': '#000000',
+      'heart': '#FF0000',
+      'diamond': '#FF0000',
+    }),
     textOpacity: (theme) => theme('opacity'),
     transformOrigin: {
       center: 'center',

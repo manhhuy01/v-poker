@@ -3,8 +3,8 @@ let socket;
 
 const API = process.env.NEXT_PUBLIC_API
 
-export const initiateSocket = ({ user }) => {
-  socket = io(API, { query: { userName: user.userName } })
+export const initiateSocket = ({ token }) => {
+  socket = io(API, { query: { token } })
   console.log(`connected socket...`);
   socket.on("disconnect", () => {
     socket.connect();

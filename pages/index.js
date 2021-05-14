@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import Head from 'next/head'
 import * as api from '../api/poker'
 import * as socket from '../api/socket'
+import MenuSide from '../components/menuSide'
+import Game from '../components/game'
 
 export async function getServerSideProps(context) {
   const { token } = context.req.cookies;
@@ -30,25 +32,32 @@ export async function getServerSideProps(context) {
 
 }
 
-export default function Home({ user }) {
+export default function Home({ user, token }) {
   const [data, setData] = useState({});
   useEffect(() => {
     if (user) {
-      socket.initiateSocket({ user });
+      socket.initiateSocket({ token });
     }
     socket.subscribeToGetData((err, roomInfo) => {
       if (err) {
         alert(err)
       }
-      setData(roomInfo);
+
+      let normalizeData = {
+        ...roomInfo,
+        players: roomInfo.players.map((userName) => ({
+          userName,
+          isDealer: userName === roomInfo.dealer,
+        }))
+      }
+      setData(normalizeData);
     })
 
 
     return () => {
-      socket.disconnectSocket();
+      // socket.disconnectSocket();
     }
   }, [user]);
-  console.log(data)
   return (
     <div>
       <Head>
@@ -56,9 +65,14 @@ export default function Home({ user }) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main>
-        <div>Hello</div>
-        {!!user && user.userName}
-        {data?.players?.length}
+        <MenuSide
+          data={data}
+          user={user}
+        />
+        <Game
+          data={data}
+          user={user}
+        />
       </main>
     </div>
   )
