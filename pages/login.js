@@ -20,16 +20,17 @@ export default function Login() {
 
     setLoading(true)
     try {
-      let res = await (await api.login({ userName, password })).json();
+      let { data } = await api.login({ userName, password });
       setLoading(false)
-      console.log(res)
-      if (res.error) {
-        alert(res.error)
+      if (data.error) {
+        alert(data.error)
       } else {
-        cookie.set('token', res.token)
+        let now = new Date();
+        cookie.set('token', data.token, { expires: new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1) })
         window.location.href = '/'
       }
     } catch (err) {
+      alert(err.response.data.error)
       console.log(err)
     } finally {
       setLoading(false)

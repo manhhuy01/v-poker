@@ -3,15 +3,18 @@ import Card from './card'
 export default function position({
   pos = 0,
   namePos = '',
-  userName = 'manhhuy01',
+  userName = '',
   cards,
-  budget = 1200,
+  balance = 0,
   bet,
   isThinking = false,
+  onEditClick,
+  onAddClick,
+  rawPosition,
 }) {
   let className;
   let chipClassName;
-  switch (pos) {
+  switch (+pos) {
     case 1:
       className = 'bottom-0 left-1/2'
       chipClassName = '-top-16';
@@ -73,19 +76,31 @@ export default function position({
   return (
     <div className={`items-center flex flex-col absolute w-0 h-0 ${className}`}>
       <div className={`${isThinking ? 'border-yellow-200 animate-pulse bg-yellow-600' : 'border-gray-700 bg-gray-600'} rounded-full w-20 h-20  -top-8 absolute  border-4`} />
-      <div className="z-10 absolute -top-11 flex">
-        <Card />
-        <Card />
-      </div>
-      <div className="text-white pr-1 pl-1 rounded border-yellow-600 border bg-gray-900 text-xs z-10">{userName}</div>
       {
-        !!namePos && <div className={`${posClassName} absolute font-extrabold text-xs z-10 pl-1 pr-1 rounded -bottom-12`} >{namePos}</div>
+        !userName && (
+          <div onClick={() => onAddClick(rawPosition || pos) } className="absolute z-10 text-white w-max -top-6 text-base p-5 cursor-pointer">+</div>
+        )
       }
-      <div className="bg-gray-900 text-blue-400 pr-2 pl-2 rounded z-10 text-xs">${budget}</div>
-      <div className={`${chipClassName} absolute flex items-center justify-center text-xs font-bold text-white`}>
-        <img className="w-4 h-4 max-w-none mr-1" src="/chip.svg" alt="chip" />
-        <span>20</span>
-      </div>
+      {
+        !!userName && (
+          <>
+            <div className="z-10 absolute -top-11 flex">
+              <Card />
+              <Card />
+            </div>
+            <div onClick={() => onEditClick(userName)} className="text-white pr-1 pl-1 rounded border-yellow-600 border bg-gray-900 text-xs z-10 cursor-pointer">{userName}</div>
+            {
+              !!namePos && <div className={`${posClassName} absolute font-extrabold text-xs z-10 pl-1 pr-1 rounded -bottom-12`} >{namePos}</div>
+            }
+            <div className="bg-gray-900 text-blue-400 pr-2 pl-2 rounded z-10 text-xs">${balance}</div>
+            <div className={`${chipClassName} absolute flex items-center justify-center text-xs font-bold text-white`}>
+              <img className="w-4 h-4 max-w-none mr-1" src="/chip.svg" alt="chip" />
+              <span>20</span>
+            </div>
+          </>
+        )
+      }
+
     </div>
   )
 }

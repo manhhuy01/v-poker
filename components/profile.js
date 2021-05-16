@@ -7,6 +7,7 @@ export default function Profile({ user }) {
         }
       </span>
       <p className="font-bold ml-2">{user?.userName}</p>
+      <p className="ml-2">${user?.accBalance}</p>
     </div>
   )
 }

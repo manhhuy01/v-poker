@@ -21,15 +21,15 @@ export default function Register() {
       return alert('Coi kĩ lại bạn ơi!')
     }
     setLoading(true)
-    let res = await (await api.register({ userName, password })).json();
-    setLoading(false)
 
-    if (res.error) {
-      alert(res.error)
-    } else {
-      cookie.set('token', res.token)
+    try {
+      let res = await api.register({ userName, password });
+      cookie.set('token', res.data.token)
       window.location.href = '/'
+    } catch (err){
+      alert(err.response.data.error)
     }
+    setLoading(false)
   }
   return (
     <>
