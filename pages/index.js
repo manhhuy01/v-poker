@@ -22,10 +22,12 @@ export async function getServerSideProps(context) {
   }
   try {
     const res = await api.getInfo(token);
+    
     return {
       props: { user: res.data, token },
     }
-  } catch {
+  } catch(err) {
+    console.log(err)
     return {
       redirect: {
         destination: '/login',
