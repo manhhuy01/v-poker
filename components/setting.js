@@ -4,19 +4,16 @@ import Modal from './modal'
 export default function setting({ data }) {
   const [isOpen, setOpen] = useState(false);
   const sbInput = useRef(null);
-  const dealerAlsoPlayerInput = useRef(null);
   const [loading, setLoading] = useState(false)
   const confirm = async () => {
     setLoading(true)
     let sbVal = sbInput.current.value;
-    let dealerVal = dealerAlsoPlayerInput.current.checked;
-    console.log(dealerVal)
     if (!+sbVal) {
       alert('sb input phải là số')
       return setLoading(false)
     }
     try {
-      await updateSetting({ smallBlind: +sbVal, dealerAlsoPlayer: dealerVal });
+      await updateSetting({ smallBlind: +sbVal });
     } catch (err) {
       console.log('update setting error', err)
       alert('update setting fail')
@@ -46,10 +43,6 @@ export default function setting({ data }) {
           <div className="mt-2">
             <label className="mr-2">Small Blind</label>
             <input type="input" className="border-2" ref={sbInput} defaultValue={data?.smallBlind} />
-          </div>
-          <div className="mt-2">
-            <input ref={dealerAlsoPlayerInput} type="checkbox" className="mr-2 checked:bg-blue-600 checked:border-transparent" defaultChecked={!!data?.dealerAlsoPlayer}/>
-            <span>Dealer also player</span>
           </div>
         </div>
 

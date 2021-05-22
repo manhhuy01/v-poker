@@ -1,5 +1,3 @@
-import { useRef, useState } from 'react'
-import { updateProfile } from '../api/poker'
 import Modal from './modal'
 
 export default function addModal({ waitingPlayers, isOpen, onClose, loading, onChose }) {

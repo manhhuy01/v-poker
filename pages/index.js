@@ -60,6 +60,9 @@ export default function Home({ user, token }) {
 
 
       console.log('roomInfo', roomInfo)
+      let newPosition = transformPosition(user.userName, roomInfo.position)
+      let pos = Object.keys(newPosition).find(p => newPosition[p].user?.userName === user.userName);
+      
       let normalizeData = {
         ...roomInfo,
         players: roomInfo.players.map((player) => ({
@@ -69,12 +72,16 @@ export default function Home({ user, token }) {
         user: {
           ...user,
           isDealer: user.userName === roomInfo.dealer,
+          isThinking: !!Object.keys(roomInfo.position).find(p => roomInfo.position[p].isThinking 
+            && roomInfo.position[p].user?.userName === user.userName),
+          position: newPosition && newPosition[pos],
+
         },
-        position: transformPosition(user.userName, roomInfo.position)
+        position: newPosition
       }
 
 
-      console.log(normalizeData)
+      console.log('normalizeData', normalizeData)
       setData(normalizeData);
     })
 

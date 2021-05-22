@@ -1,5 +1,4 @@
 export const transformPosition = (userName, position) => {
-  console.log(position)
   const arr = Object.keys(position || {})
   let newPosition = {}
   let curPosition = arr.find(pos => position[pos]?.user?.userName === userName);

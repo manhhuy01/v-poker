@@ -1,6 +1,13 @@
-export default function card({ num = '10', color = 's' }){
+const REGEX = /(.*)(s|h|c|d)/
+
+export default function card({ data='10s' }){
+  
+  const matchArr = data.match(REGEX);
+  const num = matchArr[1]
+  const color = matchArr[2]
   let symbol = ''
   let colorClass = ''
+
   switch(color){
     case 's':
       symbol = '♠';
