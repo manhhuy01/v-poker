@@ -1,14 +1,22 @@
 const REGEX = /(.*)(s|h|c|d)/
 
-export default function card({ data='10s' }){
-  
+export default function card({ data = 'u' }) {
+
+
+  if (data == 'u') {
+    return (
+      <div className={`border-black bg-white shadow rounded w-8 h-10 font-bold p-1 ml-1 mr-1 bg-card bg-card-up bg-size-card`}>
+      </div>
+    )
+  }
+
   const matchArr = data.match(REGEX);
   const num = matchArr[1]
   const color = matchArr[2]
   let symbol = ''
   let colorClass = ''
 
-  switch(color){
+  switch (color) {
     case 's':
       symbol = '♠';
       colorClass = 'text-spade'

@@ -165,6 +165,7 @@ export default function game({ data, onEditClick, onAddClick }) {
                 rawPosition={data?.position[position]?.rawPosition}
                 bet={data?.position[position]?.betBalance}
                 cards={data?.position[position]?.cards}
+                isFold={data?.position[position]?.isFold}
                 onEditClick={onEditClick}
                 onAddClick={onAddClick}
               />
@@ -230,7 +231,7 @@ export default function game({ data, onEditClick, onAddClick }) {
           )
         }
         {
-          (!data?.table?.preFlop || isThinking) && (
+          (!data?.table?.preFlop || isThinking) && data?.user?.position && (
             <div className="flex w-full justify-evenly sm:w-1/2">
               {
                 isCanFold && <button onClick={onActionFold} disabled={loadingPlayerAction} className="flex items-center justify-center text-white bg-red-500 p-2 rounded w-20 focus:outline-none flex items-center justify-center" type="button">

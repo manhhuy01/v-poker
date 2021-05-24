@@ -92,6 +92,7 @@ module.exports = {
       'gradient-to-bl': 'linear-gradient(to bottom left, var(--tw-gradient-stops))',
       'gradient-to-l': 'linear-gradient(to left, var(--tw-gradient-stops))',
       'gradient-to-tl': 'linear-gradient(to top left, var(--tw-gradient-stops))',
+      'card': 'repeating-linear-gradient(45deg, #D20716 25%, transparent 25%, transparent 75%, #D20716 75%, #D20716), repeating-linear-gradient(45deg, #D20716 25%, #e5e5f7 25%, #e5e5f7 75%, #D20716 75%, #D20716);'
     },
     backgroundOpacity: (theme) => theme('opacity'),
     backgroundPosition: {
@@ -104,11 +105,13 @@ module.exports = {
       'right-bottom': 'right bottom',
       'right-top': 'right top',
       top: 'top',
+      'card-up': '0 0, 4px 4px',
     },
     backgroundSize: {
       auto: 'auto',
       cover: 'cover',
       contain: 'contain',
+      'size-card': '4px 8px'
     },
     blur: {
       0: '0',

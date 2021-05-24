@@ -11,6 +11,7 @@ export default function position({
   onEditClick,
   onAddClick,
   rawPosition,
+  isFold,
 }) {
   let className;
   let chipClassName;
@@ -75,7 +76,7 @@ export default function position({
   }
   return (
     <div className={`items-center flex flex-col absolute w-0 h-0 ${className}`}>
-      <div className={`${isThinking ? 'border-yellow-200 animate-pulse bg-yellow-600' : 'border-gray-700 bg-gray-600'} rounded-full w-20 h-20  -top-8 absolute  border-4`} />
+      <div className={`${isThinking ? 'border-gray-700 animate-pulse bg-yellow-500' : 'border-gray-700 bg-gray-600'} rounded-full w-20 h-20  -top-8 absolute  border-4`} />
       {
         !userName && (
           <div onClick={() => onAddClick(rawPosition || pos)} className=" absolute z-10 text-white w-max -top-6 text-base p-5 cursor-pointer">+</div>
@@ -84,13 +85,16 @@ export default function position({
       {
         !!userName && (
           <>
-            <div className="z-10 absolute -top-11 flex">
-              {
-                cards && cards.map((c, i) => (
-                  <Card data={c} key={i} />
-                ))
-              }
-            </div>
+            {
+              !isFold && <div className="z-10 absolute -top-11 flex">
+                {
+                  cards && cards.map((c, i) => (
+                    <Card data={c} key={i} />
+                  ))
+                }
+              </div>
+            }
+
             <div onClick={() => onEditClick(userName)} className="text-white pr-1 pl-1 rounded border-yellow-600 border bg-gray-900 text-xs z-10 cursor-pointer">{userName}</div>
             {
               !!namePos && <div className={`${posClassName} absolute font-extrabold text-xs z-10 pl-1 pr-1 rounded -bottom-12`} >{namePos}</div>
