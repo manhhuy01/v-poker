@@ -8,7 +8,7 @@ import Setting from '../components/setting'
 import { transformPosition } from '../utils'
 import UserModal from '../components/userModal'
 import AddModal from '../components/addModal'
-
+import Loading from '../components/loading'
 
 export async function getServerSideProps(context) {
   const { token } = context.req.cookies;
@@ -22,11 +22,11 @@ export async function getServerSideProps(context) {
   }
   try {
     const res = await api.getInfo(token);
-    
+
     return {
       props: { user: res.data, token },
     }
-  } catch(err) {
+  } catch (err) {
     console.log(err)
     return {
       redirect: {
@@ -62,7 +62,7 @@ export default function Home({ user, token }) {
       console.log('roomInfo', roomInfo)
       let newPosition = transformPosition(user.userName, roomInfo.position)
       let pos = Object.keys(newPosition).find(p => newPosition[p].user?.userName === user.userName);
-      
+
       let normalizeData = {
         ...roomInfo,
         players: roomInfo.players.map((player) => ({
@@ -72,7 +72,7 @@ export default function Home({ user, token }) {
         user: {
           ...user,
           isDealer: user.userName === roomInfo.dealer,
-          isThinking: !!Object.keys(roomInfo.position).find(p => roomInfo.position[p].isThinking 
+          isThinking: !!Object.keys(roomInfo.position).find(p => roomInfo.position[p].isThinking
             && roomInfo.position[p].user?.userName === user.userName),
           position: newPosition && newPosition[pos],
 
@@ -102,7 +102,7 @@ export default function Home({ user, token }) {
   }
 
   const onAddClick = (position) => {
-    if(!data?.user?.isDealer) return alert('Liên hệ/chờ dealer thêm vô');
+    if (!data?.user?.isDealer) return alert('Liên hệ/chờ dealer thêm vô');
     let playingPlayers = Object.keys(data.position).map(pos => data.position[pos]?.user?.userName).filter(Boolean);
     let allPlayers = data.players.map(x => x.userName);
     let waitingPlayers = [allPlayers, playingPlayers].reduce((a, b) => a.filter(c => !b.includes(c)))
@@ -112,10 +112,10 @@ export default function Home({ user, token }) {
   }
 
   const onAddPlayer = async (userName) => {
-  
+
     try {
-      await api.joinTable({userName, position: addPosition});
-    } catch(err){
+      await api.joinTable({ userName, position: addPosition });
+    } catch (err) {
       return alert('error join table')
     }
     setAddModal(false)
@@ -124,9 +124,11 @@ export default function Home({ user, token }) {
   return (
     <div>
       <Head>
-        <title>Create Next App</title>
+        <title>V-Poker</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
+
+
       <main>
         <MenuSide
           data={data}
@@ -164,7 +166,9 @@ export default function Home({ user, token }) {
             />
           )
         }
-
+        {
+          !data.players && <Loading />
+        }
       </main>
     </div>
   )

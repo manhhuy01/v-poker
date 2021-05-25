@@ -13,9 +13,13 @@ export default function Register() {
   const register = async (e) => {
     e.preventDefault();
     //validate 
-    const userName = userEl.current.value.trim();
+    const userName = userEl.current.value.trim().toLowerCase();
     const password = passwordEl.current.value.trim();
     const confirmPassword = confirmPasswordEl.current.value.trim();
+
+    if(!/^([0-9,a-z])*$/.test(userName)){
+      return alert('User name có kí tự đặt biệt')
+    }
 
     if (!userName || !password || password != confirmPassword) {
       return alert('Coi kĩ lại bạn ơi!')
@@ -42,7 +46,7 @@ export default function Register() {
           <p className="block text-center text-2xl font-semibold m-2">Register</p>
           <form name="login" onSubmit={register}>
             <div className="mb-2 mt-2">
-              <input className="block w-full rounded-xl p-2 bg-blue-200 focus:outline-none outline-none" id="username" type="text" placeholder="Username" ref={userEl} />
+              <input className="lowercase block w-full rounded-xl p-2 bg-blue-200 focus:outline-none outline-none" id="username" type="text" placeholder="Username" ref={userEl} />
             </div>
             <div className="mb-2 mt-2">
               <input className="block w-full rounded-xl p-2 bg-blue-200 focus:outline-none outline-none" id="password" type="password" placeholder="Password" ref={passwordEl} />

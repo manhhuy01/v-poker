@@ -10,9 +10,9 @@ const Pot = ({ balance }) => (
 export default function pot({ cards, pot }) {
   return (
     <div className="w-3/4 md:w-1/2 absolute top-1/2 left-1/2 transform -translate-x-2/4 -translate-y-2/4 flex flex-col items-center">
-      <div className="flex justify-around w-3/4 mb-20 sm:mb-0 flex-wrap">
+      <div className="flex justify-around w-3/4 mb-20 sm:mb-0 flex-wrap md:mb-10">
       {
-        !!pot && pot.map((p,i) => (<Pot key={i} balance={p.balance}/>) )
+        !!pot && pot.map((p,i) => !!p.balance && <Pot key={i} balance={p.balance}/>)
       }
       </div>
       <div className="flex justify-center w-full ">

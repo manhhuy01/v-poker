@@ -41,6 +41,7 @@ export const setDealerPosition = ({ userName }) => axios.post('/game/setDealerPo
 export const startGame = () => axios.post('/game/start');
 export const shuffleCards = () => axios.post('/game/shuffleCards');
 export const preFlop = () => axios.post('/game/preFlop');
+export const reset = () => axios.post('/game/reset');
 
 export const playerAction = ({ type, betBalance }) => axios.post('/player/action', { type, betBalance})
 

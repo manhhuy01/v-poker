@@ -1,6 +1,6 @@
 export default function Profile({ user }) {
   return (
-    <div className="flex items-center mb-2 mt-2">
+    <div className="flex items-center mb-2 mt-2 cursor-pointer">
       <span className={`${user?.isDealer ? 'text-red-500' : 'text-green-500'}`}>
         {
           user.isDealer ? '♛' : '◯'

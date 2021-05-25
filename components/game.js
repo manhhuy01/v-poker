@@ -2,8 +2,7 @@ import { useState, useRef } from 'react'
 import Position from '../components/materials/position'
 import Pot from './materials/pot'
 import {
-  startGame, shuffleCards, preFlop, flop,
-  playerAction
+  startGame, shuffleCards, preFlop, playerAction, reset
 } from '../api/poker'
 import Modal from './modal'
 
@@ -40,6 +39,7 @@ export default function game({ data, onEditClick, onAddClick }) {
   }
 
   const onPreFlop = async () => {
+    console.log('vo')
     setLoadingDealerAction(true)
     try {
       await preFlop();
@@ -50,6 +50,19 @@ export default function game({ data, onEditClick, onAddClick }) {
     }
     setLoadingDealerAction(false)
   }
+
+  const onReset = async () => {
+    setLoadingDealerAction(true)
+    try {
+      await reset();
+    } catch (err) {
+      if (err?.response?.data?.error) {
+        alert(err?.response?.data?.error)
+      }
+    }
+    setLoadingDealerAction(false)
+  }
+
   const onActionCall = async () => {
     setLoadingPlayerAction(true)
     try {
@@ -146,8 +159,8 @@ export default function game({ data, onEditClick, onAddClick }) {
     && isPlaying && !isFold && !isAllIn && isPreFlop
   const isCanCall = !isAllIn && isPreFlop && !isCanCheck
   const isCanFold = !isAllIn && isPreFlop && !isFold
+  const isCanReset = data?.table?.start && data?.table?.finish
 
-  console.log(data?.user?.position?.betBalance, data?.table?.currentBet)
   return (
     <div className="w-screen h-screen bg-gray-800 overflow-hidden">
       <div className="pb-20 w-full h-full flex items-center justify-center">
@@ -168,6 +181,8 @@ export default function game({ data, onEditClick, onAddClick }) {
                 isFold={data?.position[position]?.isFold}
                 onEditClick={onEditClick}
                 onAddClick={onAddClick}
+                isPlaying={data?.position[position]?.isPlaying}
+                winBalance={data?.position[position]?.winBalance}
               />
             ))
           }
@@ -175,9 +190,10 @@ export default function game({ data, onEditClick, onAddClick }) {
             pot={data?.table?.pot}
             cards={[...(data?.table?.flop || []), data?.table?.turn, data?.table?.river]}
           />
+
         </div>
       </div>
-      <div onClick={onFullScreen} className="absolute top-0 left-1/2 cursor-pointer text-2xl text-white">&#x26F6;</div>
+      <div onClick={onFullScreen} className="absolute top-0 left-1/2 cursor-pointer text-2xl text-white transform -translate-x-2/4 ">&#x26F6;</div>
       <div className="sticky bottom-0 left-0 flex flex-row flex-wrap p-3 justify-center">
         {
           data?.user?.isDealer && (
@@ -191,18 +207,7 @@ export default function game({ data, onEditClick, onAddClick }) {
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>)
                   }
-                Pre-Flop
-                </button>
-              }
-              {
-                !!data?.table?.preFlop && <button onClick={onPreFlop} className="text-white bg-green-500 p-2 pl-3 pr-3 rounded w-fit focus:outline-none flex items-center justify-center" type="button">
-                  {
-                    isLoadingDealerAction && (<svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>)
-                  }
-                Flop
+                Chia bài
                 </button>
               }
               {
@@ -213,18 +218,30 @@ export default function game({ data, onEditClick, onAddClick }) {
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>)
                   }
-                Start
+                Vào ván
                 </button>
               }
+
               {
-                !data?.table?.preFlop && <button onClick={onShuffle} className="text-white bg-blue-500 p-2 rounded pl-3 pr-3 w-fit focus:outline-none flex items-center justify-center" type="button">
+                isCanReset && <button onClick={onReset} className="text-white bg-yellow-500 p-2 pl-3 pr-3 rounded w-fit focus:outline-none flex items-center justify-center" type="button">
                   {
                     isLoadingDealerAction && (<svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>)
                   }
-                Shuffle
+                  Thu dọn
+                </button>
+              }
+              {
+                data?.table?.start && !data?.table?.preFlop && <button onClick={onShuffle} className="text-white bg-blue-500 p-2 rounded pl-3 pr-3 w-fit focus:outline-none flex items-center justify-center" type="button">
+                  {
+                    isLoadingDealerAction && (<svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>)
+                  }
+                Xào bài
                 </button>
               }
             </div>

@@ -83,7 +83,7 @@ export default function userModel({ profile: { userName, accBalance }, isOpen, o
           </button>
         </div>
         <div className="mb-4 mt-4">
-          <button onClick={onSetDealer} className="w-full rounded bg-blue-500 text-white p-2 focus:outline-none hover:bg-green-800" type="button">Set Dealer Position</button>
+          <button onClick={onSetDealer} className="w-full rounded bg-blue-500 text-white p-2 focus:outline-none hover:bg-blue-800" type="button">Set Dealer Position</button>
         </div>
         <div className="mb-4 mt-6">
           <button onClick={onTransfer} className="w-full rounded bg-green-500 text-white p-2 focus:outline-none hover:bg-green-800" type="button">Transfer Dealer Role</button>

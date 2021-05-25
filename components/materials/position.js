@@ -12,21 +12,23 @@ export default function position({
   onAddClick,
   rawPosition,
   isFold,
+  isPlaying,
+  winBalance,
 }) {
   let className;
   let chipClassName;
   switch (+pos) {
     case 1:
       className = 'bottom-0 left-1/2'
-      chipClassName = '-top-16';
+      chipClassName = '-top-20';
       break;
     case 2:
       className = 'left-0 bottom-1/5 sm:bottom-0 sm:left-1/4'
-      chipClassName = '-top-8 left-16 sm:-top-16 sm:left-0';
+      chipClassName = '-top-8 left-16 sm:-top-20 sm:left-0';
       break;
     case 3:
       className = 'bottom-1/2 left-0 sm:bottom-1/4'
-      chipClassName = '-right-20 sm:-top-8';
+      chipClassName = '-right-24 sm:-top-8';
       break;
     case 4:
       className = 'left-0 top-1/5 sm:top-1/4 sm:left-0';
@@ -47,11 +49,11 @@ export default function position({
       break;
     case 8:
       className = 'bottom-1/2 right-0 sm:bottom-1/4'
-      chipClassName = '-left-20 sm:-top-8';
+      chipClassName = '-left-24 sm:-top-8';
       break;
     case 9:
       className = 'right-0 bottom-1/5 sm:bottom-0 sm:right-1/4'
-      chipClassName = '-top-8 right-16 sm:-top-16 sm:right-0';
+      chipClassName = '-top-8 right-16 sm:-top-20 sm:right-0';
 
       break;
 
@@ -85,26 +87,32 @@ export default function position({
       {
         !!userName && (
           <>
-            {
-              !isFold && <div className="z-10 absolute -top-11 flex">
-                {
-                  cards && cards.map((c, i) => (
-                    <Card data={c} key={i} />
-                  ))
-                }
-              </div>
-            }
-
+            
+            <div className="z-10 absolute -top-11 flex">
+              {
+                cards && cards.map((c, i) => (
+                  <Card data={c} key={i} isFold={isFold}/>
+                ))
+              }
+            </div>
             <div onClick={() => onEditClick(userName)} className="text-white pr-1 pl-1 rounded border-yellow-600 border bg-gray-900 text-xs z-10 cursor-pointer">{userName}</div>
             {
               !!namePos && <div className={`${posClassName} absolute font-extrabold text-xs z-10 pl-1 pr-1 rounded -bottom-12`} >{namePos}</div>
             }
-            <div className="bg-gray-900 text-blue-400 pr-2 pl-2 rounded z-10 text-xs">${balance}</div>
+            <div className="bg-gray-900 text-blue-400 pr-2 pl-2 rounded z-10 text-xs">${ isPlaying && !balance ? 'All In' :balance}</div>
             {
               !!bet && (
                 <div className={`${chipClassName} absolute flex items-center justify-center text-xs font-bold text-white`}>
                   <img className="w-4 h-4 max-w-none mr-1" src="/chip.svg" alt="chip" />
                   <span>{bet}</span>
+                </div>
+              )
+            }
+            {
+              !!winBalance && (
+                <div className={`${chipClassName} w-max absolute flex items-center justify-center text-xs font-bold text-white`}>
+                  <span> {`+ ${winBalance}`}</span>
+                  <img className="ml-1 w-4 h-4 max-w-none mr-1" src="/chip.svg" alt="chip" />
                 </div>
               )
             }

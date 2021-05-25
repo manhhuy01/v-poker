@@ -12,10 +12,16 @@ export default function Login() {
   const [loading, setLoading] = useState(false)
   const login = async (e) => {
     e.preventDefault();
-    const userName = userEl.current.value.trim();
+
+    const userName = userEl.current.value.trim().toLowerCase();
     const password = passwordEl.current.value.trim();
+    
     if (!userName || !password) {
       return alert('Coi kĩ lại bạn ơi!')
+    }
+
+    if(!/^([0-9,a-z])*$/.test(userName)){
+      return alert('User name có kí tự đặt biệt')
     }
 
     setLoading(true)
@@ -49,7 +55,7 @@ export default function Login() {
           <p className="block text-center text-2xl font-semibold m-2">Login</p>
           <form name="login" onSubmit={login}>
             <div className="mb-2 mt-2">
-              <input className="block w-full rounded-xl p-2 bg-blue-200 focus:outline-none outline-none" id="username" type="text" placeholder="Username" ref={userEl} />
+              <input className="lowercase block w-full rounded-xl p-2 bg-blue-200 focus:outline-none outline-none" id="username" type="text" placeholder="Username" ref={userEl} />
             </div>
             <div className="mb-2 mt-2">
               <input className="block w-full rounded-xl p-2 bg-blue-200 focus:outline-none outline-none" id="password" type="password" placeholder="Password" ref={passwordEl} />
