@@ -43,7 +43,7 @@ export const shuffleCards = () => axios.post('/game/shuffleCards');
 export const preFlop = () => axios.post('/game/preFlop');
 export const reset = () => axios.post('/game/reset');
 
-export const playerAction = ({ type, betBalance }) => axios.post('/player/action', { type, betBalance})
+export const playerAction = ({ type, betBalance, isAllIn }) => axios.post('/player/action', { type, betBalance, isAllIn})
 
 
 

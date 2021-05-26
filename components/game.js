@@ -118,6 +118,25 @@ export default function game({ data, onEditClick, onAddClick }) {
     setLoadingPlayerAction(false)
   }
 
+  const onActionAllIn = async () => {
+    setLoadingPlayerAction(true)
+    let betBalance = (data?.user?.position?.user?.accBalance || 0) + data?.user?.position?.betBalance;
+    if (+betBalance == 'NaN') {
+      return alert('Bet sai định dạng')
+    }
+    setOpenModalBet(false)
+    try {
+      await playerAction({ type: 'BET', userName: data?.user?.userName, betBalance: +betBalance, isAllIn: true })
+    } catch (err) {
+      console.log('vo', err)
+
+      if (err?.response?.data?.error) {
+        alert(err?.response?.data?.error)
+      }
+    }
+    setLoadingPlayerAction(false)
+  }
+
   const onFullScreen = () => {
     var elem = document.documentElement;
     /* View in fullscreen */
@@ -183,6 +202,7 @@ export default function game({ data, onEditClick, onAddClick }) {
                 onAddClick={onAddClick}
                 isPlaying={data?.position[position]?.isPlaying}
                 winBalance={data?.position[position]?.winBalance}
+                start={data?.table?.start}
               />
             ))
           }
@@ -286,7 +306,7 @@ export default function game({ data, onEditClick, onAddClick }) {
                 )
               }
               {
-                !isAllIn && (
+                !isAllIn && data?.table?.start && (
                   <button onClick={() => setOpenModalBet(true)} className="flex items-center justify-center text-white bg-blue-500 p-2 rounded w-20 focus:outline-none" type="button">Bet</button>
                 )
               }
@@ -306,8 +326,8 @@ export default function game({ data, onEditClick, onAddClick }) {
             onConfirm={() => onActionBet()}
           >
             <div className="flex flex-col items-center justify-center w-full">
-              <input className="border-2 rounded mb-4" type="input" ref={betInput} defaultValue={data?.position[data?.user?.position]?.betBalance || 0} />
-              <button className="w-max pl-4 pr-4 bg-red-500 rounded text-white" type="button">All IN</button>
+              <input className="border-2 rounded mb-4" type="input" ref={betInput} defaultValue={data?.user?.position?.betBalance || 0} />
+              <button onClick={onActionAllIn} className="w-max pl-4 pr-4 bg-red-500 rounded text-white" type="button">All IN</button>
             </div>
           </Modal>
         )

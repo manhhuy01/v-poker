@@ -14,6 +14,7 @@ export default function position({
   isFold,
   isPlaying,
   winBalance,
+  start,
 }) {
   let className;
   let chipClassName;
@@ -99,7 +100,7 @@ export default function position({
             {
               !!namePos && <div className={`${posClassName} absolute font-extrabold text-xs z-10 pl-1 pr-1 rounded -bottom-12`} >{namePos}</div>
             }
-            <div className="bg-gray-900 text-blue-400 pr-2 pl-2 rounded z-10 text-xs">${ isPlaying && !balance ? 'All In' :balance}</div>
+            <div className="bg-gray-900 text-blue-400 pr-2 pl-2 rounded z-10 text-xs w-max">${ isPlaying && !balance && start ? 'ALL IN' :balance}</div>
             {
               !!bet && (
                 <div className={`${chipClassName} absolute flex items-center justify-center text-xs font-bold text-white`}>
