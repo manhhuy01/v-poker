@@ -120,16 +120,11 @@ export default function game({ data, onEditClick, onAddClick }) {
 
   const onActionAllIn = async () => {
     setLoadingPlayerAction(true)
-    let betBalance = (data?.user?.position?.user?.accBalance || 0) + data?.user?.position?.betBalance;
-    if (+betBalance == 'NaN') {
-      return alert('Bet sai định dạng')
-    }
     setOpenModalBet(false)
     try {
-      await playerAction({ type: 'BET', userName: data?.user?.userName, betBalance: +betBalance, isAllIn: true })
+      await playerAction({ type: 'BET', userName: data?.user?.userName, isAllIn: true })
     } catch (err) {
       console.log('vo', err)
-
       if (err?.response?.data?.error) {
         alert(err?.response?.data?.error)
       }
@@ -243,7 +238,7 @@ export default function game({ data, onEditClick, onAddClick }) {
               }
 
               {
-                isCanReset && <button onClick={onReset} className="text-white bg-yellow-500 p-2 pl-3 pr-3 rounded w-fit focus:outline-none flex items-center justify-center" type="button">
+                <button onClick={onReset} className="text-white bg-yellow-500 p-2 pl-3 pr-3 rounded w-fit focus:outline-none flex items-center justify-center" type="button">
                   {
                     isLoadingDealerAction && (<svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
