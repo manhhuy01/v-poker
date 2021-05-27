@@ -51,6 +51,7 @@ export default function Home({ user, token }) {
   const [openAddModal, setAddModal] = useState(false);
   const [waitingPlayers, setWaitingPlayers] = useState([])
   const [addPosition, setAddPosition] = useState()
+  const [notification, setNotification] = useState()
 
   const [playChipSound] = useSound('/chip-sound.mp3');
   const [playCheckSound] = useSound('/check-sound.mp3');
@@ -85,25 +86,28 @@ export default function Home({ user, token }) {
 
       setData(normalizeData);
     })
-    socket.subscribeToGetNotification((err, notification)=> {
-      console.log(notification)
-      switch(notification){
-        case 'BET':
-        case 'CALL':
-          playChipSound();
-          break;
-        case 'CHECK':
-          playCheckSound();
-          break;
-        default:
-          break;
-      }
+    socket.subscribeToGetNotification((err, notificationData)=> {
+      setNotification(notificationData)
     })
 
     return () => {
       // socket.disconnectSocket();
     }
   }, [user]);
+
+  useEffect(()=>{
+    switch(notification){
+      case 'BET':
+      case 'CALL':
+        playChipSound();
+        break;
+      case 'CHECK':
+        playCheckSound();
+        break;
+      default:
+        break;
+    }
+  },[notification])
 
   const onEditClick = (userName) => {
     if (!data?.user?.isDealer) return;
