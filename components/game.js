@@ -12,6 +12,7 @@ export default function game({ data, onEditClick, onAddClick }) {
 
   const [loadingPlayerAction, setLoadingPlayerAction] = useState(false)
   const [isOpenModalBet, setOpenModalBet] = useState(false);
+  const [isHiddenCard, setHiddenCard] = useState(false)
   const betInput = useRef(null);
   const onStart = async () => {
     setLoadingDealerAction(true)
@@ -163,6 +164,8 @@ export default function game({ data, onEditClick, onAddClick }) {
 
   }
 
+  const hideCard = () => setHiddenCard(!isHiddenCard);
+
   const isPlaying = data?.user?.position?.isPlaying || false;
   const isPreFlop = !!data?.table?.preFlop
   const isFold = data?.user?.position?.isFold || false;
@@ -198,6 +201,9 @@ export default function game({ data, onEditClick, onAddClick }) {
                 isPlaying={data?.position[position]?.isPlaying}
                 winBalance={data?.position[position]?.winBalance}
                 start={data?.table?.start}
+                isUserPlaying={data?.user?.position?.user?.userName == data?.position[position]?.user?.userName}
+                isHiddenCard={isHiddenCard}
+                hideCard={hideCard}
               />
             ))
           }

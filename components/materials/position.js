@@ -15,6 +15,9 @@ export default function position({
   isPlaying,
   winBalance,
   start,
+  isUserPlaying,
+  isHiddenCard = true,
+  hideCard,
 }) {
   let className;
   let chipClassName;
@@ -91,9 +94,12 @@ export default function position({
             
             <div className="z-10 absolute -top-11 flex">
               {
-                cards && cards.map((c, i) => (
-                  <Card data={c} key={i} isFold={isFold}/>
-                ))
+                cards && cards.map((c, i) => {
+                  if(isHiddenCard && isUserPlaying) {
+                    return <Card data={'u'} key={i} isFold={isFold}/>
+                  }
+                  return <Card data={c} key={i} isFold={isFold}/>
+                })
               }
             </div>
             <div onClick={() => onEditClick(userName)} className="text-white pr-1 pl-1 rounded border-yellow-600 border bg-gray-900 text-xs z-10 cursor-pointer">{userName}</div>
@@ -101,6 +107,7 @@ export default function position({
               !!namePos && <div className={`${posClassName} absolute font-extrabold text-xs z-10 pl-1 pr-1 rounded -bottom-12`} >{namePos}</div>
             }
             <div className="bg-gray-900 text-blue-400 pr-2 pl-2 rounded z-10 text-xs w-max">${ isPlaying && !balance && start ? 'ALL IN' :balance}</div>
+            { isUserPlaying && <div onClick={hideCard} className="absolute left-12 top-50 text-xl text-white cursor-pointer">Θ</div> }
             {
               !!bet && (
                 <div className={`${chipClassName} absolute flex items-center justify-center text-xs font-bold text-white`}>
