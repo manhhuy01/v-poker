@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 import Head from 'next/head'
+import useSound from 'use-sound';
+
 import * as api from '../api/poker'
 import * as socket from '../api/socket'
 import MenuSide from '../components/menuSide'
@@ -9,6 +11,7 @@ import { transformPosition } from '../utils'
 import UserModal from '../components/userModal'
 import AddModal from '../components/addModal'
 import Loading from '../components/loading'
+
 
 export async function getServerSideProps(context) {
   const { token } = context.req.cookies;
@@ -49,6 +52,8 @@ export default function Home({ user, token }) {
   const [waitingPlayers, setWaitingPlayers] = useState([])
   const [addPosition, setAddPosition] = useState()
 
+  const [playChipSound] = useSound('/chip-sound.mp3');
+  const [playCheckSound] = useSound('/check-sound.mp3');
   useEffect(() => {
     if (user) {
       socket.initiateSocket({ token });
@@ -58,8 +63,6 @@ export default function Home({ user, token }) {
         alert(err)
       }
 
-
-      console.log('roomInfo', roomInfo)
       let newPosition = transformPosition(user.userName, roomInfo.position)
       let pos = Object.keys(newPosition).find(p => newPosition[p].user?.userName === user.userName);
 
@@ -80,11 +83,22 @@ export default function Home({ user, token }) {
         position: newPosition
       }
 
-
-      console.log('normalizeData', normalizeData)
       setData(normalizeData);
     })
-
+    socket.subscribeToGetNotification((err, notification)=> {
+      console.log(notification)
+      switch(notification){
+        case 'BET':
+        case 'CALL':
+          playChipSound();
+          break;
+        case 'CHECK':
+          playCheckSound();
+          break;
+        default:
+          break;
+      }
+    })
 
     return () => {
       // socket.disconnectSocket();

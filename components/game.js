@@ -1,4 +1,6 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
+import useSound from 'use-sound';
+
 import Position from '../components/materials/position'
 import Pot from './materials/pot'
 import {
@@ -7,6 +9,7 @@ import {
 import Modal from './modal'
 
 export default function game({ data, onEditClick, onAddClick }) {
+  const [playDingSound] = useSound('/ding.mp3');
   const [isFullScreen, setFullScreen] = useState(false)
   const [isLoadingDealerAction, setLoadingDealerAction] = useState(false)
 
@@ -14,6 +17,13 @@ export default function game({ data, onEditClick, onAddClick }) {
   const [isOpenModalBet, setOpenModalBet] = useState(false);
   const [isHiddenCard, setHiddenCard] = useState(false)
   const betInput = useRef(null);
+
+  useEffect(()=> {
+    if(data?.user?.position?.isThinking){
+      playDingSound();
+    }
+  }, [data?.user?.position?.isThinking])
+
   const onStart = async () => {
     setLoadingDealerAction(true)
     try {
@@ -40,7 +50,6 @@ export default function game({ data, onEditClick, onAddClick }) {
   }
 
   const onPreFlop = async () => {
-    console.log('vo')
     setLoadingDealerAction(true)
     try {
       await preFlop();
@@ -100,6 +109,18 @@ export default function game({ data, onEditClick, onAddClick }) {
     setLoadingPlayerAction(false)
   }
 
+  const onActionShow = async () => {
+    setLoadingPlayerAction(true)
+    try {
+      await playerAction({ type: 'SHOW' })
+    } catch (err) {
+      if (err?.response?.data?.error) {
+        alert(err?.response?.data?.error)
+      }
+    }
+    setLoadingPlayerAction(false)
+  }
+
   const onActionBet = async () => {
     setLoadingPlayerAction(true)
     let betBalance = betInput.current.value;
@@ -110,8 +131,6 @@ export default function game({ data, onEditClick, onAddClick }) {
     try {
       await playerAction({ type: 'BET', userName: data?.user?.userName, betBalance: +betBalance })
     } catch (err) {
-      console.log('vo', err)
-
       if (err?.response?.data?.error) {
         alert(err?.response?.data?.error)
       }
@@ -125,7 +144,6 @@ export default function game({ data, onEditClick, onAddClick }) {
     try {
       await playerAction({ type: 'BET', userName: data?.user?.userName, isAllIn: true })
     } catch (err) {
-      console.log('vo', err)
       if (err?.response?.data?.error) {
         alert(err?.response?.data?.error)
       }
@@ -165,19 +183,19 @@ export default function game({ data, onEditClick, onAddClick }) {
   }
 
   const hideCard = () => setHiddenCard(!isHiddenCard);
-
+  const isFinish = data?.table?.finish;
   const isPlaying = data?.user?.position?.isPlaying || false;
   const isPreFlop = !!data?.table?.preFlop
   const isFold = data?.user?.position?.isFold || false;
   const isThinking = data?.user?.position?.isThinking || false;
   const isAllIn = data?.user?.position?.user?.accBalance == 0
     && isPlaying && !isFold
-  const isCanCheck = data?.user?.position?.betBalance == data?.table?.currentBet
+  const isCanCheck = data?.user?.position?.betBalance == data?.table?.currentBet && !isFinish
     && isPlaying && !isFold && !isAllIn && isPreFlop
-  const isCanCall = !isAllIn && isPreFlop && !isCanCheck
-  const isCanFold = !isAllIn && isPreFlop && !isFold
-  const isCanReset = data?.table?.start && data?.table?.finish
-
+  const isCanCall = !isAllIn && isPreFlop && !isCanCheck && !isFinish
+  const isCanFold = !isAllIn && isPreFlop && !isFold && !isFinish
+  const isCanShowCard = data?.table?.finish && !data?.user?.position?.isFold
+  const isCanBet = !isAllIn && !isFinish
   return (
     <div className="w-screen h-screen bg-gray-800 overflow-hidden">
       <div className="pb-20 w-full h-full flex items-center justify-center">
@@ -269,7 +287,7 @@ export default function game({ data, onEditClick, onAddClick }) {
           )
         }
         {
-          (!data?.table?.preFlop || isThinking) && data?.user?.position && (
+          (!data?.table?.preFlop || isThinking || data?.table?.finish) && data?.user?.position && (
             <div className="flex w-full justify-evenly sm:w-1/2">
               {
                 isCanFold && <button onClick={onActionFold} disabled={loadingPlayerAction} className="flex items-center justify-center text-white bg-red-500 p-2 rounded w-20 focus:outline-none flex items-center justify-center" type="button">
@@ -306,15 +324,29 @@ export default function game({ data, onEditClick, onAddClick }) {
                   </button>
                 )
               }
+
               {
-                !isAllIn && data?.table?.start && (
+                isCanBet && data?.table?.start && (
                   <button onClick={() => setOpenModalBet(true)} className="flex items-center justify-center text-white bg-blue-500 p-2 rounded w-20 focus:outline-none" type="button">Bet</button>
                 )
               }
-
+              {
+                isCanShowCard && (
+                  <button onClick={onActionShow} disabled={loadingPlayerAction} className="flex items-center justify-center text-white bg-green-500 p-2 rounded w-20 focus:outline-none" type="button">
+                    {
+                      loadingPlayerAction && (<svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>)
+                    }
+                Show
+                  </button>
+                )
+              }
             </div>
           )
         }
+
 
       </div>
       {

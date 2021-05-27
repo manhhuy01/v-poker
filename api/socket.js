@@ -14,7 +14,14 @@ export const initiateSocket = ({ token }) => {
 export const subscribeToGetData = (cb) => {
   if (!socket) return (true);
   socket.on('data', data => {
-    console.log('data event received!');
+    return cb(null, data);
+  });
+}
+
+export const subscribeToGetNotification = (cb) => {
+  if (!socket) return (true);
+  socket.on('notification', data => {
+    console.log(data)
     return cb(null, data);
   });
 }

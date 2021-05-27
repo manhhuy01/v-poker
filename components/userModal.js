@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { updateProfile, removeFromTable, transferDealerRole, setDealerPosition } from '../api/poker'
+import { updateProfile, removeFromTable, transferDealerRole, setDealerPosition, forceFold } from '../api/poker'
 import Modal from './modal'
 
 export default function userModel({ profile: { userName, accBalance }, isOpen, onClose, loading, onChose }) {
@@ -59,6 +59,18 @@ export default function userModel({ profile: { userName, accBalance }, isOpen, o
     onClose();
   }
 
+  const onFold = async () => {
+    try {
+      await forceFold({ userName });
+    } catch (err) {
+      console.log(err)
+      if (err?.response?.data?.error) {
+        alert(err?.response?.data?.error)
+      }
+    }
+    onClose();
+  }
+
   return (
     <Modal
       isOpen={isOpen}
@@ -84,6 +96,9 @@ export default function userModel({ profile: { userName, accBalance }, isOpen, o
         </div>
         <div className="mb-4 mt-4">
           <button onClick={onSetDealer} className="w-full rounded bg-blue-500 text-white p-2 focus:outline-none hover:bg-blue-800" type="button">Set Dealer Position</button>
+        </div>
+        <div className="mb-4 mt-4">
+          <button onClick={onFold} className="w-full rounded bg-red-500 text-white p-2 focus:outline-none hover:bg-blue-800" type="button">Force Fold</button>
         </div>
         <div className="mb-4 mt-6">
           <button onClick={onTransfer} className="w-full rounded bg-green-500 text-white p-2 focus:outline-none hover:bg-green-800" type="button">Transfer Dealer Role</button>

@@ -38,6 +38,7 @@ export const joinTable = ({ userName, position }) => axios.post(`/game/joinTable
 export const removeFromTable = ({ userName }) => axios.post('/game/removeFromTable', { userName })
 export const transferDealerRole = ({ userName }) => axios.post('/game/transferDealerRole', { userName })
 export const setDealerPosition = ({ userName }) => axios.post('/game/setDealerPosition', { userName })
+export const forceFold = ({ userName }) => axios.post('/game/fold', { userName })
 export const startGame = () => axios.post('/game/start');
 export const shuffleCards = () => axios.post('/game/shuffleCards');
 export const preFlop = () => axios.post('/game/preFlop');
