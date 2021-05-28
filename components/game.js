@@ -194,7 +194,7 @@ export default function game({ data, onEditClick, onAddClick }) {
     && isPlaying && !isFold && !isAllIn && isPreFlop
   const isCanCall = !isAllIn && isPreFlop && !isCanCheck && !isFinish
   const isCanFold = !isAllIn && isPreFlop && !isFold && !isFinish
-  const isCanShowCard = data?.table?.finish && !data?.user?.position?.isFold
+  const isCanShowCard = isFinish && !isFold && !data?.table?.isShowDown
   const isCanBet = !isAllIn && !isFinish
   return (
     <div className="w-screen h-screen bg-gray-800 overflow-hidden">
