@@ -21,11 +21,18 @@ export const subscribeToGetData = (cb) => {
 export const subscribeToGetNotification = (cb) => {
   if (!socket) return (true);
   socket.on('notification', data => {
-    console.log(data)
     return cb(null, data);
   });
 }
 
-export const sendMessage = (room, message) => {
-  if (socket) socket.emit('chat', { message, room });
+
+export const subscribeToGetMessage = (cb) => {
+  if (!socket) return (true);
+  socket.on('chat', data => {
+    return cb(null, data);
+  });
+}
+
+export const sendMessage = ({ message, userName }) => {
+  socket.emit('sendMessage', { userName, message })
 }

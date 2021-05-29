@@ -11,6 +11,7 @@ import { transformPosition } from '../utils'
 import UserModal from '../components/userModal'
 import AddModal from '../components/addModal'
 import Loading from '../components/loading'
+import Chat from '../components/chat';
 
 
 export async function getServerSideProps(context) {
@@ -184,6 +185,7 @@ export default function Home({ user, token }) {
             />
           )
         }
+        <Chat user={user}/>
         {
           !data.players && <Loading />
         }
