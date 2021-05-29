@@ -129,12 +129,12 @@ export default function chat({ user }) {
 
       <div className={`${isOpen ? '' : 'invisible'} absolute w-full h-full top-0 left-0 z-20 flex justify-center`}>
         <div onClick={close} className="absolute w-full h-full top-0 left-0 bg-white bg-opacity-50" />
-        <div className="absolute w-full h-full flex flex-col md:w-1/2 md:m-auto">
+        <div className="absolute w-full h-full flex flex-col md:w-1/2 justify-center">
           <div className="w-full h-12 bg-green-800 flex justify-between items-center pl-2 text-white">
             <span>Chat</span>
             <button onClick={close} className="p-4 focus:outline-none">✖</button>
           </div>
-          <div id='chat-body' className="h-full bg-white p-4 overflow-auto">
+          <div id='chat-body' className="h-3/4 bg-white p-4 overflow-auto">
             {
               data.messages && data.messages.map((chat, i) => (
                 <ChatElement
