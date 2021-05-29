@@ -87,6 +87,7 @@ export default function chat({ user }) {
     }
 
     inputRef.current.value = '';
+    inputRef.current.focus();
     setTimeout(() => {
       var objDiv = document.getElementById("chat-body");
       objDiv.scrollTop = objDiv.scrollHeight;
