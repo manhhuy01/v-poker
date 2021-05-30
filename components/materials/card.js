@@ -8,7 +8,7 @@ export default function card({ data = 'u', isFold }) {
       return null;
     }
     return (
-      <div className={`border-black bg-white shadow rounded w-8 h-10 font-bold p-1 ml-1 mr-1 bg-card bg-card-up bg-size-card`}>
+      <div className={`border-black bg-white shadow rounded w-8 h-10 md:w-10 md:h-14 font-bold p-1 ml-1 mr-1 bg-card bg-card-up bg-size-card`}>
       </div>
     )
   }
@@ -40,9 +40,9 @@ export default function card({ data = 'u', isFold }) {
       break;
   }
   return (
-    <div className={`${colorClass} ${isFold ? 'opacity-50' : ''} border-black bg-white shadow rounded w-8 h-10 font-bold p-1 ml-1 mr-1`}>
-      <div className="leading-4">{num}</div>
-      <div className="text-lg leading-4 text-right ">{symbol}</div>
+    <div className={`${colorClass} ${isFold ? 'opacity-50' : ''} border-black bg-white shadow rounded w-8 h-10 md:w-10 md:h-14 font-bold p-1 ml-1 mr-1`}>
+      <div className="leading-4 md:text-xl">{num}</div>
+      <div className="text-lg md:text-2xl leading-4 md:leading-4 text-right ">{symbol}</div>
     </div>
   )
 }

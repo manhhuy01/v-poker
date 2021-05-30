@@ -153,17 +153,24 @@ export default function Home({ user, token }) {
           data={data}
           onEditClick={onEditClick}
         />
-        {
-          data?.user?.isDealer && <Setting
-            data={data?.setting}
-          />
-        }
-        <Game
-          data={data}
-          user={user}
-          onEditClick={onEditClick}
-          onAddClick={onAddClick}
-        />
+
+        <div className="flex w-screen h-screen">
+          <div className="relative w-full h-full">
+            <Game
+              data={data}
+              user={user}
+              onEditClick={onEditClick}
+              onAddClick={onAddClick}
+            />
+            {
+              data?.user?.isDealer && <Setting
+                data={data?.setting}
+              />
+            }
+          </div>
+          <Chat user={user} />
+        </div>
+
         {
           !!profileEdit && (
             <UserModal
@@ -185,7 +192,7 @@ export default function Home({ user, token }) {
             />
           )
         }
-        <Chat user={user}/>
+
         {
           !data.players && <Loading />
         }

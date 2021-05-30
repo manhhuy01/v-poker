@@ -197,7 +197,7 @@ export default function game({ data, onEditClick, onAddClick }) {
   const isCanShowCard = isFinish && !isFold && !data?.table?.isShowDown
   const isCanBet = !isAllIn && !isFinish
   return (
-    <div className="w-screen h-screen bg-gray-800 overflow-hidden">
+    <div className="relative w-full h-screen bg-gray-800 overflow-hidden">
       <div className="pb-20 w-full h-full flex items-center justify-center">
         <div className="w-10/12 h-5/6 relative border-8 border-black rounded-large bg-green-700">
           {

@@ -24,11 +24,11 @@ export default function position({
   switch (+pos) {
     case 1:
       className = 'bottom-0 left-1/2'
-      chipClassName = '-top-20';
+      chipClassName = '-top-20 md:-top-24';
       break;
     case 2:
       className = 'left-0 bottom-1/5 sm:bottom-0 sm:left-1/4'
-      chipClassName = '-top-8 left-16 sm:-top-20 sm:left-0';
+      chipClassName = '-top-8 left-16 sm:-top-20 sm:left-0 md:-top-24';
       break;
     case 3:
       className = 'bottom-1/2 left-0 sm:bottom-1/4'
@@ -57,7 +57,7 @@ export default function position({
       break;
     case 9:
       className = 'right-0 bottom-1/5 sm:bottom-0 sm:right-1/4'
-      chipClassName = '-top-8 right-16 sm:-top-20 sm:right-0';
+      chipClassName = '-top-8 right-16 sm:-top-20 sm:right-0 md:-top-24';
 
       break;
 
@@ -92,7 +92,7 @@ export default function position({
         !!userName && (
           <>
 
-            <div className="z-10 absolute -top-11 flex">
+            <div className="z-10 absolute -top-11 md:-top-14 flex">
               {
                 cards && cards.map((c, i) => {
                   if (isHiddenCard && isUserPlaying) {

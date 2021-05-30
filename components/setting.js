@@ -26,7 +26,7 @@ export default function setting({ data }) {
 
   return (
     <>
-      <button onClick={() => setOpen(true)} className="absolute top-0 right-0 w-10 h-10 bg-white p-1 focus:outline-none">
+      <button onClick={() => setOpen(true)} className="absolute z-10 top-0 right-0 w-10 h-10 bg-white p-1 focus:outline-none">
         <img src="/settings.svg" alt='setting' />
       </button>
       <Modal
