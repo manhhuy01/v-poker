@@ -95,10 +95,7 @@ export default function position({
             <div className="z-10 absolute -top-11 md:-top-14 flex">
               {
                 cards && cards.map((c, i) => {
-                  if (isHiddenCard && isUserPlaying) {
-                    return <Card data={'u'} key={i} isFold={isFold} />
-                  }
-                  return <Card data={c} key={i} isFold={isFold} />
+                  return <Card data={c} key={i} isFold={isFold} isHidden={isHiddenCard && isUserPlaying} />
                 })
               }
             </div>

@@ -227,7 +227,8 @@ export default function game({ data, onEditClick, onAddClick }) {
           }
           <Pot
             pot={data?.table?.pot}
-            cards={[...(data?.table?.flop || []), data?.table?.turn, data?.table?.river]}
+            cards={[...(data?.table?.flop || []), data?.table?.turn, data?.table?.river].filter(Boolean)}
+            start={data?.table?.start}
           />
 
         </div>
