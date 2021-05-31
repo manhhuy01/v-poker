@@ -222,6 +222,7 @@ export default function game({ data, onEditClick, onAddClick }) {
                 isUserPlaying={data?.user?.position?.user?.userName == data?.position[position]?.user?.userName}
                 isHiddenCard={isHiddenCard}
                 hideCard={hideCard}
+                result={data?.position[position]?.resultCard?.name}
               />
             ))
           }

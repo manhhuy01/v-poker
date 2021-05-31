@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 const REGEX = /(.*)(s|h|c|d)/
 
+
+
 export default function card({ data = 'u', isFold, isHidden }) {
   const [hide, setHide] = useState(true)
   useEffect(() => {
@@ -52,7 +54,7 @@ export default function card({ data = 'u', isFold, isHidden }) {
       break;
   }
   return (
-    <div className={` ${hide ? '' : 'transform-180'} delay-300 transition-transform transform-3d relative transform-gpu w-8 h-10 md:w-10 md:h-14 ml-1 mr-1`}>
+    <div className={` ${hide ? '' : 'transform-180'} duration-500 transition-transform transform-3d relative transform-gpu w-8 h-10 md:w-10 md:h-14 ml-1 mr-1`}>
       <div className={` backface-hidden transform-180 ${colorClass} ${isFold ? 'bg-opacity-50' : ''} w-full h-full absolute border-black bg-white shadow rounded  font-bold p-1 `}>
         <div className="leading-4 md:text-xl">{num}</div>
         <div className="text-lg md:text-2xl leading-4 md:leading-4 text-right ">{symbol}</div>
