@@ -11,6 +11,11 @@
   transform: rotateY(180deg);
 }
 
+.backface-hidden {
+  -webkit-backface-visibility: hidden; /* Safari */
+  backface-visibility: hidden;
+}
+
 .transform-3d {
   -webkit-transform-style: preserve-3d;
   transform-style: preserve-3d;
