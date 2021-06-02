@@ -1,22 +1,25 @@
 import { useState, useRef } from 'react'
 import { updateSetting } from '../api/poker'
+import { useToasts } from 'react-toast-notifications'
+
 import Modal from './modal'
 export default function setting({ data }) {
   const [isOpen, setOpen] = useState(false);
   const sbInput = useRef(null);
   const [loading, setLoading] = useState(false)
+  const { addToast } = useToasts()
+
   const confirm = async () => {
     setLoading(true)
     let sbVal = sbInput.current.value;
     if (!+sbVal) {
-      alert('sb input phải là số')
+      addToast('sb input phải là số', { appearance: 'error'})
       return setLoading(false)
     }
     try {
       await updateSetting({ smallBlind: +sbVal });
     } catch (err) {
-      console.log('update setting error', err)
-      alert('update setting fail')
+      addToast('update setting fail', { appearance: 'error'})
     } finally {
       setLoading(false)
 

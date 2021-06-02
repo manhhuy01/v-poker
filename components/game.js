@@ -1,12 +1,16 @@
 import { useState, useRef, useEffect } from 'react'
+import { useToasts } from 'react-toast-notifications'
+
 import useSound from 'use-sound';
 
 import Position from '../components/materials/position'
 import Pot from './materials/pot'
 import {
-  startGame, shuffleCards, preFlop, playerAction, reset
+  startGame, shuffleCards, preFlop, playerAction, reset,
+  showAllCards, playerTipDealer,
 } from '../api/poker'
 import Modal from './modal'
+import Spin from './spin'
 
 export default function game({ data, onEditClick, onAddClick }) {
   const [playDingSound] = useSound('/ding.mp3');
@@ -15,11 +19,14 @@ export default function game({ data, onEditClick, onAddClick }) {
 
   const [loadingPlayerAction, setLoadingPlayerAction] = useState(false)
   const [isOpenModalBet, setOpenModalBet] = useState(false);
+  const [isOpenModalTip, setOpenModalTip] = useState(false);
   const [isHiddenCard, setHiddenCard] = useState(false)
   const betInput = useRef(null);
+  const tipInput = useRef(null);
+  const { addToast } = useToasts()
 
-  useEffect(()=> {
-    if(data?.user?.position?.isThinking){
+  useEffect(() => {
+    if (data?.user?.position?.isThinking) {
       playDingSound();
     }
   }, [data?.user?.position?.isThinking])
@@ -30,7 +37,9 @@ export default function game({ data, onEditClick, onAddClick }) {
       await startGame();
     } catch (err) {
       if (err?.response?.data?.error) {
-        alert(err?.response?.data?.error)
+        addToast(err?.response?.data?.error, {
+          appearance: 'error',
+        })
       }
     }
     setLoadingDealerAction(false)
@@ -43,7 +52,9 @@ export default function game({ data, onEditClick, onAddClick }) {
       await shuffleCards();
     } catch (err) {
       if (err?.response?.data?.error) {
-        alert(err?.response?.data?.error)
+        addToast(err?.response?.data?.error, {
+          appearance: 'error',
+        })
       }
     }
     setLoadingDealerAction(false)
@@ -55,7 +66,9 @@ export default function game({ data, onEditClick, onAddClick }) {
       await preFlop();
     } catch (err) {
       if (err?.response?.data?.error) {
-        alert(err?.response?.data?.error)
+        addToast(err?.response?.data?.error, {
+          appearance: 'error',
+        })
       }
     }
     setLoadingDealerAction(false)
@@ -67,7 +80,9 @@ export default function game({ data, onEditClick, onAddClick }) {
       await reset();
     } catch (err) {
       if (err?.response?.data?.error) {
-        alert(err?.response?.data?.error)
+        addToast(err?.response?.data?.error, {
+          appearance: 'error',
+        })
       }
     }
     setLoadingDealerAction(false)
@@ -79,7 +94,9 @@ export default function game({ data, onEditClick, onAddClick }) {
       await playerAction({ type: 'CALL' })
     } catch (err) {
       if (err?.response?.data?.error) {
-        alert(err?.response?.data?.error)
+        addToast(err?.response?.data?.error, {
+          appearance: 'error',
+        })
       }
     }
     setLoadingPlayerAction(false)
@@ -91,7 +108,9 @@ export default function game({ data, onEditClick, onAddClick }) {
       await playerAction({ type: 'FOLD' })
     } catch (err) {
       if (err?.response?.data?.error) {
-        alert(err?.response?.data?.error)
+        addToast(err?.response?.data?.error, {
+          appearance: 'error',
+        })
       }
     }
     setLoadingPlayerAction(false)
@@ -103,7 +122,9 @@ export default function game({ data, onEditClick, onAddClick }) {
       await playerAction({ type: 'CHECK' })
     } catch (err) {
       if (err?.response?.data?.error) {
-        alert(err?.response?.data?.error)
+        addToast(err?.response?.data?.error, {
+          appearance: 'error',
+        })
       }
     }
     setLoadingPlayerAction(false)
@@ -115,7 +136,9 @@ export default function game({ data, onEditClick, onAddClick }) {
       await playerAction({ type: 'SHOW' })
     } catch (err) {
       if (err?.response?.data?.error) {
-        alert(err?.response?.data?.error)
+        addToast(err?.response?.data?.error, {
+          appearance: 'error',
+        })
       }
     }
     setLoadingPlayerAction(false)
@@ -125,30 +148,76 @@ export default function game({ data, onEditClick, onAddClick }) {
     setLoadingPlayerAction(true)
     let betBalance = betInput.current.value;
     if (+betBalance == 'NaN') {
-      return alert('Bet sai định dạng')
+      return addToast('Bet sai định dạng', {
+        appearance: 'error',
+      })
     }
     setOpenModalBet(false)
     try {
       await playerAction({ type: 'BET', userName: data?.user?.userName, betBalance: +betBalance })
     } catch (err) {
       if (err?.response?.data?.error) {
-        alert(err?.response?.data?.error)
+        addToast(err?.response?.data?.error, {
+          appearance: 'error',
+        })
+      }
+    }
+    setLoadingPlayerAction(false)
+  }
+
+  const onActionTip = async () => {
+    setLoadingPlayerAction(true)
+    let tip = tipInput.current.value;
+    if (+tip == 'NaN') {
+      return addToast('Tip sai định dạng số', {
+        appearance: 'error',
+      })
+    }
+    setOpenModalTip(false)
+    try {
+      await playerTipDealer({ tip })
+      // return addToast('Tip thành công', {
+      //   appearance: 'success',
+      // })
+    } catch (err) {
+      if (err?.response?.data?.error) {
+        addToast(err?.response?.data?.error, {
+          appearance: 'error',
+        })
       }
     }
     setLoadingPlayerAction(false)
   }
 
   const onActionAllIn = async () => {
-    setLoadingPlayerAction(true)
-    setOpenModalBet(false)
+    if (window.confirm('Chắc không bạn?')) {
+      setLoadingPlayerAction(true)
+      setOpenModalBet(false)
+      try {
+        await playerAction({ type: 'BET', userName: data?.user?.userName, isAllIn: true })
+      } catch (err) {
+        if (err?.response?.data?.error) {
+          addToast(err?.response?.data?.error, {
+            appearance: 'error',
+          })
+        }
+      }
+      setLoadingPlayerAction(false)
+    }
+  }
+
+  const onShowAllCards = async () => {
+    setLoadingDealerAction(true)
     try {
-      await playerAction({ type: 'BET', userName: data?.user?.userName, isAllIn: true })
+      await showAllCards();
     } catch (err) {
       if (err?.response?.data?.error) {
-        alert(err?.response?.data?.error)
+        addToast(err?.response?.data?.error, {
+          appearance: 'error',
+        })
       }
     }
-    setLoadingPlayerAction(false)
+    setLoadingDealerAction(false)
   }
 
   const onFullScreen = () => {
@@ -230,6 +299,8 @@ export default function game({ data, onEditClick, onAddClick }) {
             pot={data?.table?.pot}
             cards={[...(data?.table?.flop || []), data?.table?.turn, data?.table?.river].filter(Boolean)}
             start={data?.table?.start}
+            onClickTipDealer={() => setOpenModalTip(true)}
+            finish={data?.table?.finish}
           />
 
         </div>
@@ -242,46 +313,31 @@ export default function game({ data, onEditClick, onAddClick }) {
 
               {
                 data?.table?.start && !data?.table?.preFlop && <button onClick={onPreFlop} className="text-white bg-green-500 p-2 pl-3 pr-3 rounded w-fit focus:outline-none flex items-center justify-center" type="button">
-                  {
-                    isLoadingDealerAction && (<svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>)
-                  }
+                  <Spin loading={isLoadingDealerAction} />
                 Chia bài
                 </button>
               }
               {
                 !data?.table?.start && <button onClick={onStart} className="text-white bg-yellow-500 p-2 pl-3 pr-3 rounded w-fit focus:outline-none flex items-center justify-center" type="button">
-                  {
-                    isLoadingDealerAction && (<svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>)
-                  }
+                  <Spin loading={isLoadingDealerAction} />
                 Vào ván
                 </button>
               }
-
+              {
+                isFinish && !data?.table?.river && <button onClick={onShowAllCards} className="text-white bg-yellow-500 p-2 pl-3 pr-3 rounded w-fit focus:outline-none flex items-center justify-center" type="button">
+                  <Spin loading={isLoadingDealerAction} />
+                  Chia Hết
+                </button>
+              }
               {
                 <button onClick={onReset} className="text-white bg-yellow-500 p-2 pl-3 pr-3 rounded w-fit focus:outline-none flex items-center justify-center" type="button">
-                  {
-                    isLoadingDealerAction && (<svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>)
-                  }
+                  <Spin loading={isLoadingDealerAction} />
                   Thu dọn
                 </button>
               }
               {
                 data?.table?.start && !data?.table?.preFlop && <button onClick={onShuffle} className="text-white bg-blue-500 p-2 rounded pl-3 pr-3 w-fit focus:outline-none flex items-center justify-center" type="button">
-                  {
-                    isLoadingDealerAction && (<svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>)
-                  }
+                  <Spin loading={isLoadingDealerAction} />
                 Xào bài
                 </button>
               }
@@ -293,35 +349,20 @@ export default function game({ data, onEditClick, onAddClick }) {
             <div className="flex w-full justify-evenly sm:w-1/2">
               {
                 isCanFold && <button onClick={onActionFold} disabled={loadingPlayerAction} className="flex items-center justify-center text-white bg-red-500 p-2 rounded w-20 focus:outline-none flex items-center justify-center" type="button">
-                  {
-                    loadingPlayerAction && (<svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>)
-                  }
+                  <Spin loading={loadingPlayerAction} />
                 Fold
                 </button>
               }
               {
                 isCanCheck && <button onClick={onActionCheck} disabled={loadingPlayerAction} className="flex items-center justify-center text-white bg-red-500 p-2 rounded w-20 focus:outline-none flex items-center justify-center" type="button">
-                  {
-                    loadingPlayerAction && (<svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>)
-                  }
+                  <Spin loading={loadingPlayerAction} />
                 Check
                 </button>
               }
               {
                 isCanCall && (
                   <button onClick={onActionCall} disabled={loadingPlayerAction} className="flex items-center justify-center text-white bg-yellow-500 p-2 rounded w-20 focus:outline-none" type="button">
-                    {
-                      loadingPlayerAction && (<svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>)
-                    }
+                    <Spin loading={loadingPlayerAction} />
                   Call
                   </button>
                 )
@@ -332,16 +373,21 @@ export default function game({ data, onEditClick, onAddClick }) {
                   <button onClick={() => setOpenModalBet(true)} className="flex items-center justify-center text-white bg-blue-500 p-2 rounded w-20 focus:outline-none" type="button">Bet</button>
                 )
               }
+
+              {
+                isCanBet && data?.table?.start && (
+                  <button onClick={onActionAllIn} className="w-max pl-4 pr-4 bg-red-500 rounded text-white" type="button">
+                    <Spin loading={loadingPlayerAction} />
+                  All IN
+                  </button>
+                )
+              }
+
               {
                 isCanShowCard && (
                   <button onClick={onActionShow} disabled={loadingPlayerAction} className="flex items-center justify-center text-white bg-green-500 p-2 rounded w-20 focus:outline-none" type="button">
-                    {
-                      loadingPlayerAction && (<svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>)
-                    }
-                Show
+                    <Spin loading={loadingPlayerAction} />
+                  Show
                   </button>
                 )
               }
@@ -362,7 +408,21 @@ export default function game({ data, onEditClick, onAddClick }) {
           >
             <div className="flex flex-col items-center justify-center w-full">
               <input className="border-2 rounded mb-4" type="input" ref={betInput} defaultValue={data?.user?.position?.betBalance || 0} />
-              <button onClick={onActionAllIn} className="w-max pl-4 pr-4 bg-red-500 rounded text-white" type="button">All IN</button>
+            </div>
+          </Modal>
+        )
+      }
+      {
+        isOpenModalTip && (
+          <Modal
+            isOpen={isOpenModalTip}
+            onClose={() => setOpenModalTip(false)}
+            loading={false}
+            onCancel={() => setOpenModalTip(false)}
+            onConfirm={() => onActionTip()}
+          >
+            <div className="flex flex-col items-center justify-center w-full">
+              <input className="border-2 rounded mb-4" type="input" ref={tipInput} defaultValue={0} />
             </div>
           </Modal>
         )

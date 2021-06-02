@@ -1,9 +1,13 @@
 import { useRef, useState } from 'react'
 import cookie from 'cookie-cutter'
 import Head from 'next/head'
+import { useToasts } from 'react-toast-notifications'
+
 import * as api from '../api/poker'
 
 export default function Register() {
+  const { addToast } = useToasts()
+
   const userEl = useRef(null);
   const passwordEl = useRef(null);
   const confirmPasswordEl = useRef(null);
@@ -18,11 +22,11 @@ export default function Register() {
     const confirmPassword = confirmPasswordEl.current.value.trim();
 
     if(!/^([0-9,a-z])*$/.test(userName)){
-      return alert('User name có kí tự đặt biệt')
+      return addToast('user name có kí tự đặc biệt', { appearance: 'error'})
     }
 
     if (!userName || !password || password != confirmPassword) {
-      return alert('Coi kĩ lại bạn ơi!')
+      return addToast('Coi kĩ lại bạn ơi', { appearance: 'info'})
     }
     setLoading(true)
 
@@ -31,7 +35,7 @@ export default function Register() {
       cookie.set('token', res.data.token)
       window.location.href = '/'
     } catch (err){
-      alert(err.response.data.error)
+      return addToast(err.response.data.error, { appearance: 'error'})
     }
     setLoading(false)
   }

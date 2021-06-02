@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useToasts } from 'react-toast-notifications'
 import Head from 'next/head'
 import useSound from 'use-sound';
 
@@ -56,6 +57,8 @@ export default function Home({ user, token }) {
 
   const [playChipSound] = useSound('/chip-sound.mp3');
   const [playCheckSound] = useSound('/check-sound.mp3');
+
+  const { addToast } = useToasts()
   useEffect(() => {
     if (user) {
       socket.initiateSocket({ token });
@@ -88,7 +91,7 @@ export default function Home({ user, token }) {
       setData(normalizeData);
     })
     socket.subscribeToGetNotification((err, notificationData) => {
-      setNotification({ type: notificationData })
+      setNotification({ ...notificationData })
     })
 
     return () => {
@@ -97,7 +100,7 @@ export default function Home({ user, token }) {
   }, [user]);
 
   useEffect(() => {
-    switch (notification.type) {
+    switch (notification.action) {
       case 'BET':
       case 'CALL':
         playChipSound();
@@ -105,23 +108,32 @@ export default function Home({ user, token }) {
       case 'CHECK':
         playCheckSound();
         break;
+      case 'TIP': 
+        addToast(`${notification.userName} đã tip ${notification.tip} cho dealer`, { appearance: 'success'})
+        break;
       default:
         break;
     }
-  }, [notification])
+  }, [notification?.id])
 
   const onEditClick = (userName) => {
     if (!data?.user?.isDealer) return;
     let userProfile = data.players.find(x => x.userName === userName);
     if (!userProfile) {
-      return alert('không tìm thấy user')
+      return addToast('Không tìm thấy user', {
+        appearance: 'error',
+      })
     }
     setProfileEdit(userProfile);
     setMenuEdit(true);
   }
 
   const onAddClick = (position) => {
-    if (!data?.user?.isDealer) return alert('Liên hệ/chờ dealer thêm vô');
+    if (!data?.user?.isDealer) {
+      return addToast('Liên hệ/chờ dealer thêm vô', {
+        appearance: 'info',
+      })
+    }
     let playingPlayers = Object.keys(data.position).map(pos => data.position[pos]?.user?.userName).filter(Boolean);
     let allPlayers = data.players.map(x => x.userName);
     let waitingPlayers = [allPlayers, playingPlayers].reduce((a, b) => a.filter(c => !b.includes(c)))
@@ -135,12 +147,15 @@ export default function Home({ user, token }) {
     try {
       await api.joinTable({ userName, position: addPosition });
     } catch (err) {
-      return alert('error join table')
+      return  addToast('error join table', {
+        appearance: 'error',
+      })
     }
     setAddModal(false)
   }
 
   return (
+
     <div>
       <Head>
         <title>V-Poker</title>
@@ -198,5 +213,6 @@ export default function Home({ user, token }) {
         }
       </main>
     </div>
+
   )
 }

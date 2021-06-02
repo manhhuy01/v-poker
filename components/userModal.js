@@ -1,22 +1,23 @@
 import { useRef, useState } from 'react'
+import { useToasts } from 'react-toast-notifications'
+
 import { updateProfile, removeFromTable, transferDealerRole, setDealerPosition, forceFold } from '../api/poker'
 import Modal from './modal'
 
 export default function userModel({ profile: { userName, accBalance }, isOpen, onClose, loading, onChose }) {
-
+  const { addToast } = useToasts()
   const balanceInput = useRef(null)
   const [loadingBalance, setLoadingBalance] = useState(false)
   const updateBalance = async () => {
     let balanceVal = balanceInput.current.value;
     if (+balanceVal == "NaN" || +balanceVal < 0) {
-      return alert('số dư bị sai')
+      return addToast('Số dư bị sai', { appearance: 'error'})
     }
     setLoadingBalance(true)
     try {
       await updateProfile({ userName, accBalance: +balanceVal });
     } catch (err) {
-      alert('update balance err')
-      console.log('update balance err')
+      addToast('update balance error', { appearance: 'error'})
     }
     setLoadingBalance(false)
     onClose();
@@ -26,9 +27,8 @@ export default function userModel({ profile: { userName, accBalance }, isOpen, o
     try {
       await removeFromTable({ userName });
     } catch (err) {
-      console.log(err)
       if (err?.response?.data?.error) {
-        alert(err?.response?.data?.error)
+        addToast(err?.response?.data?.error, { appearance: 'error'})
       }
     }
     onClose();
@@ -40,7 +40,7 @@ export default function userModel({ profile: { userName, accBalance }, isOpen, o
     } catch (err) {
       console.log(err)
       if (err?.response?.data?.error) {
-        alert(err?.response?.data?.error)
+        addToast(err?.response?.data?.error, { appearance: 'error'})
       }
     }
     onClose();
@@ -53,7 +53,7 @@ export default function userModel({ profile: { userName, accBalance }, isOpen, o
     } catch (err) {
       console.log(err)
       if (err?.response?.data?.error) {
-        alert(err?.response?.data?.error)
+        addToast(err?.response?.data?.error, { appearance: 'error'})
       }
     }
     onClose();
@@ -65,7 +65,7 @@ export default function userModel({ profile: { userName, accBalance }, isOpen, o
     } catch (err) {
       console.log(err)
       if (err?.response?.data?.error) {
-        alert(err?.response?.data?.error)
+        addToast(err?.response?.data?.error, { appearance: 'error'})
       }
     }
     onClose();
