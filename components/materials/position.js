@@ -97,7 +97,7 @@ export default function position({
         chipClassName += '-translate-x-20 sm:-translate-y-8';
         break;
       case 9:
-        chipClassName += '-translate-y-8 translate-x-16 sm:-translate-y-20 sm:translate-x-0 md:-translate-y-24';
+        chipClassName += '-translate-y-8 -translate-x-16 sm:-translate-y-20 sm:translate-x-0 md:-translate-y-24';
 
         break;
 

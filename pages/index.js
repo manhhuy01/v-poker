@@ -110,7 +110,7 @@ export default function Home({ user, token }) {
       case 'BET':
         playChipSound();
         setTimeout(() => {
-          betSounds[notification.indexSound || 1]();
+          betSounds[notification.indexSound || 0]();
         }, 500);
         break;
       case 'CALL':
