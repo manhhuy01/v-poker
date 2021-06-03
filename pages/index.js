@@ -60,7 +60,10 @@ export default function Home({ user, token }) {
   const [playTipSound] = useSound('/tip.mp3');
   const [playCashSound] = useSound('/cash.mp3');
   const [playShuffleSound] = useSound('/shuffle.mp3');
-
+  let betSounds = [1, 2, 3, 4, 5, 6, 7].map(i => {
+    const [playGGSound] = useSound(`/bet_${i}.mp3`);
+    return playGGSound
+  })
   const { addToast } = useToasts()
   useEffect(() => {
     if (user) {
@@ -105,19 +108,24 @@ export default function Home({ user, token }) {
   useEffect(() => {
     switch (notification.action) {
       case 'BET':
+        playChipSound();
+        setTimeout(() => {
+          betSounds[notification.indexSound || 1]();
+        }, 500);
+        break;
       case 'CALL':
         playChipSound();
         break;
       case 'CHECK':
         playCheckSound();
         break;
-      case 'TIP': 
+      case 'TIP':
         playTipSound();
-        addToast(`${notification.userName} đã tip ${notification.tip} cho dealer`, { appearance: 'success'})
+        addToast(`${notification.userName} đã tip ${notification.tip} cho dealer`, { appearance: 'success' })
         break;
-      case 'CASH-IN-OUT': 
+      case 'CASH-IN-OUT':
         playCashSound();
-        addToast(`Số dư của ${notification.userName} đã thay đổi thành ${notification.accBalance}`, { appearance: 'success'})
+        addToast(`Số dư của ${notification.userName} đã thay đổi thành ${notification.accBalance}`, { appearance: 'success' })
         break;
       case 'SHUFFLE':
         playShuffleSound();
@@ -158,7 +166,7 @@ export default function Home({ user, token }) {
     try {
       await api.joinTable({ userName, position: addPosition });
     } catch (err) {
-      return  addToast('error join table', {
+      return addToast('error join table', {
         appearance: 'error',
       })
     }
