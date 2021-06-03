@@ -57,6 +57,9 @@ export default function Home({ user, token }) {
 
   const [playChipSound] = useSound('/chip-sound.mp3');
   const [playCheckSound] = useSound('/check-sound.mp3');
+  const [playTipSound] = useSound('/tip.mp3');
+  const [playCashSound] = useSound('/cash.mp3');
+  const [playShuffleSound] = useSound('/shuffle.mp3');
 
   const { addToast } = useToasts()
   useEffect(() => {
@@ -109,7 +112,15 @@ export default function Home({ user, token }) {
         playCheckSound();
         break;
       case 'TIP': 
+        playTipSound();
         addToast(`${notification.userName} đã tip ${notification.tip} cho dealer`, { appearance: 'success'})
+        break;
+      case 'CASH-IN-OUT': 
+        playCashSound();
+        addToast(`Số dư của ${notification.userName} đã thay đổi thành ${notification.accBalance}`, { appearance: 'success'})
+        break;
+      case 'SHUFFLE':
+        playShuffleSound();
         break;
       default:
         break;
