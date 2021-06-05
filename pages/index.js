@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { useToasts } from 'react-toast-notifications'
 import Head from 'next/head'
 import useSound from 'use-sound';
+import NoSleep from 'nosleep.js';
+
 
 import * as api from '../api/poker'
 import * as socket from '../api/socket'
@@ -65,6 +67,15 @@ export default function Home({ user, token }) {
     return playGGSound
   })
   const { addToast } = useToasts()
+
+  useEffect(()=> {
+    var noSleep = new NoSleep();
+    document.addEventListener('click', function enableNoSleep() {
+      document.removeEventListener('click', enableNoSleep, false);
+      noSleep.enable();
+    }, false);
+  }, [])
+
   useEffect(() => {
     if (user) {
       socket.initiateSocket({ token });
@@ -99,7 +110,12 @@ export default function Home({ user, token }) {
     socket.subscribeToGetNotification((err, notificationData) => {
       setNotification({ ...notificationData })
     })
-
+    socket.subscribeToDisconnect((err, disconnected ) => {
+      if(disconnected){
+        // reload
+        window.location.href = '/'
+      }
+    })
     return () => {
       // socket.disconnectSocket();
     }
@@ -110,7 +126,7 @@ export default function Home({ user, token }) {
       case 'BET':
         playChipSound();
         setTimeout(() => {
-          betSounds[notification.indexSound || 0]();
+          betSounds[notification.indexSound % 7 || 0]();
         }, 500);
         break;
       case 'CALL':

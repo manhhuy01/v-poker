@@ -36,3 +36,10 @@ export const subscribeToGetMessage = (cb) => {
 export const sendMessage = ({ message, userName }) => {
   socket.emit('sendMessage', { userName, message })
 }
+
+export const subscribeToDisconnect = (cb) => {
+  if (!socket) return (true);
+  socket.on('disconnect', () => {
+    return cb(null, true);
+  });
+}

@@ -1,9 +1,10 @@
 import Head from 'next/head'
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { useToasts } from 'react-toast-notifications'
 
 import * as api from '../api/poker'
 import cookie from 'cookie-cutter'
+
 
 
 export default function Login() {
@@ -13,6 +14,7 @@ export default function Login() {
   const passwordEl = useRef(null);
 
   const [loading, setLoading] = useState(false)
+
   const login = async (e) => {
     e.preventDefault();
 
