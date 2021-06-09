@@ -75,17 +75,19 @@ export default function game({ data, onEditClick, onAddClick }) {
   }
 
   const onReset = async () => {
-    setLoadingDealerAction(true)
-    try {
-      await reset();
-    } catch (err) {
-      if (err?.response?.data?.error) {
-        addToast(err?.response?.data?.error, {
-          appearance: 'error',
-        })
+    if ((!data.table.finish && window.confirm('Chắc chưa bạn')) || data.table.finish) {
+      setLoadingDealerAction(true)
+      try {
+        await reset();
+      } catch (err) {
+        if (err?.response?.data?.error) {
+          addToast(err?.response?.data?.error, {
+            appearance: 'error',
+          })
+        }
       }
+      setLoadingDealerAction(false)
     }
-    setLoadingDealerAction(false)
   }
 
   const onActionCall = async () => {
@@ -318,13 +320,13 @@ export default function game({ data, onEditClick, onAddClick }) {
                 </button>
               }
               {
-                !data?.table?.start && <button onClick={onStart} className="text-white bg-yellow-500 p-2 pl-3 pr-3 rounded w-fit focus:outline-none flex items-center justify-center" type="button">
+                !data?.table?.start && <button onClick={onStart} className="text-white bg-red-500 p-2 pl-3 pr-3 rounded w-fit focus:outline-none flex items-center justify-center" type="button">
                   <Spin loading={isLoadingDealerAction} />
                 Vào ván
                 </button>
               }
               {
-                isFinish && !data?.table?.river && <button onClick={onShowAllCards} className="text-white bg-yellow-500 p-2 pl-3 pr-3 rounded w-fit focus:outline-none flex items-center justify-center" type="button">
+                isFinish && !data?.table?.river && <button onClick={onShowAllCards} className="text-white bg-purple-500 p-2 pl-3 pr-3 rounded w-fit focus:outline-none flex items-center justify-center" type="button">
                   <Spin loading={isLoadingDealerAction} />
                   Chia Hết
                 </button>
