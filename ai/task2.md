@@ -1,0 +1,2 @@
+1. Trang report đang có UI không tốt, hãy làm lại UI cho đẹp hơn, đặt biệt là màu sắc, không thay đổi bất kì layout hay nội dung nào, chỉ thay đổi màu, hiện tại tôi thấy cột Lợi Nhuận khó nhìn, hãy thay đổi số dương màu khác với số âm
+2. Trang report, cột loại ở tab lịch sử của tôi cũng đang khó nhìn (màu trùng với background) hay thay đổi cho phù hợp với từ loại win/lose

@@ -134,7 +134,7 @@ export default function chat({ user }) {
         <div className="absolute w-full h-full flex flex-col justify-center">
           <div className="w-full h-12 bg-green-800 flex justify-between items-center pl-2 text-white">
             <span>Chat</span>
-            <button onClick={close} className="p-4 focus:outline-none">✖</button>
+            <button onClick={close} className="p-4 focus:outline-none text-white">X</button>
           </div>
           <div id='chat-body' className="h-3/4 bg-white p-4 overflow-auto md:h-full">
             {

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import Link from 'next/link'
 import Profile from './profile'
 
 export default function menuSide({ data, onEditClick }) {
@@ -28,8 +29,11 @@ export default function menuSide({ data, onEditClick }) {
         </ul>
       </div>
 
-      <div className="h-16 p-4 border">
-        <button className="w-full bg-gray-300 focus:outline-none rounded">Leave Room</button>
+      <div className="p-4 border space-y-2">
+        <Link className="block w-full text-center py-2 bg-blue-500 text-white focus:outline-none rounded hover:bg-blue-600 transition-colors" href="/report">
+          Report
+        </Link>
+        <button className="w-full bg-gray-300 focus:outline-none rounded py-2">Leave Room</button>
       </div>
     </div>
   )

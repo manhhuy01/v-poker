@@ -47,5 +47,8 @@ export const showAllCards = () => axios.post('/game/showAllCards');
 export const playerAction = ({ type, betBalance, isAllIn }) => axios.post('/player/action', { type, betBalance, isAllIn})
 export const playerTipDealer = ({ tip }) => axios.post('/player/tip', { tip })
 
+export const getReportSummary = () => axios.get('/report/summary')
+export const getGameLogs = (userName, { days, page, limit }) => axios.get(`/report/game-logs/${userName}?days=${days}&page=${page}&limit=${limit}`)
+
 
 
