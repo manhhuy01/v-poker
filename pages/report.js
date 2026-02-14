@@ -160,7 +160,7 @@ export default function Report({ user }) {
                             <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-xs shadow-lg shadow-indigo-200 uppercase">
                               {item.username.substring(0, 2)}
                             </div>
-                            <span className="font-bold text-gray-700 group-hover:text-indigo-600 transition-colors uppercase tracking-tight">
+                            <span className="font-bold text-gray-700 group-hover:text-indigo-600 transition-colors tracking-tight">
                               {item.username}
                             </span>
                           </div>

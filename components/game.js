@@ -11,8 +11,9 @@ import {
 } from '../api/poker'
 import Modal from './modal'
 import Spin from './spin'
+import ChatFloating from './chatFloating'
 
-export default function game({ data, onEditClick, onAddClick }) {
+export default function game({ data, onEditClick, onAddClick, chatMessages = [], onSendMessage, onChatOpen }) {
   const [playDingSound] = useSound('/ding.mp3');
   const [isFullScreen, setFullScreen] = useState(false)
   const [isLoadingDealerAction, setLoadingDealerAction] = useState(false)
@@ -268,8 +269,8 @@ export default function game({ data, onEditClick, onAddClick }) {
   const isCanShowCard = isFinish && !isFold && !data?.table?.isShowDown
   const isCanBet = !isAllIn && !isFinish
   return (
-    <div className="relative w-full h-screen bg-gray-800 overflow-hidden">
-      <div className="pb-20 w-full h-full flex items-center justify-center">
+    <div className="game-container relative w-full h-screen bg-gray-800 overflow-hidden">
+      <div className="game-layout pt-16 pb-20 w-full h-full flex items-center justify-center">
         <div className="w-10/12 h-5/6 relative border-8 border-black rounded-large bg-green-700">
           {
             Object.keys(data?.position || {}).map((position) => (
@@ -297,18 +298,25 @@ export default function game({ data, onEditClick, onAddClick }) {
               />
             ))
           }
-          <Pot
-            pot={data?.table?.pot}
-            cards={[...(data?.table?.flop || []), data?.table?.turn, data?.table?.river].filter(Boolean)}
-            start={data?.table?.start}
-            onClickTipDealer={() => setOpenModalTip(true)}
-            finish={data?.table?.finish}
-          />
 
+          <div className="absolute top-1/4 left-1/2 transform -translate-x-1/2 w-2/3 flex flex-col items-center pointer-events-none gap-8">
+              <Pot
+              pot={data?.table?.pot}
+              cards={[...(data?.table?.flop || []), data?.table?.turn, data?.table?.river].filter(Boolean)}
+              start={data?.table?.start}
+              onClickTipDealer={() => setOpenModalTip(true)}
+              finish={data?.table?.finish}
+            />
+            <ChatFloating
+              recentMessages={chatMessages.slice(-1)}
+              onSendMessage={onSendMessage}
+              onChatOpen={onChatOpen}
+            />
+          </div>
         </div>
       </div>
-      <div onClick={onFullScreen} className="absolute top-0 left-1/2 cursor-pointer text-2xl text-white transform -translate-x-2/4 ">&#x26F6;</div>
-      <div className="sticky bottom-0 left-0 flex flex-row flex-wrap p-3 justify-center">
+      <div onClick={onFullScreen} className="absolute top-24 left-1/2 z-10 cursor-pointer text-2xl text-white transform -translate-x-2/4 hover:scale-125 transition-all bg-black/20 p-2.5 rounded-2xl backdrop-blur-md border border-white/10 shadow-lg">&#x26F6;</div>
+      <div className="sticky game-action bottom-0 left-0 flex flex-row flex-wrap p-3 justify-center">
         {
           data?.user?.isDealer && (
             <div className="flex w-full justify-evenly border border-white mb-2 sm:w-1/2 sm:mb-0">
@@ -316,13 +324,13 @@ export default function game({ data, onEditClick, onAddClick }) {
               {
                 data?.table?.start && !data?.table?.preFlop && <button onClick={onPreFlop} className="text-white bg-green-500 p-2 pl-3 pr-3 rounded w-fit focus:outline-none flex items-center justify-center" type="button">
                   <Spin loading={isLoadingDealerAction} />
-                Chia bài
+                  Chia bài
                 </button>
               }
               {
                 !data?.table?.start && <button onClick={onStart} className="text-white bg-red-500 p-2 pl-3 pr-3 rounded w-fit focus:outline-none flex items-center justify-center" type="button">
                   <Spin loading={isLoadingDealerAction} />
-                Vào ván
+                  Vào ván
                 </button>
               }
               {
@@ -338,9 +346,9 @@ export default function game({ data, onEditClick, onAddClick }) {
                 </button>
               }
               {
-                data?.table?.start && !data?.table?.preFlop && <button onClick={onShuffle} className="text-white bg-blue-500 p-2 rounded pl-3 pr-3 w-fit focus:outline-none flex items-center justify-center" type="button">
+                !data?.table?.start && <button onClick={onShuffle} className="text-white bg-blue-500 p-2 rounded pl-3 pr-3 w-fit focus:outline-none flex items-center justify-center" type="button">
                   <Spin loading={isLoadingDealerAction} />
-                Xào bài
+                  Xào bài
                 </button>
               }
             </div>
@@ -352,20 +360,20 @@ export default function game({ data, onEditClick, onAddClick }) {
               {
                 isCanFold && <button onClick={onActionFold} disabled={loadingPlayerAction} className="flex items-center justify-center text-white bg-red-500 p-2 rounded w-20 focus:outline-none flex items-center justify-center" type="button">
                   <Spin loading={loadingPlayerAction} />
-                Fold
+                  Fold
                 </button>
               }
               {
                 isCanCheck && <button onClick={onActionCheck} disabled={loadingPlayerAction} className="flex items-center justify-center text-white bg-red-500 p-2 rounded w-20 focus:outline-none flex items-center justify-center" type="button">
                   <Spin loading={loadingPlayerAction} />
-                Check
+                  Check
                 </button>
               }
               {
                 isCanCall && (
                   <button onClick={onActionCall} disabled={loadingPlayerAction} className="flex items-center justify-center text-white bg-yellow-500 p-2 rounded w-20 focus:outline-none" type="button">
                     <Spin loading={loadingPlayerAction} />
-                  Call
+                    Call
                   </button>
                 )
               }
@@ -380,7 +388,7 @@ export default function game({ data, onEditClick, onAddClick }) {
                 isCanBet && data?.table?.start && (
                   <button onClick={onActionAllIn} className="w-max pl-4 pr-4 bg-red-500 rounded text-white" type="button">
                     <Spin loading={loadingPlayerAction} />
-                  All IN
+                    All IN
                   </button>
                 )
               }
@@ -389,7 +397,7 @@ export default function game({ data, onEditClick, onAddClick }) {
                 isCanShowCard && (
                   <button onClick={onActionShow} disabled={loadingPlayerAction} className="flex items-center justify-center text-white bg-green-500 p-2 rounded w-20 focus:outline-none" type="button">
                     <Spin loading={loadingPlayerAction} />
-                  Show
+                    Show
                   </button>
                 )
               }

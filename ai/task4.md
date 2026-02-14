@@ -1,0 +1,1 @@
+1. chuyển đổi menuSide thành component modal, khi bấm vào "phòng chờ" ở topMenu sẽ mở modal này

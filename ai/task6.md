@@ -1,0 +1,1 @@
+1. hãy đưa nội dung cuộc trò chuyện vào giữa bàn game, ngay trên vị trí của components/materials/pot.js trong game.js, có cả input để người dùng có thể gửi tin nhắn, khi bấm vào chat thì mở modal chat full screen trên mobile, còn trên desktop thì mở như chat component hiện tại

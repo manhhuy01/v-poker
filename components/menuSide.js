@@ -1,40 +1,48 @@
-import { useState } from 'react'
 import Link from 'next/link'
 import Profile from './profile'
+import Modal from './modal'
 
-export default function menuSide({ data, onEditClick }) {
-  const [isOpen, setOpen] = useState(false)
+export default function menuSide({ data, onEditClick, isOpen, onClose }) {
   return (
-    <div className={`${isOpen ? 'translate-x-0' : '-translate-x-60'} z-20 flex flex-col w-60 h-screen fixed bg-white shadow-inner transition delay-150 duration-300 ease-in-out transform `}>
-      <div className="w-full flex justify-between shadow pl-3 items-center">
-        <p>Info</p>
-        <button className="shadow text-gray-500 w-10 h-10 relative focus:outline-none bg-white self-end transform translate-x-10" onClick={() => setOpen(!isOpen)}>
-          <div className="block w-5 absolute left-1/2 top-1/2   transform  -translate-x-1/2 -translate-y-1/2">
-            <span aria-hidden="true" className={`block absolute h-0.5 w-5 bg-current transform transition duration-500 ease-in-out ${isOpen ? 'rotate-45' : '-translate-y-1.5'}`}></span>
-            <span aria-hidden="true" className={`block absolute  h-0.5 w-5 bg-current   transform transition duration-500 ease-in-out ${isOpen ? 'opacity-0' : ''} `}></span>
-            <span aria-hidden="true" className={`block absolute  h-0.5 w-5 bg-current transform  transition duration-500 ease-in-out ${isOpen ? '-rotate-45' : 'translate-y-1.5'}`}></span>
-          </div>
-        </button>
-      </div>
-      <div className="h-full overflow-auto">
-        <p className="m-4">Players in room</p>
-        <ul>
-          {
-            data?.players && data.players.map((player, i) => (
-              <li className="ml-5" key={i} onClick={()=> onEditClick(player.userName)}>
-                <Profile user={player} />
-              </li>
-            ))
-          }
-        </ul>
-      </div>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      noConfirm={true}
+    >
+      <div className="w-full">
+        <div className="flex justify-between items-center mb-6 border-b border-gray-100 pb-4">
+          <h3 className="text-xl font-black uppercase tracking-tight text-gray-900">
+            Phòng chờ (Lobby)
+          </h3>
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-400">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
 
-      <div className="p-4 border space-y-2">
-        <Link className="block w-full text-center py-2 bg-blue-500 text-white focus:outline-none rounded hover:bg-blue-600 transition-colors" href="/report">
-          Report
-        </Link>
-        <button className="w-full bg-gray-300 focus:outline-none rounded py-2">Leave Room</button>
+        <div className="space-y-4">
+          <div>
+            <p className="text-[10px] uppercase font-black tracking-widest text-gray-400 mb-3">Người chơi trong phòng ({data?.players?.length || 0})</p>
+            <div className="grid grid-cols-1 gap-2 max-h-[40vh] overflow-y-auto pr-2 custom-scrollbar">
+              {
+                data?.players && data.players.map((player, i) => (
+                  <div 
+                    key={i} 
+                    className="flex items-center justify-between p-3 rounded-2xl border border-gray-50 hover:bg-indigo-50/50 hover:border-indigo-100 transition-all cursor-pointer group"
+                    onClick={() => onEditClick(player.userName)}
+                  >
+                    <Profile user={player} />
+                    <svg className="w-4 h-4 text-gray-300 group-hover:text-indigo-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </div>
+                ))
+              }
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
+    </Modal>
   )
 }

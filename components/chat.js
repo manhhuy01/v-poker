@@ -1,160 +1,88 @@
 import { useState, useEffect, useRef } from 'react'
-import * as socket from '../api/socket'
-
-
 
 const ChatElement = ({ userName, message, isYour }) => {
   return (
-    <div className={`w-full flex mb-2 ${isYour ? 'pl-12' : 'pr-12'}`}>
-      <div className="w-full flex items-center">
-        <div className="w-full flex flex-col">
-          {!!userName && <div className="font-bold">{userName}</div>}
-          <div className={`${isYour ? 'bg-blue-300' : 'bg-blue-100'} p-1 rounded-md w-auto pl-4 pr-4`}>{message}</div>
+    <div className={`w-full flex mb-3 ${isYour ? 'justify-end pl-10' : 'justify-start pr-10'}`}>
+      <div className={`max-w-full flex flex-col ${isYour ? 'items-end' : 'items-start'}`}>
+        {!isYour && !!userName && <div className="text-[10px] font-black tracking-widest text-gray-500 mb-1 ml-1">{userName}</div>}
+        <div className={`px-4 py-2 rounded-2xl text-sm font-medium shadow-sm transition-all duration-300 ${isYour 
+          ? 'bg-indigo-600 text-white rounded-br-none' 
+          : 'bg-gray-100 text-gray-800 rounded-bl-none'}`}>
+          {message}
         </div>
       </div>
     </div>
   )
 }
 
-
-export default function chat({ user }) {
+export default function chat({ user, isOpen, onClose, data, onSendMessage }) {
   const inputRef = useRef(null);
-  const [isOpen, setOpen] = useState(false)
-  const [data, setData] = useState({ count: 0, messages: [] })
-  const [newNumber, setNewNumber] = useState(0)
-  const [readNumber, setReadNumber] = useState(0)
-  useEffect(() => {
-    setTimeout(() => {
-      socket.subscribeToGetMessage((err, dataAPI) => {
-        if (err) {
-          alert(err)
-        }
-
-        setData({
-          ...dataAPI,
-          messages: dataAPI.messages.reduce((agg, chat, i) => {
-            if (i && chat.userName === agg[i - 1].userName) {
-              agg.push({ ...chat, owner: chat.userName === user.userName, hiddenUserName: true })
-            } else {
-              agg.push({ ...chat, owner: chat.userName === user.userName })
-            }
-            return agg;
-          }, [])
-        });
-        setTimeout(() => {
-          var objDiv = document.getElementById("chat-body");
-          objDiv.scrollTop = objDiv.scrollHeight;
-        }, 100);
-      })
-    }, 1000);
-
-  }, [user])
-
-  useEffect(() => {
-    let newReadNumber = readNumber;
-    if (isOpen) {
-      newReadNumber = data.count;
-      setReadNumber(newReadNumber);
-    }
-    setNewNumber(data?.count - newReadNumber);
-  }, [data?.count])
-
+  
   useEffect(() => {
     if (isOpen) {
-      setReadNumber(data.count)
+      setTimeout(() => {
+        const objDiv = document.getElementById("chat-body");
+        if (objDiv) objDiv.scrollTop = objDiv.scrollHeight;
+        if (inputRef.current) inputRef.current.focus();
+      }, 100);
     }
-  }, [isOpen])
+  }, [isOpen, data?.messages?.length]);
 
-  useEffect(() => {
-    setNewNumber(data?.count - readNumber);
-  }, [readNumber])
-
-  const send = (e) => {
+  const handleSend = (e) => {
     e.preventDefault();
-    let message = inputRef.current.value.trim();
+    const message = inputRef.current.value.trim();
     if (message) {
-      socket.sendMessage({ message, userName: user.userName })
-      setData({
-        ...data,
-        count: data.count ++,
-        messages: [
-          ...data.messages,
-          {
-            message,
-            owner: true,
-          }
-        ]
-      })
-      setReadNumber(data.count++)
+      onSendMessage(message);
+      inputRef.current.value = '';
     }
-    inputRef.current.value = '';
-    inputRef.current.focus();
-    setTimeout(() => {
-      var objDiv = document.getElementById("chat-body");
-      objDiv.scrollTop = objDiv.scrollHeight;
-    }, 100);
-
-  }
-  const open = () => {
-    var objDiv = document.getElementById("chat-body");
-    objDiv.scrollTop = objDiv.scrollHeight;
-    setOpen(true)
-    setReadNumber(data.count)
-    setTimeout(() => {
-      inputRef.current.focus();
-    }, 100);
-  }
-
-  const close = () => {
-    setTimeout(() => {
-      inputRef.current.blur();
-    }, 0);
-    setOpen(false)
   }
 
   return (
-    <>
-      <span className={` ${isOpen ? 'invisible' : ''} absolute bottom-1/6 right-12 `}>
-        <button onClick={open} className="bg-white rounded p-2 ">
-          {`Chat ${newNumber ? `(${newNumber})` : ''}`}
-        </button>
-        {
-          !!newNumber && (
-            <span className="absolute -top-1 -right-1 flex h-3 w-3">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
-            </span>
-          )
-        }
-
-      </span>
-
-      <div className={`${isOpen ? 'md:w-96' : 'overflow-hidden md:visible md:w-0 invisible'} md:relative absolute w-full transition-all h-full top-0 left-0 z-20 flex justify-center`}>
-        <div onClick={close} className="absolute w-full md:hidden h-full top-0 left-0 bg-white bg-opacity-50" />
-        <div className="absolute w-full h-full flex flex-col justify-center">
-          <div className="w-full h-12 bg-green-800 flex justify-between items-center pl-2 text-white">
-            <span>Chat</span>
-            <button onClick={close} className="p-4 focus:outline-none text-white">X</button>
-          </div>
-          <div id='chat-body' className="h-3/4 bg-white p-4 overflow-auto md:h-full">
-            {
-              data.messages && data.messages.map((chat, i) => (
-                <ChatElement
-                  key={i}
-                  userName={(chat.owner || chat.hiddenUserName) ? '' : chat.userName}
-                  isYour={chat.owner}
-                  message={chat.message}
-                />
-              ))
-            }
-          </div>
-          <form className="w-full flex h-16 p-2 bg-gray-800" onSubmit={send}>
-            <input ref={inputRef} className="pl-2 w-full h-full border border-gray-800" type="input" />
-            <button onClick={send} className="focus:outline-none bg-white w-max h-full bg-green-600 text-white pl-2 pr-2 ml-2" type="submit">Send</button>
-          </form>
-
+    <div className={`${isOpen ? 'md:w-96 w-full translate-x-0 z-50' : 'w-0 translate-x-full md:translate-x-0 md:w-0 overflow-hidden'} absolute md:relative right-0 transition-all duration-500 h-full top-0 z-[50] flex flex-col bg-white border-l border-gray-100 shadow-2xl overflow-hidden`}>
+      <div className="w-full h-16 bg-gray-900 flex justify-between items-center px-6 text-white shrink-0">
+        <div className="flex items-center space-x-2">
+          <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+          <span className="font-black uppercase tracking-tighter italic">Phòng Chat</span>
         </div>
+        <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-lg transition-colors focus:outline-none">
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
       </div>
-    </>
+
+      <div id='chat-body' className="flex-1 p-6 overflow-y-auto scroll-smooth custom-scrollbar">
+        {
+          data?.messages && data.messages.map((chat, i) => (
+            <ChatElement
+              key={i}
+              userName={(chat.owner || chat.hiddenUserName) ? '' : chat.userName}
+              isYour={chat.owner}
+              message={chat.message}
+            />
+          ))
+        }
+      </div>
+
+      <div className="p-4 bg-gray-50 border-t border-gray-100">
+        <form className="flex items-center space-x-2" onSubmit={handleSend}>
+          <input 
+            ref={inputRef} 
+            className="flex-1 bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" 
+            placeholder="Nhập tin nhắn..."
+            type="text" 
+          />
+          <button 
+            onClick={handleSend} 
+            className="p-3 bg-indigo-600 text-white rounded-xl shadow-lg shadow-indigo-200 hover:bg-indigo-700 active:scale-95 transition-all focus:outline-none"
+            type="submit"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+            </svg>
+          </button>
+        </form>
+      </div>
+    </div>
   )
 }

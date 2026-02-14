@@ -10,6 +10,7 @@ import * as socket from '../api/socket'
 import MenuSide from '../components/menuSide'
 import Game from '../components/game'
 import Setting from '../components/setting'
+import TopMenu from '../components/topMenu'
 import { transformPosition } from '../utils'
 import UserModal from '../components/userModal'
 import AddModal from '../components/addModal'
@@ -66,6 +67,9 @@ export default function Home({ user, token }) {
     const [playGGSound] = useSound(`/bet_${i}.mp3`);
     return playGGSound
   })
+  const [openLobby, setOpenLobby] = useState(false);
+  const [openChat, setOpenChat] = useState(false);
+  const [chatData, setChatData] = useState({ count: 0, messages: [] });
   const { addToast } = useToasts()
 
   useEffect(()=> {
@@ -80,6 +84,23 @@ export default function Home({ user, token }) {
     if (user) {
       socket.initiateSocket({ token });
     }
+    
+    socket.subscribeToGetMessage((err, dataAPI) => {
+      if (err) return;
+      setChatData(prev => ({
+        ...dataAPI,
+        messages: dataAPI.messages.reduce((agg, chat, i) => {
+          const isYour = chat.userName === user.userName;
+          if (i && chat.userName === agg[i - 1].userName) {
+            agg.push({ ...chat, owner: isYour, hiddenUserName: true })
+          } else {
+            agg.push({ ...chat, owner: isYour })
+          }
+          return agg;
+        }, [])
+      }));
+    });
+
     socket.subscribeToGetData((err, roomInfo) => {
       if (err) {
         alert(err)
@@ -178,7 +199,6 @@ export default function Home({ user, token }) {
   }
 
   const onAddPlayer = async (userName) => {
-
     try {
       await api.joinTable({ userName, position: addPosition });
     } catch (err) {
@@ -189,36 +209,53 @@ export default function Home({ user, token }) {
     setAddModal(false)
   }
 
-  return (
+  const onSendMessage = (message) => {
+    if (message.trim()) {
+      socket.sendMessage({ message: message.trim(), userName: user.userName });
+    }
+  }
 
+  return (
     <div>
       <Head>
         <title>V-Poker</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-
-      <main>
+      <main className="relative">
         <MenuSide
           data={data}
           onEditClick={onEditClick}
+          isOpen={openLobby}
+          onClose={() => setOpenLobby(false)}
         />
 
         <div className="flex w-screen h-screen">
           <div className="relative w-full h-full">
+            <TopMenu 
+              data={data} 
+              user={user} 
+              onLobbyClick={() => setOpenLobby(true)} 
+              chatCount={chatData.messages.length}
+              onChatOpen={() => setOpenChat(true)}
+            />
             <Game
               data={data}
               user={user}
               onEditClick={onEditClick}
               onAddClick={onAddClick}
+              chatMessages={chatData.messages}
+              onSendMessage={onSendMessage}
+              onChatOpen={() => setOpenChat(true)}
             />
-            {
-              data?.user?.isDealer && <Setting
-                data={data?.setting}
-              />
-            }
           </div>
-          <Chat user={user} />
+          <Chat 
+            user={user} 
+            isOpen={openChat}
+            onClose={() => setOpenChat(false)}
+            data={chatData}
+            onSendMessage={onSendMessage}
+          />
         </div>
 
         {
