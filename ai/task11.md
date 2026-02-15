@@ -1,0 +1,1 @@
+ở modal isOpenModalBet trong game, tôi muốn thay đổi lại UI và có thêm các option bet như bet = big blind, bet = 2xbigblind, bet = 6x bigblind, bet = all-in, hãy tự lấy từ data của big blind để nhân ra số tiền bet, để những nút như vậy cho user chọn, ở dưới thì vẫn có input để user nhập số tiền bet như cũ.

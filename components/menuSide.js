@@ -11,7 +11,7 @@ export default function menuSide({ data, onEditClick, isOpen, onClose }) {
     >
       <div className="w-full">
         <div className="flex justify-between items-center mb-6 border-b border-gray-100 pb-4">
-          <h3 className="text-xl font-black uppercase tracking-tight text-gray-900">
+          <h3 className="text-xl font-black uppercase tracking-tight text-white">
             Phòng chờ (Lobby)
           </h3>
           <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-400">

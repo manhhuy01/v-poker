@@ -117,6 +117,7 @@ export default function Home({ user, token }) {
         })),
         user: {
           ...user,
+          ...roomInfo.players.find(p => p.userName === user.userName),
           isDealer: user.userName === roomInfo.dealer,
           isThinking: !!Object.keys(roomInfo.position).find(p => roomInfo.position[p].isThinking
             && roomInfo.position[p].user?.userName === user.userName),
@@ -184,11 +185,16 @@ export default function Home({ user, token }) {
     setMenuEdit(true);
   }
 
-  const onAddClick = (position) => {
+  const onAddClick = async (position) => {
     if (!data?.user?.isDealer) {
-      return addToast('Liên hệ/chờ dealer thêm vô', {
-        appearance: 'info',
-      })
+      // Automatic join for regular user
+      try {
+        await api.joinTable({ userName: user.userName, position });
+        addToast('Đã tham gia bàn chơi', { appearance: 'success' });
+      } catch (err) {
+        addToast(err?.response?.data?.error || 'Không thể tham gia bàn', { appearance: 'error' });
+      }
+      return;
     }
     let playingPlayers = Object.keys(data.position).map(pos => data.position[pos]?.user?.userName).filter(Boolean);
     let allPlayers = data.players.map(x => x.userName);

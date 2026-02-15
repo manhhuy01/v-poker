@@ -316,39 +316,38 @@ export default function game({ data, onEditClick, onAddClick, chatMessages = [],
         </div>
       </div>
       <div onClick={onFullScreen} className="absolute top-24 left-1/2 z-10 cursor-pointer text-2xl text-white transform -translate-x-2/4 hover:scale-125 transition-all bg-black/20 p-2.5 rounded-2xl backdrop-blur-md border border-white/10 shadow-lg">&#x26F6;</div>
-      <div className="sticky game-action bottom-0 left-0 flex flex-row flex-wrap p-3 justify-center">
+      <div className="sticky game-action bottom-0 left-0 flex flex-row items-center p-1.5 sm:p-6 justify-center gap-4 sm:gap-8 bg-black/90 backdrop-blur-3xl border-t border-white/10 w-full overflow-x-auto no-scrollbar">
         {
           data?.user?.isDealer && (
-            <div className="flex w-full justify-evenly border border-white mb-2 sm:w-1/2 sm:mb-0">
-
+            <div className="flex flex-row items-center gap-4 sm:gap-4 shrink-0">
               {
-                data?.table?.start && !data?.table?.preFlop && <button onClick={onPreFlop} className="text-white bg-green-500 p-2 pl-3 pr-3 rounded w-fit focus:outline-none flex items-center justify-center" type="button">
+                data?.table?.start && !data?.table?.preFlop && <button onClick={onPreFlop} className="flex-none flex flex-col items-center justify-center text-white bg-gradient-to-r from-emerald-400 to-green-600 px-1.5 py-2 sm:px-6 sm:py-3 rounded sm:rounded-2xl font-black text-[7px] sm:text-xs shadow-lg shadow-emerald-900/40 hover:scale-105 transition-all focus:outline-none border border-emerald-400/50" type="button">
                   <Spin loading={isLoadingDealerAction} />
-                  Chia bài
+                  <span className="uppercase tracking-tighter whitespace-nowrap px-0.5">Chia bài</span>
                 </button>
               }
               {
-                !data?.table?.start && <button onClick={onStart} className="text-white bg-red-500 p-2 pl-3 pr-3 rounded w-fit focus:outline-none flex items-center justify-center" type="button">
+                !data?.table?.start && <button onClick={onStart} className="flex-none flex flex-col items-center justify-center text-white bg-gradient-to-r from-pink-500 to-rose-600 px-1.5 py-2 sm:px-6 sm:py-3 rounded sm:rounded-2xl font-black text-[7px] sm:text-xs shadow-lg shadow-pink-900/40 hover:scale-105 transition-all focus:outline-none border border-pink-400/50" type="button">
                   <Spin loading={isLoadingDealerAction} />
-                  Vào ván
+                  <span className="uppercase tracking-tighter whitespace-nowrap px-0.5">Vào ván</span>
                 </button>
               }
               {
-                isFinish && !data?.table?.river && <button onClick={onShowAllCards} className="text-white bg-purple-500 p-2 pl-3 pr-3 rounded w-fit focus:outline-none flex items-center justify-center" type="button">
+                isFinish && !data?.table?.river && <button onClick={onShowAllCards} className="flex-none flex flex-col items-center justify-center text-white bg-gradient-to-r from-violet-500 to-purple-700 px-1.5 py-2 sm:px-6 sm:py-3 rounded sm:rounded-2xl font-black text-[7px] sm:text-xs shadow-lg shadow-violet-900/40 hover:scale-105 transition-all focus:outline-none border border-violet-400/50" type="button">
                   <Spin loading={isLoadingDealerAction} />
-                  Chia Hết
+                  <span className="uppercase tracking-tighter whitespace-nowrap px-0.5">Chia Hết</span>
                 </button>
               }
               {
-                <button onClick={onReset} className="text-white bg-yellow-500 p-2 pl-3 pr-3 rounded w-fit focus:outline-none flex items-center justify-center" type="button">
+                <button onClick={onReset} className="flex-none flex flex-col items-center justify-center text-white bg-gradient-to-r from-slate-500 to-slate-700 px-1.5 py-2 sm:px-6 sm:py-3 rounded sm:rounded-2xl font-black text-[7px] sm:text-xs shadow-lg shadow-slate-900/40 hover:scale-105 transition-all focus:outline-none border border-slate-400/50" type="button">
                   <Spin loading={isLoadingDealerAction} />
-                  Thu dọn
+                  <span className="uppercase tracking-tighter whitespace-nowrap px-0.5">Thu dọn</span>
                 </button>
               }
               {
-                !data?.table?.start && <button onClick={onShuffle} className="text-white bg-blue-500 p-2 rounded pl-3 pr-3 w-fit focus:outline-none flex items-center justify-center" type="button">
+                !data?.table?.start && <button onClick={onShuffle} className="flex-none flex flex-col items-center justify-center text-white bg-gradient-to-r from-indigo-500 to-blue-700 px-1.5 py-2 sm:px-6 sm:py-3 rounded sm:rounded-2xl font-black text-[7px] sm:text-xs shadow-lg shadow-indigo-900/40 hover:scale-105 transition-all focus:outline-none border border-indigo-400/50" type="button">
                   <Spin loading={isLoadingDealerAction} />
-                  Xào bài
+                  <span className="uppercase tracking-tighter whitespace-nowrap px-0.5">Xào bài</span>
                 </button>
               }
             </div>
@@ -356,68 +355,95 @@ export default function game({ data, onEditClick, onAddClick, chatMessages = [],
         }
         {
           (!data?.table?.preFlop || isThinking || data?.table?.finish) && data?.user?.position && (
-            <div className="flex w-full justify-evenly sm:w-1/2">
+            <div className="flex flex-row items-center gap-4 sm:gap-4 shrink-0 ml-1">
               {
-                isCanFold && <button onClick={onActionFold} disabled={loadingPlayerAction} className="flex items-center justify-center text-white bg-red-500 p-2 rounded w-20 focus:outline-none flex items-center justify-center" type="button">
+                isCanFold && <button onClick={onActionFold} disabled={loadingPlayerAction} className="flex-none flex flex-col items-center justify-center text-gray-400 bg-gradient-to-br from-gray-900 to-black border border-rose-950/50 px-1.5 py-2 sm:px-8 sm:py-3 rounded sm:rounded-2xl font-bold text-[7px] sm:text-sm shadow-xl shadow-black/80 hover:bg-zinc-900 transition-all focus:outline-none" type="button">
                   <Spin loading={loadingPlayerAction} />
-                  Fold
+                  <span className="uppercase tracking-tighter whitespace-nowrap px-0.5">Fold</span>
                 </button>
               }
               {
-                isCanCheck && <button onClick={onActionCheck} disabled={loadingPlayerAction} className="flex items-center justify-center text-white bg-red-500 p-2 rounded w-20 focus:outline-none flex items-center justify-center" type="button">
+                isCanCheck && <button onClick={onActionCheck} disabled={loadingPlayerAction} className="flex-none flex flex-col items-center justify-center text-white bg-gradient-to-br from-cyan-600 to-cyan-800 border border-cyan-500/40 px-1.5 py-2 sm:px-8 sm:py-3 rounded sm:rounded-2xl font-bold text-[7px] sm:text-sm hover:scale-105 shadow-lg shadow-cyan-900/40 transition-all focus:outline-none" type="button">
                   <Spin loading={loadingPlayerAction} />
-                  Check
+                  <span className="uppercase tracking-tighter whitespace-nowrap px-0.5">Check</span>
                 </button>
               }
               {
                 isCanCall && (
-                  <button onClick={onActionCall} disabled={loadingPlayerAction} className="flex items-center justify-center text-white bg-yellow-500 p-2 rounded w-20 focus:outline-none" type="button">
+                  <button onClick={onActionCall} disabled={loadingPlayerAction} className="flex-none flex flex-col items-center justify-center text-white bg-gradient-to-br from-amber-400 to-orange-600 border border-amber-400/40 px-1.5 py-2 sm:px-8 sm:py-3 rounded sm:rounded-2xl font-bold text-[7px] sm:text-sm shadow-xl shadow-amber-900/40 hover:scale-105 transition-all focus:outline-none" type="button">
                     <Spin loading={loadingPlayerAction} />
-                    Call
+                    <span className="uppercase tracking-tighter whitespace-nowrap px-0.5">Call</span>
                   </button>
                 )
               }
 
               {
                 isCanBet && data?.table?.start && (
-                  <button onClick={() => setOpenModalBet(true)} className="flex items-center justify-center text-white bg-blue-500 p-2 rounded w-20 focus:outline-none" type="button">Bet</button>
-                )
-              }
-
-              {
-                isCanBet && data?.table?.start && (
-                  <button onClick={onActionAllIn} className="w-max pl-4 pr-4 bg-red-500 rounded text-white" type="button">
-                    <Spin loading={loadingPlayerAction} />
-                    All IN
+                  <button onClick={() => setOpenModalBet(true)} className="flex-none flex flex-col items-center justify-center text-white bg-gradient-to-br from-blue-500 to-indigo-700 border border-blue-400/40 px-1.5 py-2 sm:px-8 sm:py-3 rounded sm:rounded-2xl font-bold text-[7px] sm:text-sm shadow-xl shadow-blue-900/40 hover:scale-105 transition-all focus:outline-none" type="button">
+                    <span className="uppercase tracking-tighter whitespace-nowrap px-0.5">Bet</span>
                   </button>
                 )
               }
 
               {
                 isCanShowCard && (
-                  <button onClick={onActionShow} disabled={loadingPlayerAction} className="flex items-center justify-center text-white bg-green-500 p-2 rounded w-20 focus:outline-none" type="button">
+                  <button onClick={onActionShow} disabled={loadingPlayerAction} className="flex-none flex flex-col items-center justify-center text-white bg-gradient-to-br from-emerald-500 to-teal-700 border border-emerald-400/40 px-1.5 py-2 sm:px-8 sm:py-3 rounded sm:rounded-2xl font-bold text-[7px] sm:text-sm shadow-xl shadow-emerald-900/40 hover:scale-105 transition-all focus:outline-none" type="button">
                     <Spin loading={loadingPlayerAction} />
-                    Show
+                    <span className="uppercase tracking-tighter whitespace-nowrap px-0.5">Show</span>
                   </button>
                 )
               }
             </div>
           )
         }
-
-
       </div>
       {
         isOpenModalBet && (
           <Modal
             isOpen={isOpenModalBet}
             onClose={() => setOpenModalBet(false)}
-            loading={false}
+            loading={loadingPlayerAction}
             onCancel={() => setOpenModalBet(false)}
             onConfirm={() => onActionBet()}
           >
-            <div className="flex flex-col items-center justify-center w-full">
-              <input className="border-2 rounded mb-4" type="input" ref={betInput} defaultValue={data?.user?.position?.betBalance || 0} />
+            <div className="flex flex-col w-full space-y-6">
+              <div className="text-center">
+                <h3 className="text-lg font-black uppercase tracking-widest text-white mb-1">Đưa ra mức cược</h3>
+                <p className="text-[10px] text-gray-500 font-bold uppercase tracking-tighter">Số dư khả dụng: <span className="text-emerald-400">{(data?.user?.accBalance || 0).toLocaleString()}</span></p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { label: '1x BB', value: (data?.setting?.smallBlind || 0) * 2 },
+                  { label: '2x BB', value: (data?.setting?.smallBlind || 0) * 4 },
+                  { label: '6x BB', value: (data?.setting?.smallBlind || 0) * 12 },
+                  { label: 'ALL-IN', value: data?.user?.accBalance || 0, color: 'bg-gradient-to-br from-red-600 to-rose-800 border border-red-500/40' }
+                ].map((opt, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => { if (betInput.current) betInput.current.value = opt.value }}
+                    className={`py-3 rounded-xl border border-white/10 font-black text-xs transition-all active:scale-95 flex flex-col items-center justify-center gap-1 ${opt.color ? `bg-gradient-to-br ${opt.color} text-white` : 'bg-white/5 text-gray-300 hover:bg-white/10'}`}
+                  >
+                    <span className="opacity-60 text-[8px]">{opt.label}</span>
+                    <span>{opt.value.toLocaleString()}</span>
+                  </button>
+                ))}
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-[10px] uppercase font-black tracking-widest text-gray-500 ml-1">Số tiền cược tùy chỉnh</label>
+                <div className="relative group">
+                  <input
+                    ref={betInput}
+                    type="number"
+                    autoFocus
+                    defaultValue={data?.user?.position?.betBalance || 0}
+                    className="w-full bg-gray-800 border border-white/10 rounded-2xl px-5 py-4 text-white font-bold text-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all hover:bg-gray-750"
+                  />
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 font-bold">CHIPS</div>
+                </div>
+              </div>
             </div>
           </Modal>
         )

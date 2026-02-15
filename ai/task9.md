@@ -1,0 +1,2 @@
+1. user đăng nhập có thể tự nạp tiền vào tài khoản, thêm vào mục nạp tiền ở top menu, tách component ra nếu được, hiển thị thêm số dư hiện tại
+2. user đăng nhập có thể tự join table, khi user bấm vào onAddClick, thì hãy gọi api tự thêm chính user vào table

@@ -6,8 +6,8 @@ export default function Profile({ user }) {
           user.isDealer ? '♛' : '◯'
         }
       </span>
-      <p className="font-bold ml-2">{user?.userName}</p>
-      <p className="ml-2">${user?.accBalance}</p>
+      <p className="font-bold ml-2 text-white">{user?.userName}</p>
+      <p className="ml-2 text-white">${user?.accBalance}</p>
     </div>
   )
 }

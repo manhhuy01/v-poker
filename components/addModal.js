@@ -9,7 +9,7 @@ export default function addModal({ waitingPlayers, isOpen, onClose, loading, onC
       noConfirm={true}
     >
       <div className="w-full">
-        <p className="text-lg text-center">Add player</p>
+        <p className="text-lg text-center text-white">Add player</p>
         <div className="mb-4 mt-4">
           <ul>
             <li className="w-full">
