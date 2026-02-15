@@ -70,8 +70,10 @@ export default function Home({ user, token }) {
   const [openLobby, setOpenLobby] = useState(false);
   const [openChat, setOpenChat] = useState(false);
   const { addToast } = useToasts()
+  const [messages, setMessages] = useState([])
+  const [countChat, setCountChat] = useState(0)
 
-  useEffect(()=> {
+  useEffect(() => {
     var noSleep = new NoSleep();
     document.addEventListener('click', function enableNoSleep() {
       document.removeEventListener('click', enableNoSleep, false);
@@ -83,7 +85,7 @@ export default function Home({ user, token }) {
     if (user) {
       socket.initiateSocket({ token });
     }
-    
+
 
     socket.subscribeToGetData((err, roomInfo) => {
       if (err) {
@@ -116,12 +118,26 @@ export default function Home({ user, token }) {
     socket.subscribeToGetNotification((err, notificationData) => {
       setNotification({ ...notificationData })
     })
-    socket.subscribeToDisconnect((err, disconnected ) => {
-      if(disconnected){
+    socket.subscribeToDisconnect((err, disconnected) => {
+      if (disconnected) {
         // reload
         window.location.href = '/'
       }
     })
+
+    socket.subscribeToGetMessage((dataAPI) => {
+      console.log('dataAPI', dataAPI)
+      setCountChat(dataAPI.count)
+      setMessages(dataAPI.messages.reduce((agg, chat, i) => {
+        const isYour = chat.userName === user.userName;
+        if (i && chat.userName === agg[i - 1].userName) {
+          agg.push({ ...chat, owner: isYour, hiddenUserName: true })
+        } else {
+          agg.push({ ...chat, owner: isYour })
+        }
+        return agg;
+      }, []));
+    });
     return () => {
       // socket.disconnectSocket();
     }
@@ -216,10 +232,10 @@ export default function Home({ user, token }) {
 
         <div className="flex w-screen h-screen">
           <div className="relative w-full h-full">
-            <TopMenu 
-              data={data} 
-              user={user} 
-              onLobbyClick={() => setOpenLobby(true)} 
+            <TopMenu
+              data={data}
+              user={user}
+              onLobbyClick={() => setOpenLobby(true)}
               onChatOpen={() => setOpenChat(true)}
             />
             <Game
@@ -228,12 +244,16 @@ export default function Home({ user, token }) {
               onEditClick={onEditClick}
               onAddClick={onAddClick}
               onChatOpen={() => setOpenChat(true)}
+              messages={messages}
+              countChat={countChat}
             />
           </div>
-          <Chat 
-            user={user} 
+          <Chat
+            user={user}
             isOpen={openChat}
             onClose={() => setOpenChat(false)}
+            messages={messages}
+            count={countChat}
           />
         </div>
 

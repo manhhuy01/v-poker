@@ -16,28 +16,8 @@ const ChatElement = ({ userName, message, isYour }) => {
   )
 }
 
-export default function chat({ user, isOpen, onClose }) {
+export default function Chat({ user, isOpen, onClose, messages, count }) {
   const inputRef = useRef(null);
-  const [messages, setMessages] = useState([]);
-
-  useEffect(() => {
-    const handleMessage = (dataAPI) => {
-      setMessages(dataAPI.messages.reduce((agg, chat, i) => {
-        const isYour = chat.userName === user.userName;
-        if (i && chat.userName === agg[i - 1].userName) {
-          agg.push({ ...chat, owner: isYour, hiddenUserName: true })
-        } else {
-          agg.push({ ...chat, owner: isYour })
-        }
-        return agg;
-      }, []));
-    };
-
-    socket.subscribeToGetMessage(handleMessage);
-    return () => {
-      socket.unsubscribeFromMessage(handleMessage);
-    }
-  }, [user.userName]);
 
   useEffect(() => {
     if (isOpen) {
@@ -47,7 +27,7 @@ export default function chat({ user, isOpen, onClose }) {
         if (inputRef.current) inputRef.current.focus();
       }, 100);
     }
-  }, [isOpen, messages?.length]);
+  }, [isOpen, count]);
 
 
   const onSendMessage = (message) => {

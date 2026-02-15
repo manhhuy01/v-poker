@@ -13,7 +13,7 @@ import Modal from './modal'
 import Spin from './spin'
 import ChatFloating from './chatFloating'
 
-export default function game({ data, onEditClick, onAddClick, onChatOpen }) {
+export default function Game({ data, onEditClick, onAddClick, onChatOpen, messages, countChat }) {
   const [playDingSound] = useSound('/ding.mp3');
   const [isFullScreen, setFullScreen] = useState(false)
   const [isLoadingDealerAction, setLoadingDealerAction] = useState(false)
@@ -300,7 +300,7 @@ export default function game({ data, onEditClick, onAddClick, onChatOpen }) {
           }
 
           <div className="absolute top-1/4 left-1/2 transform -translate-x-1/2 w-2/3 flex flex-col items-center pointer-events-none gap-8">
-              <Pot
+            <Pot
               pot={data?.table?.pot}
               cards={[...(data?.table?.flop || []), data?.table?.turn, data?.table?.river].filter(Boolean)}
               start={data?.table?.start}
@@ -310,6 +310,8 @@ export default function game({ data, onEditClick, onAddClick, onChatOpen }) {
             <ChatFloating
               user={data?.user}
               onChatOpen={onChatOpen}
+              messages={messages}
+              count={countChat}
             />
           </div>
         </div>
