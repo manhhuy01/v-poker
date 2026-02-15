@@ -12,7 +12,7 @@ export default function Deposit({ user, onAccountUpdate, variant = 'button' }) {
   const handleDeposit = async (e) => {
     e.preventDefault();
     const amount = parseInt(amountRef.current.value);
-    if (isNaN(amount) || amount <= 0) {
+    if (isNaN(amount) || amount < 0) {
       return addToast('Số tiền không hợp lệ', { appearance: 'error' });
     }
 
