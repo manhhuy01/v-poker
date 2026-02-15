@@ -28,9 +28,12 @@ export const subscribeToGetNotification = (cb) => {
 
 export const subscribeToGetMessage = (cb) => {
   if (!socket) return (true);
-  socket.on('chat', data => {
-    return cb(null, data);
-  });
+  socket.on('chat', cb);
+}
+
+export const unsubscribeFromMessage = (cb) => {
+  if (!socket) return;
+  socket.off('chat', cb);
 }
 
 export const sendMessage = ({ message, userName }) => {

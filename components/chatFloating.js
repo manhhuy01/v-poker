@@ -1,22 +1,37 @@
 import { useState, useRef, useEffect } from 'react'
+import * as socket from '../api/socket'
 
-export default function ChatFloating({ recentMessages, onSendMessage, onChatOpen }) {
+export default function ChatFloating({ user, onChatOpen }) {
+  const [messages, setMessages] = useState([]);
   const [isVisible, setIsVisible] = useState(false);
   const hideTimeoutRef = useRef(null);
   const inputRef = useRef(null);
 
   useEffect(() => {
-    if (recentMessages.length > 0) {
+    const handleMessage = (dataAPI) => {
+      const recent = (dataAPI?.messages || []).slice(-1);
+      console.log(recent)
+      setMessages(recent);
+
       setIsVisible(true);
       if (hideTimeoutRef.current) clearTimeout(hideTimeoutRef.current);
       hideTimeoutRef.current = setTimeout(() => {
         setIsVisible(false);
       }, 5000);
-    }
-    return () => {
-      if (hideTimeoutRef.current) clearTimeout(hideTimeoutRef.current);
     };
-  }, [recentMessages]);
+
+    socket.subscribeToGetMessage(handleMessage);
+    return () => {
+      socket.unsubscribeFromMessage(handleMessage);
+      if (hideTimeoutRef.current) clearTimeout(hideTimeoutRef.current);
+    }
+  }, []);
+
+  const onSendMessage = (message) => {
+    if (message.trim()) {
+      socket.sendMessage({ message: message.trim(), userName: user.userName });
+    }
+  }
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -36,7 +51,7 @@ export default function ChatFloating({ recentMessages, onSendMessage, onChatOpen
   return (
     <div className='chat-floating flex flex-col items-center gap-2'>
       <div className={`flex flex-col items-center space-y-1.5 pointer-events-auto transition-opacity duration-1000 ${isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-        {recentMessages.map((msg, i) => (
+        {messages.map((msg, i) => (
           <div
             key={i}
             onClick={onChatOpen}

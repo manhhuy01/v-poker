@@ -69,7 +69,6 @@ export default function Home({ user, token }) {
   })
   const [openLobby, setOpenLobby] = useState(false);
   const [openChat, setOpenChat] = useState(false);
-  const [chatData, setChatData] = useState({ count: 0, messages: [] });
   const { addToast } = useToasts()
 
   useEffect(()=> {
@@ -85,21 +84,6 @@ export default function Home({ user, token }) {
       socket.initiateSocket({ token });
     }
     
-    socket.subscribeToGetMessage((err, dataAPI) => {
-      if (err) return;
-      setChatData(prev => ({
-        ...dataAPI,
-        messages: dataAPI.messages.reduce((agg, chat, i) => {
-          const isYour = chat.userName === user.userName;
-          if (i && chat.userName === agg[i - 1].userName) {
-            agg.push({ ...chat, owner: isYour, hiddenUserName: true })
-          } else {
-            agg.push({ ...chat, owner: isYour })
-          }
-          return agg;
-        }, [])
-      }));
-    });
 
     socket.subscribeToGetData((err, roomInfo) => {
       if (err) {
@@ -215,12 +199,6 @@ export default function Home({ user, token }) {
     setAddModal(false)
   }
 
-  const onSendMessage = (message) => {
-    if (message.trim()) {
-      socket.sendMessage({ message: message.trim(), userName: user.userName });
-    }
-  }
-
   return (
     <div>
       <Head>
@@ -242,7 +220,6 @@ export default function Home({ user, token }) {
               data={data} 
               user={user} 
               onLobbyClick={() => setOpenLobby(true)} 
-              chatCount={chatData.messages.length}
               onChatOpen={() => setOpenChat(true)}
             />
             <Game
@@ -250,8 +227,6 @@ export default function Home({ user, token }) {
               user={user}
               onEditClick={onEditClick}
               onAddClick={onAddClick}
-              chatMessages={chatData.messages}
-              onSendMessage={onSendMessage}
               onChatOpen={() => setOpenChat(true)}
             />
           </div>
@@ -259,8 +234,6 @@ export default function Home({ user, token }) {
             user={user} 
             isOpen={openChat}
             onClose={() => setOpenChat(false)}
-            data={chatData}
-            onSendMessage={onSendMessage}
           />
         </div>
 

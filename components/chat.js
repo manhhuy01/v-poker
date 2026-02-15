@@ -1,12 +1,13 @@
 import { useState, useEffect, useRef } from 'react'
+import * as socket from '../api/socket'
 
 const ChatElement = ({ userName, message, isYour }) => {
   return (
     <div className={`w-full flex mb-3 ${isYour ? 'justify-end pl-10' : 'justify-start pr-10'}`}>
       <div className={`max-w-full flex flex-col ${isYour ? 'items-end' : 'items-start'}`}>
         {!isYour && !!userName && <div className="text-[10px] font-black tracking-widest text-gray-500 mb-1 ml-1">{userName}</div>}
-        <div className={`px-4 py-2 rounded-2xl text-sm font-medium shadow-sm transition-all duration-300 ${isYour 
-          ? 'bg-indigo-600 text-white rounded-br-none' 
+        <div className={`px-4 py-2 rounded-2xl text-sm font-medium shadow-sm transition-all duration-300 ${isYour
+          ? 'bg-indigo-600 text-white rounded-br-none'
           : 'bg-gray-100 text-gray-800 rounded-bl-none'}`}>
           {message}
         </div>
@@ -15,9 +16,29 @@ const ChatElement = ({ userName, message, isYour }) => {
   )
 }
 
-export default function chat({ user, isOpen, onClose, data, onSendMessage }) {
+export default function chat({ user, isOpen, onClose }) {
   const inputRef = useRef(null);
-  
+  const [messages, setMessages] = useState([]);
+
+  useEffect(() => {
+    const handleMessage = (dataAPI) => {
+      setMessages(dataAPI.messages.reduce((agg, chat, i) => {
+        const isYour = chat.userName === user.userName;
+        if (i && chat.userName === agg[i - 1].userName) {
+          agg.push({ ...chat, owner: isYour, hiddenUserName: true })
+        } else {
+          agg.push({ ...chat, owner: isYour })
+        }
+        return agg;
+      }, []));
+    };
+
+    socket.subscribeToGetMessage(handleMessage);
+    return () => {
+      socket.unsubscribeFromMessage(handleMessage);
+    }
+  }, [user.userName]);
+
   useEffect(() => {
     if (isOpen) {
       setTimeout(() => {
@@ -26,7 +47,14 @@ export default function chat({ user, isOpen, onClose, data, onSendMessage }) {
         if (inputRef.current) inputRef.current.focus();
       }, 100);
     }
-  }, [isOpen, data?.messages?.length]);
+  }, [isOpen, messages?.length]);
+
+
+  const onSendMessage = (message) => {
+    if (message.trim()) {
+      socket.sendMessage({ message: message.trim(), userName: user.userName });
+    }
+  }
 
   const handleSend = (e) => {
     e.preventDefault();
@@ -53,7 +81,7 @@ export default function chat({ user, isOpen, onClose, data, onSendMessage }) {
 
       <div id='chat-body' className="flex-1 p-6 overflow-y-auto scroll-smooth custom-scrollbar">
         {
-          data?.messages && data.messages.map((chat, i) => (
+          messages && messages.map((chat, i) => (
             <ChatElement
               key={i}
               userName={(chat.owner || chat.hiddenUserName) ? '' : chat.userName}
@@ -66,14 +94,14 @@ export default function chat({ user, isOpen, onClose, data, onSendMessage }) {
 
       <div className="p-4 bg-gray-50 border-t border-gray-100">
         <form className="flex items-center space-x-2" onSubmit={handleSend}>
-          <input 
-            ref={inputRef} 
-            className="flex-1 bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" 
+          <input
+            ref={inputRef}
+            className="flex-1 bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
             placeholder="Nhập tin nhắn..."
-            type="text" 
+            type="text"
           />
-          <button 
-            onClick={handleSend} 
+          <button
+            onClick={handleSend}
             className="p-3 bg-indigo-600 text-white rounded-xl shadow-lg shadow-indigo-200 hover:bg-indigo-700 active:scale-95 transition-all focus:outline-none"
             type="submit"
           >

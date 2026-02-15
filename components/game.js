@@ -13,7 +13,7 @@ import Modal from './modal'
 import Spin from './spin'
 import ChatFloating from './chatFloating'
 
-export default function game({ data, onEditClick, onAddClick, chatMessages = [], onSendMessage, onChatOpen }) {
+export default function game({ data, onEditClick, onAddClick, onChatOpen }) {
   const [playDingSound] = useSound('/ding.mp3');
   const [isFullScreen, setFullScreen] = useState(false)
   const [isLoadingDealerAction, setLoadingDealerAction] = useState(false)
@@ -308,8 +308,7 @@ export default function game({ data, onEditClick, onAddClick, chatMessages = [],
               finish={data?.table?.finish}
             />
             <ChatFloating
-              recentMessages={chatMessages.slice(-1)}
-              onSendMessage={onSendMessage}
+              user={data?.user}
               onChatOpen={onChatOpen}
             />
           </div>
