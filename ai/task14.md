@@ -1,0 +1,1 @@
+1. input chat nhanh để giữa bàn thì hơi choáng chõ, hãy tách component ra và di chuyển nó xuống dưới cùng đối với mobile (ở trên so với game action), còn desktop thì không cần hiện input

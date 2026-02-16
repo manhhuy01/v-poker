@@ -70,7 +70,7 @@ export default function position({
   let chipClassName = 'opacity-0';
 
   if (bet) {
-    chipClassName = 'opacity-1 '
+    chipClassName = 'opacity-100 '
     switch (+pos) {
       case 1:
         chipClassName += '-translate-y-20 md:-translate-y-24';
@@ -109,7 +109,7 @@ export default function position({
   let winChipClassName = '';
 
   if (winBalance) {
-    winChipClassName = 'opacity-1 ';
+    winChipClassName = 'opacity-100 ';
     switch (+pos) {
       case 1:
         winChipClassName += '-top-48 sm:-top-36 translate-y-28 sm:translate-y-16 md:translate-y-12';
@@ -222,7 +222,7 @@ export default function position({
               !!namePos && <div className={`${posClassName} absolute font-extrabold text-xs z-10 pl-1 pr-1 rounded -bottom-12`} >{namePos}</div>
             }
             <div className="bg-gray-900 text-blue-400 pr-2 pl-2 rounded z-10 text-xs w-max">${isPlaying && !balance && start ? 'ALL IN' : balance}</div>
-            { isUserPlaying && <div onClick={hideCard} className={`${isHiddenCard ? 'text-red-500' : 'text-white'} absolute left-16 top-50 text-xl text-white cursor-pointer`}>Θ</div>}
+            { isUserPlaying && <div onClick={hideCard} className={`${isHiddenCard ? 'text-red-500' : 'text-white'} absolute left-16 top-0 text-xl text-white cursor-pointer`}>Θ</div>}
 
             <div className={`${chipClassName} transform transition transition-transform absolute flex items-center justify-center text-xs font-bold text-white`}>
               <img className="w-4 h-4 max-w-none mr-1" src="/chip.svg" alt="chip" />

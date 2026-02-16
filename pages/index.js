@@ -230,8 +230,8 @@ export default function Home({ user, token }) {
           onClose={() => setOpenLobby(false)}
         />
 
-        <div className="flex w-screen h-screen">
-          <div className="relative w-full h-full">
+        <div className="flex w-screen h-dvh">
+          <div className="relative w-full h-dvh">
             <TopMenu
               data={data}
               user={user}

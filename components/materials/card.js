@@ -22,7 +22,7 @@ export default function card({ data = 'u', isFold, isHidden }) {
       return null;
     }
     return (
-      <div className={`border-black bg-white shadow rounded w-8 h-10 md:w-10 md:h-14 font-bold p-1 ml-1 mr-1 bg-card bg-card-up bg-size-card`}>
+      <div className={`border-black bg-white shadow rounded w-8 h-10 md:w-10 md:h-14 font-bold p-1 ml-1 mr-1 bg-card-pattern`}>
       </div>
     )
   }
@@ -59,7 +59,7 @@ export default function card({ data = 'u', isFold, isHidden }) {
         <div className="leading-4 md:text-xl">{num}</div>
         <div className="text-lg md:text-2xl leading-4 md:leading-4 text-right ">{symbol}</div>
       </div>
-      { !isFold && <div className={`backface-hidden absolute w-full h-full border-black bg-white shadow rounded font-bold bg-card bg-card-up bg-size-card`}>
+      { !isFold && <div className={`backface-hidden absolute w-full h-full border-black bg-white shadow rounded font-bold bg-card-pattern`}>
       </div>}
     </div>
 

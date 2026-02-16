@@ -12,6 +12,7 @@ import {
 import Modal from './modal'
 import Spin from './spin'
 import ChatFloating from './chatFloating'
+import QuickChatInput from './quickChatInput'
 
 export default function Game({ data, onEditClick, onAddClick, onChatOpen, messages, countChat }) {
   const [playDingSound] = useSound('/ding.mp3');
@@ -150,14 +151,18 @@ export default function Game({ data, onEditClick, onAddClick, onChatOpen, messag
   const onActionBet = async () => {
     setLoadingPlayerAction(true)
     let betBalance = betInput.current.value;
-    if (+betBalance == 'NaN') {
+    if (+betBalance == 'NaN' && betBalance != 'all-in') {
       return addToast('Bet sai định dạng', {
         appearance: 'error',
       })
     }
     setOpenModalBet(false)
     try {
-      await playerAction({ type: 'BET', userName: data?.user?.userName, betBalance: +betBalance })
+      if (betBalance == 'all-in') {
+        await playerAction({ type: 'BET', userName: data?.user?.userName, isAllIn: true })
+      } else {
+        await playerAction({ type: 'BET', userName: data?.user?.userName, betBalance: +betBalance })
+      }
     } catch (err) {
       if (err?.response?.data?.error) {
         addToast(err?.response?.data?.error, {
@@ -190,23 +195,6 @@ export default function Game({ data, onEditClick, onAddClick, onChatOpen, messag
       }
     }
     setLoadingPlayerAction(false)
-  }
-
-  const onActionAllIn = async () => {
-    if (window.confirm('Chắc không bạn?')) {
-      setLoadingPlayerAction(true)
-      setOpenModalBet(false)
-      try {
-        await playerAction({ type: 'BET', userName: data?.user?.userName, isAllIn: true })
-      } catch (err) {
-        if (err?.response?.data?.error) {
-          addToast(err?.response?.data?.error, {
-            appearance: 'error',
-          })
-        }
-      }
-      setLoadingPlayerAction(false)
-    }
   }
 
   const onShowAllCards = async () => {
@@ -269,8 +257,8 @@ export default function Game({ data, onEditClick, onAddClick, onChatOpen, messag
   const isCanShowCard = isFinish && !isFold && !data?.table?.isShowDown
   const isCanBet = !isAllIn && !isFinish
   return (
-    <div className="game-container relative w-full h-screen bg-gray-800 overflow-hidden">
-      <div className="game-layout pt-16 pb-20 w-full h-full flex items-center justify-center">
+    <div className="game-container relative w-full h-dvh bg-gray-800 overflow-hidden">
+      <div className="game-layout pt-16 pb-40 w-full h-dvh flex items-center justify-center">
         <div className="w-10/12 h-5/6 relative border-8 border-black rounded-large bg-green-700">
           {
             Object.keys(data?.position || {}).map((position) => (
@@ -299,7 +287,13 @@ export default function Game({ data, onEditClick, onAddClick, onChatOpen, messag
             ))
           }
 
-          <div className="absolute top-1/4 left-1/2 transform -translate-x-1/2 w-2/3 flex flex-col items-center pointer-events-none gap-8">
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-2/3 flex flex-col items-center pointer-events-none gap-8">
+            <ChatFloating
+              user={data?.user}
+              onChatOpen={onChatOpen}
+              messages={messages}
+              count={countChat}
+            />
             <Pot
               pot={data?.table?.pot}
               cards={[...(data?.table?.flop || []), data?.table?.turn, data?.table?.river].filter(Boolean)}
@@ -307,46 +301,46 @@ export default function Game({ data, onEditClick, onAddClick, onChatOpen, messag
               onClickTipDealer={() => setOpenModalTip(true)}
               finish={data?.table?.finish}
             />
-            <ChatFloating
-              user={data?.user}
-              onChatOpen={onChatOpen}
-              messages={messages}
-              count={countChat}
-            />
+
           </div>
         </div>
       </div>
       <div onClick={onFullScreen} className="absolute top-24 left-1/2 z-10 cursor-pointer text-2xl text-white transform -translate-x-2/4 hover:scale-125 transition-all bg-black/20 p-2.5 rounded-2xl backdrop-blur-md border border-white/10 shadow-lg">&#x26F6;</div>
-      <div className="sticky game-action bottom-0 left-0 flex flex-row items-center p-1.5 sm:p-6 justify-center gap-4 sm:gap-8 bg-black/90 backdrop-blur-3xl border-t border-white/10 w-full overflow-x-auto no-scrollbar">
+      <div className="absolute bottom-16 sm:bottom-24 left-0 w-full flex justify-center z-20 pointer-events-none">
+        <div className="w-full max-w-md pointer-events-auto">
+          <QuickChatInput user={data?.user} />
+        </div>
+      </div>
+      <div className="sticky game-action bottom-0 left-0 flex flex-row items-center p-2 sm:p-6 justify-center gap-2 sm:gap-8 bg-black/90 backdrop-blur-3xl border-t border-white/10 w-full overflow-x-auto no-scrollbar">
         {
           data?.user?.isDealer && (
             <div className="flex flex-row items-center gap-4 sm:gap-4 shrink-0">
               {
-                data?.table?.start && !data?.table?.preFlop && <button onClick={onPreFlop} className="flex-none flex flex-col items-center justify-center text-white bg-gradient-to-r from-emerald-400 to-green-600 px-1.5 py-2 sm:px-6 sm:py-3 rounded sm:rounded-2xl font-black text-[7px] sm:text-xs shadow-lg shadow-emerald-900/40 hover:scale-105 transition-all focus:outline-none border border-emerald-400/50" type="button">
+                data?.table?.start && !data?.table?.preFlop && <button onClick={onPreFlop} className="flex-none flex flex-col items-center justify-center text-white bg-gradient-to-r from-emerald-400 to-green-600 px-3 py-3 sm:px-6 sm:py-3 rounded sm:rounded-2xl font-black text-[10px] sm:text-xs shadow-lg shadow-emerald-900/40 hover:scale-105 transition-all focus:outline-none border border-emerald-400/50" type="button">
                   <Spin loading={isLoadingDealerAction} />
                   <span className="uppercase tracking-tighter whitespace-nowrap px-0.5">Chia bài</span>
                 </button>
               }
               {
-                !data?.table?.start && <button onClick={onStart} className="flex-none flex flex-col items-center justify-center text-white bg-gradient-to-r from-pink-500 to-rose-600 px-1.5 py-2 sm:px-6 sm:py-3 rounded sm:rounded-2xl font-black text-[7px] sm:text-xs shadow-lg shadow-pink-900/40 hover:scale-105 transition-all focus:outline-none border border-pink-400/50" type="button">
+                !data?.table?.start && <button onClick={onStart} className="flex-none flex flex-col items-center justify-center text-white bg-gradient-to-r from-pink-500 to-rose-600 px-3 py-3 sm:px-6 sm:py-3 rounded sm:rounded-2xl font-black text-[10px] sm:text-xs shadow-lg shadow-pink-900/40 hover:scale-105 transition-all focus:outline-none border border-pink-400/50" type="button">
                   <Spin loading={isLoadingDealerAction} />
                   <span className="uppercase tracking-tighter whitespace-nowrap px-0.5">Vào ván</span>
                 </button>
               }
               {
-                isFinish && !data?.table?.river && <button onClick={onShowAllCards} className="flex-none flex flex-col items-center justify-center text-white bg-gradient-to-r from-violet-500 to-purple-700 px-1.5 py-2 sm:px-6 sm:py-3 rounded sm:rounded-2xl font-black text-[7px] sm:text-xs shadow-lg shadow-violet-900/40 hover:scale-105 transition-all focus:outline-none border border-violet-400/50" type="button">
+                isFinish && !data?.table?.river && <button onClick={onShowAllCards} className="flex-none flex flex-col items-center justify-center text-white bg-gradient-to-r from-violet-500 to-purple-700 px-3 py-3 sm:px-6 sm:py-3 rounded sm:rounded-2xl font-black text-[10px] sm:text-xs shadow-lg shadow-violet-900/40 hover:scale-105 transition-all focus:outline-none border border-violet-400/50" type="button">
                   <Spin loading={isLoadingDealerAction} />
                   <span className="uppercase tracking-tighter whitespace-nowrap px-0.5">Chia Hết</span>
                 </button>
               }
               {
-                <button onClick={onReset} className="flex-none flex flex-col items-center justify-center text-white bg-gradient-to-r from-slate-500 to-slate-700 px-1.5 py-2 sm:px-6 sm:py-3 rounded sm:rounded-2xl font-black text-[7px] sm:text-xs shadow-lg shadow-slate-900/40 hover:scale-105 transition-all focus:outline-none border border-slate-400/50" type="button">
+                <button onClick={onReset} className="flex-none flex flex-col items-center justify-center text-white bg-gradient-to-r from-slate-500 to-slate-700 px-3 py-3 sm:px-6 sm:py-3 rounded sm:rounded-2xl font-black text-[10px] sm:text-xs shadow-lg shadow-slate-900/40 hover:scale-105 transition-all focus:outline-none border border-slate-400/50" type="button">
                   <Spin loading={isLoadingDealerAction} />
                   <span className="uppercase tracking-tighter whitespace-nowrap px-0.5">Thu dọn</span>
                 </button>
               }
               {
-                !data?.table?.start && <button onClick={onShuffle} className="flex-none flex flex-col items-center justify-center text-white bg-gradient-to-r from-indigo-500 to-blue-700 px-1.5 py-2 sm:px-6 sm:py-3 rounded sm:rounded-2xl font-black text-[7px] sm:text-xs shadow-lg shadow-indigo-900/40 hover:scale-105 transition-all focus:outline-none border border-indigo-400/50" type="button">
+                !data?.table?.start && <button onClick={onShuffle} className="flex-none flex flex-col items-center justify-center text-white bg-gradient-to-r from-indigo-500 to-blue-700 px-3 py-3 sm:px-6 sm:py-3 rounded sm:rounded-2xl font-black text-[10px] sm:text-xs shadow-lg shadow-indigo-900/40 hover:scale-105 transition-all focus:outline-none border border-indigo-400/50" type="button">
                   <Spin loading={isLoadingDealerAction} />
                   <span className="uppercase tracking-tighter whitespace-nowrap px-0.5">Xào bài</span>
                 </button>
@@ -358,20 +352,20 @@ export default function Game({ data, onEditClick, onAddClick, onChatOpen, messag
           (!data?.table?.preFlop || isThinking || data?.table?.finish) && data?.user?.position && (
             <div className="flex flex-row items-center gap-4 sm:gap-4 shrink-0 ml-1">
               {
-                isCanFold && <button onClick={onActionFold} disabled={loadingPlayerAction} className="flex-none flex flex-col items-center justify-center text-gray-400 bg-gradient-to-br from-gray-900 to-black border border-rose-950/50 px-1.5 py-2 sm:px-8 sm:py-3 rounded sm:rounded-2xl font-bold text-[7px] sm:text-sm shadow-xl shadow-black/80 hover:bg-zinc-900 transition-all focus:outline-none" type="button">
+                isCanFold && <button onClick={onActionFold} disabled={loadingPlayerAction} className="flex-none flex flex-col items-center justify-center text-gray-400 bg-gradient-to-br from-gray-900 to-black border border-rose-950/50 px-5 py-3 sm:px-8 sm:py-3 rounded sm:rounded-2xl font-bold text-[10px] sm:text-sm shadow-xl shadow-black/80 hover:bg-zinc-900 transition-all focus:outline-none" type="button">
                   <Spin loading={loadingPlayerAction} />
                   <span className="uppercase tracking-tighter whitespace-nowrap px-0.5">Fold</span>
                 </button>
               }
               {
-                isCanCheck && <button onClick={onActionCheck} disabled={loadingPlayerAction} className="flex-none flex flex-col items-center justify-center text-white bg-gradient-to-br from-cyan-600 to-cyan-800 border border-cyan-500/40 px-1.5 py-2 sm:px-8 sm:py-3 rounded sm:rounded-2xl font-bold text-[7px] sm:text-sm hover:scale-105 shadow-lg shadow-cyan-900/40 transition-all focus:outline-none" type="button">
+                isCanCheck && <button onClick={onActionCheck} disabled={loadingPlayerAction} className="flex-none flex flex-col items-center justify-center text-white bg-gradient-to-br from-cyan-600 to-cyan-800 border border-cyan-500/40 px-5 py-3 sm:px-8 sm:py-3 rounded sm:rounded-2xl font-bold text-[10px] sm:text-sm hover:scale-105 shadow-lg shadow-cyan-900/40 transition-all focus:outline-none" type="button">
                   <Spin loading={loadingPlayerAction} />
                   <span className="uppercase tracking-tighter whitespace-nowrap px-0.5">Check</span>
                 </button>
               }
               {
                 isCanCall && (
-                  <button onClick={onActionCall} disabled={loadingPlayerAction} className="flex-none flex flex-col items-center justify-center text-white bg-gradient-to-br from-amber-400 to-orange-600 border border-amber-400/40 px-1.5 py-2 sm:px-8 sm:py-3 rounded sm:rounded-2xl font-bold text-[7px] sm:text-sm shadow-xl shadow-amber-900/40 hover:scale-105 transition-all focus:outline-none" type="button">
+                  <button onClick={onActionCall} disabled={loadingPlayerAction} className="flex-none flex flex-col items-center justify-center text-white bg-gradient-to-br from-amber-400 to-orange-600 border border-amber-400/40 px-5 py-3 sm:px-8 sm:py-3 rounded sm:rounded-2xl font-bold text-[10px] sm:text-sm shadow-xl shadow-amber-900/40 hover:scale-105 transition-all focus:outline-none" type="button">
                     <Spin loading={loadingPlayerAction} />
                     <span className="uppercase tracking-tighter whitespace-nowrap px-0.5">Call</span>
                   </button>
@@ -380,7 +374,7 @@ export default function Game({ data, onEditClick, onAddClick, onChatOpen, messag
 
               {
                 isCanBet && data?.table?.start && (
-                  <button onClick={() => setOpenModalBet(true)} className="flex-none flex flex-col items-center justify-center text-white bg-gradient-to-br from-blue-500 to-indigo-700 border border-blue-400/40 px-1.5 py-2 sm:px-8 sm:py-3 rounded sm:rounded-2xl font-bold text-[7px] sm:text-sm shadow-xl shadow-blue-900/40 hover:scale-105 transition-all focus:outline-none" type="button">
+                  <button onClick={() => setOpenModalBet(true)} className="flex-none flex flex-col items-center justify-center text-white bg-gradient-to-br from-blue-500 to-indigo-700 border border-blue-400/40 px-5 py-3 sm:px-8 sm:py-3 rounded sm:rounded-2xl font-bold text-[10px] sm:text-sm shadow-xl shadow-blue-900/40 hover:scale-105 transition-all focus:outline-none" type="button">
                     <span className="uppercase tracking-tighter whitespace-nowrap px-0.5">Bet</span>
                   </button>
                 )
@@ -388,7 +382,7 @@ export default function Game({ data, onEditClick, onAddClick, onChatOpen, messag
 
               {
                 isCanShowCard && (
-                  <button onClick={onActionShow} disabled={loadingPlayerAction} className="flex-none flex flex-col items-center justify-center text-white bg-gradient-to-br from-emerald-500 to-teal-700 border border-emerald-400/40 px-1.5 py-2 sm:px-8 sm:py-3 rounded sm:rounded-2xl font-bold text-[7px] sm:text-sm shadow-xl shadow-emerald-900/40 hover:scale-105 transition-all focus:outline-none" type="button">
+                  <button onClick={onActionShow} disabled={loadingPlayerAction} className="flex-none flex flex-col items-center justify-center text-white bg-gradient-to-br from-emerald-500 to-teal-700 border border-emerald-400/40 px-5 py-3 sm:px-8 sm:py-3 rounded sm:rounded-2xl font-bold text-[10px] sm:text-sm shadow-xl shadow-emerald-900/40 hover:scale-105 transition-all focus:outline-none" type="button">
                     <Spin loading={loadingPlayerAction} />
                     <span className="uppercase tracking-tighter whitespace-nowrap px-0.5">Show</span>
                   </button>
@@ -418,7 +412,7 @@ export default function Game({ data, onEditClick, onAddClick, onChatOpen, messag
                   { label: '1x BB', value: (data?.setting?.smallBlind || 0) * 2 },
                   { label: '2x BB', value: (data?.setting?.smallBlind || 0) * 4 },
                   { label: '6x BB', value: (data?.setting?.smallBlind || 0) * 12 },
-                  { label: 'ALL-IN', value: data?.user?.accBalance || 0, color: 'bg-gradient-to-br from-red-600 to-rose-800 border border-red-500/40' }
+                  { label: 'ALL-IN', value: 'all-in', color: 'bg-gradient-to-br from-red-600 to-rose-800 border border-red-500/40' }
                 ].map((opt, i) => (
                   <button
                     key={i}
@@ -437,7 +431,6 @@ export default function Game({ data, onEditClick, onAddClick, onChatOpen, messag
                 <div className="relative group">
                   <input
                     ref={betInput}
-                    type="number"
                     autoFocus
                     defaultValue={data?.user?.position?.betBalance || 0}
                     className="w-full bg-gray-800 border border-white/10 rounded-2xl px-5 py-4 text-white font-bold text-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all hover:bg-gray-750"

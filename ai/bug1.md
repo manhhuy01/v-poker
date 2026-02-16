@@ -1,0 +1,1 @@
+1. pop up deposit trong deposit component đang bị lỗi UI do upgrade tailwind từ v2 sang v4. hãy fix bằng cách tách popup ra riêng bên ngoài thay vì đặt chung component

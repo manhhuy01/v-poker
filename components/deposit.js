@@ -2,6 +2,7 @@ import { useState, useRef } from 'react'
 import { useToasts } from 'react-toast-notifications'
 import { updateProfile } from '../api/poker'
 import Spin from './spin'
+import Modal from './modal'
 
 export default function Deposit({ user, onAccountUpdate, variant = 'button' }) {
   const [isOpen, setOpen] = useState(false);
@@ -60,50 +61,32 @@ export default function Deposit({ user, onAccountUpdate, variant = 'button' }) {
     <>
       {renderTrigger()}
 
-      {isOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setOpen(false)}></div>
-          <div className="relative bg-gray-900 border border-white/10 rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-300">
-            <div className="px-8 py-6 border-b border-white/5 bg-white/5 flex justify-between items-center">
-              <div>
-                <h3 className="text-xl font-black uppercase tracking-tight text-white">Nạp tiền</h3>
-                <p className="text-xs text-gray-400 mt-1 font-medium tracking-wide">Số dư hiện tại: <span className="text-emerald-400">{(user.accBalance || 0).toLocaleString()}</span></p>
-              </div>
-              <button 
-                onClick={() => setOpen(false)} 
-                className="p-2 hover:bg-white/5 rounded-xl transition-colors text-gray-400 hover:text-white"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
+      <Modal
+        isOpen={isOpen}
+        onClose={() => setOpen(false)}
+        loading={loading}
+        onCancel={() => setOpen(false)}
+        onConfirm={handleDeposit}
+      >
+        <div className="space-y-6">
+          <div className="text-center">
+            <h3 className="text-xl font-black uppercase tracking-tight text-white">Nạp tiền</h3>
+            <p className="text-xs text-gray-400 mt-1 font-medium tracking-wide">Số dư hiện tại: <span className="text-emerald-400">{(user.accBalance || 0).toLocaleString()}</span></p>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-[10px] uppercase font-black tracking-widest text-gray-500 ml-1">Số tiền muốn nạp</label>
+            <div className="relative group">
+              <input
+                ref={amountRef}
+                autoFocus
+                placeholder="Ví dụ: 10"
+                className="w-full bg-gray-800 border border-white/10 rounded-2xl px-5 py-4 text-white font-bold text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all hover:bg-gray-700"
+              />
             </div>
-
-            <form onSubmit={handleDeposit} className="p-8 space-y-6">
-              <div className="space-y-2">
-                <label className="text-[10px] uppercase font-black tracking-widest text-gray-500 ml-1">Số tiền muốn nạp</label>
-                <div className="relative group">
-                  <input
-                    ref={amountRef}
-                    autoFocus
-                    placeholder="Ví dụ: 10"
-                    className="w-full bg-gray-800 border border-white/10 rounded-2xl px-5 py-4 text-white font-bold text-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all hover:bg-gray-750"
-                  />
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-emerald-600 text-white font-black uppercase tracking-widest py-4 rounded-2xl shadow-xl shadow-emerald-900/40 hover:bg-emerald-700 active:scale-[0.98] transition-all flex items-center justify-center space-x-3 disabled:opacity-50 disabled:cursor-not-allowed border border-white/20"
-              >
-                <Spin loading={loading} />
-                <span>Xác nhận nạp</span>
-              </button>
-            </form>
           </div>
         </div>
-      )}
+      </Modal>
     </>
   );
 }

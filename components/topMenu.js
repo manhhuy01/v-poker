@@ -11,6 +11,8 @@ export default function TopMenu({ data, user, onLobbyClick, chatCount, onChatOpe
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        // Don't close if clicking inside a modal (Portal issues)
+        if (event.target.closest('.modal-container')) return;
         setProfileOpen(false);
       }
     }
@@ -70,7 +72,7 @@ export default function TopMenu({ data, user, onLobbyClick, chatCount, onChatOpe
         </button>
 
         {profileOpen && (
-          <div className="absolute top-full right-0 mt-2 w-56 bg-gray-900 border border-white/10 rounded-2xl shadow-2xl overflow-hidden py-2 backdrop-blur-xl">
+          <div className="absolute top-full right-0 mt-2 w-56 bg-gray-900 border border-white/10 rounded-2xl shadow-2xl overflow-hidden py-2 ">
             <div className="px-4 py-2 border-b border-white/5 mb-2">
               <p className="text-[10px] uppercase font-black tracking-widest text-gray-500">Người chơi</p>
               <p className="text-sm font-bold truncate leading-none">{currentUser?.userName}</p>
