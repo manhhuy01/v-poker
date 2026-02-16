@@ -25,13 +25,35 @@ export default function Game({ data, onEditClick, onAddClick, onChatOpen, messag
   const [isHiddenCard, setHiddenCard] = useState(false)
   const betInput = useRef(null);
   const tipInput = useRef(null);
+  const [autoAction, setAutoAction] = useState(null); // 'FOLD', 'CALL_CHECK'
+  const [autoActionBetValue, setAutoActionBetValue] = useState(0);
   const { addToast } = useToasts()
 
   useEffect(() => {
     if (data?.user?.position?.isThinking) {
       playDingSound();
+
+      // Execute auto action
+      if (autoAction === 'FOLD' && isCanFold) {
+        onActionFold();
+      } else if (autoAction === 'CALL_CHECK') {
+        if (isCanCheck) {
+          onActionCheck();
+        } else if (isCanCall && autoActionBetValue == data?.table?.currentBet) {
+          onActionCall();
+        }
+      }
+      setAutoAction(null);
+      setAutoActionBetValue(0);
     }
-  }, [data?.user?.position?.isThinking])
+  }, [data?.user?.position?.isThinking, autoAction, autoActionBetValue])
+
+  // Reset auto call/check if somebody raises
+  useEffect(() => {
+    if (autoAction === 'CALL_CHECK' && data?.table?.currentBet > autoActionBetValue) {
+      setAutoAction(null);
+    }
+  }, [data?.table?.currentBet, autoAction, autoActionBetValue])
 
   const onStart = async () => {
     setLoadingDealerAction(true)
@@ -388,6 +410,31 @@ export default function Game({ data, onEditClick, onAddClick, onChatOpen, messag
                   </button>
                 )
               }
+            </div>
+          )
+        }
+        {
+          !isThinking && isPlaying && !isFold && isPreFlop && !isFinish && (
+            <div className="flex flex-row items-center gap-2 sm:gap-4 shrink-0 px-2">
+              <button 
+                onClick={() => setAutoAction(autoAction === 'FOLD' ? null : 'FOLD')}
+                className={`flex-none flex items-center justify-center px-4 py-3 rounded-xl font-bold text-[10px] sm:text-xs transition-all border ${autoAction === 'FOLD' ? 'bg-rose-600 text-white border-rose-400 shadow-lg shadow-rose-900/50 scale-105' : 'bg-gray-900/50 text-gray-400 border-white/5 hover:bg-white/5'}`}
+              >
+                AUTO FOLD
+              </button>
+              <button 
+                onClick={() => {
+                  if (autoAction === 'CALL_CHECK') {
+                    setAutoAction(null);
+                  } else {
+                    setAutoAction('CALL_CHECK');
+                    setAutoActionBetValue(data?.table?.currentBet || 0);
+                  }
+                }}
+                className={`flex-none flex items-center justify-center px-4 py-3 rounded-xl font-bold text-[10px] sm:text-xs transition-all border ${autoAction === 'CALL_CHECK' ? 'bg-indigo-600 text-white border-indigo-400 shadow-lg shadow-indigo-900/50 scale-105' : 'bg-gray-900/50 text-gray-400 border-white/5 hover:bg-white/5'}`}
+              >
+                AUTO CALL/CHECK
+              </button>
             </div>
           )
         }
