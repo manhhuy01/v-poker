@@ -1,0 +1,1 @@
+1. hãy làm lại UI màn hình login và register cho phù hợp với theme hiện tại của game (dark theme)
