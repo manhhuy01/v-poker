@@ -1,0 +1,1 @@
+1. trong trang report, ở tab tổng hợp, tôi muốn khi nhấn vào tên của 1 người thì sẽ coi được lịch sử của người đó tương tự như tab "lịch sử của tôi"

@@ -57,19 +57,20 @@ export default function Report({ user }) {
 
   const [summaryLoaded, setSummaryLoaded] = useState(false)
   const [logsCache, setLogsCache] = useState({})
+  const [viewingUser, setViewingUser] = useState(user.userName)
 
   useEffect(() => {
     if (activeTab === 'summary') {
       if (!summaryLoaded) fetchSummary()
     } else {
-      const cacheKey = `${days}-${page}`
+      const cacheKey = `${viewingUser}-${days}-${page}`
       if (logsCache[cacheKey]) {
         setGameLogs(logsCache[cacheKey])
       } else {
         fetchGameLogs(cacheKey)
       }
     }
-  }, [activeTab, days, page])
+  }, [activeTab, days, page, viewingUser])
 
   const fetchSummary = async () => {
     setLoading(true)
@@ -87,7 +88,7 @@ export default function Report({ user }) {
   const fetchGameLogs = async (cacheKey) => {
     setLoading(true)
     try {
-      const res = await api.getGameLogs(user.userName, { days, page, limit })
+      const res = await api.getGameLogs(viewingUser, { days, page, limit })
       const data = res.data.data || []
       setGameLogs(data)
       setLogsCache(prev => ({ ...prev, [cacheKey]: data }))
@@ -131,7 +132,7 @@ export default function Report({ user }) {
           <TabButton active={activeTab === 'summary'} onClick={() => setActiveTab('summary')}>
             Tổng hợp
           </TabButton>
-          <TabButton active={activeTab === 'logs'} onClick={() => setActiveTab('logs')}>
+          <TabButton active={activeTab === 'logs'} onClick={() => { setViewingUser(user.userName); setPage(1); setActiveTab('logs'); }}>
             Lịch sử của tôi
           </TabButton>
         </div>
@@ -156,11 +157,14 @@ export default function Report({ user }) {
                     return (
                       <tr key={idx} className="hover:bg-indigo-50/20 transition-all duration-300 group">
                         <td className="px-8 py-6">
-                          <div className="flex items-center space-x-3">
-                            <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-xs shadow-lg shadow-indigo-200 uppercase">
+                          <div 
+                            className="flex items-center space-x-3 cursor-pointer group/name"
+                            onClick={() => { setViewingUser(item.username); setPage(1); setActiveTab('logs'); }}
+                          >
+                            <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-xs shadow-lg shadow-indigo-200 uppercase group-hover/name:scale-110 transition-transform">
                               {item.username.substring(0, 2)}
                             </div>
-                            <span className="font-bold text-gray-700 group-hover:text-indigo-600 transition-colors tracking-tight">
+                            <span className="font-bold text-gray-700 group-hover/name:text-indigo-600 transition-colors tracking-tight border-b border-transparent group-hover/name:border-indigo-400">
                               {item.username}
                             </span>
                           </div>
@@ -212,6 +216,29 @@ export default function Report({ user }) {
         ) : (
           <div className="space-y-6">
             <div className="flex flex-wrap gap-4 items-center justify-between">
+              <div className="flex items-center space-x-4">
+                {viewingUser !== user.userName && (
+                  <button 
+                    onClick={() => { setViewingUser(user.userName); setPage(1); }}
+                    className="flex items-center space-x-2 px-4 py-2 bg-indigo-50 text-indigo-600 rounded-xl font-bold text-sm hover:bg-indigo-100 transition-colors border border-indigo-100"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    <span>Lịch sử của tôi</span>
+                  </button>
+                )}
+                <div className="bg-white px-5 py-2.5 rounded-xl border border-gray-100 shadow-sm flex items-center space-x-3">
+                  <div className="w-6 h-6 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center font-black text-[10px] uppercase">
+                    {viewingUser.substring(0, 2)}
+                  </div>
+                  <div>
+                    <span className="text-xs text-gray-400 font-bold uppercase tracking-tight block leading-none mb-1">Đang xem lịch sử của</span>
+                    <span className="text-sm font-black text-gray-900 leading-none">{viewingUser}</span>
+                  </div>
+                </div>
+              </div>
+
               <div className="flex bg-white rounded-xl p-1.5 border border-gray-100 shadow-sm">
                 {[
                   { label: '7 ngày', value: 7 },
