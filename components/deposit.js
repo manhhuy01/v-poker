@@ -19,7 +19,7 @@ export default function Deposit({ user, onAccountUpdate, variant = 'button' }) {
 
     setLoading(true);
     try {
-      const newBalance = (user.accBalance || 0) + amount;
+      const newBalance = amount;
       await updateProfile({ userName: user.userName, accBalance: newBalance });
       setOpen(false);
       if (onAccountUpdate) onAccountUpdate();
