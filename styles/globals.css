@@ -21,6 +21,13 @@
   }
 }
 
+@theme {
+  --color-spade: #000000;
+  --color-club: #000000;
+  --color-heart: #FF0000;
+  --color-diamond: #FF0000;
+}
+
 @layer base {
   html,
   body {
