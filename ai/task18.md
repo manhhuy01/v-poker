@@ -1,0 +1,1 @@
+1. ở top menu, user profile open, tôi cần thêm 1 option nữa là "Rời khỏi bàn", khi click vào thì gọi api removeFromTable như ở userModal.js

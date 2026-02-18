@@ -487,7 +487,6 @@ export default function Game({ data, onEditClick, onAddClick, onChatOpen, messag
                   <input
                     ref={betInput}
                     autoFocus
-                    defaultValue={data?.user?.position?.betBalance || 0}
                     className="w-full bg-gray-800 border border-white/10 rounded-2xl px-5 py-4 text-white font-bold text-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all hover:bg-gray-750"
                   />
                   <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 font-bold">CHIPS</div>

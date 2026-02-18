@@ -2,11 +2,14 @@ import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import Setting from './setting';
 import Deposit from './deposit';
+import { removeFromTable } from '../api/poker';
+import { useToasts } from 'react-toast-notifications';
 
 export default function TopMenu({ data, user, onLobbyClick, chatCount, onChatOpen }) {
   const [profileOpen, setProfileOpen] = useState(false);
   const dropdownRef = useRef(null);
   const currentUser = data?.user || user;
+  const { addToast } = useToasts();
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -23,9 +26,23 @@ export default function TopMenu({ data, user, onLobbyClick, chatCount, onChatOpe
   }, []);
 
   const onLeaveRoom = () => {
-    if (window.confirm('Bạn có chắc muốn rời phòng?')) {
+    if (window.confirm('Bạn có chắc muốn đăng xuất?')) {
       document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
       window.location.href = '/login';
+    }
+  }
+
+  const onRemoveFromTable = async () => {
+    if (window.confirm('Bạn có muốn rời khỏi bàn chơi (vẫn giữ đăng nhập)?')) {
+      try {
+        await removeFromTable({ userName: currentUser?.userName });
+        setProfileOpen(false);
+        addToast('Đã rời khỏi bàn chơi', { appearance: 'success' });
+      } catch (err) {
+        if (err?.response?.data?.error) {
+          addToast(err?.response?.data?.error, { appearance: 'error' });
+        }
+      }
     }
   }
 
@@ -91,6 +108,16 @@ export default function TopMenu({ data, user, onLobbyClick, chatCount, onChatOpe
             {data?.user?.isDealer && (
               <Setting data={data?.setting} />
             )}
+
+            <button 
+              onClick={onRemoveFromTable}
+              className="w-full text-left px-4 py-3 text-sm font-medium hover:bg-white/5 transition-colors flex items-center space-x-3"
+            >
+               <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              <span>Rời khỏi bàn</span>
+            </button>
             
             <div className="border-t border-white/5 mt-2 pt-1">
               <button 
@@ -100,7 +127,7 @@ export default function TopMenu({ data, user, onLobbyClick, chatCount, onChatOpe
                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                 </svg>
-                <span>Rời phòng</span>
+                <span>Thoát</span>
               </button>
             </div>
           </div>
