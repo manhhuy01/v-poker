@@ -52,8 +52,16 @@ export default function Game({ data, onEditClick, onAddClick, onChatOpen, messag
   useEffect(() => {
     if (autoAction === 'CALL_CHECK' && data?.table?.currentBet > autoActionBetValue) {
       setAutoAction(null);
+      setAutoActionBetValue(0);
     }
   }, [data?.table?.currentBet, autoAction, autoActionBetValue])
+
+  useEffect(() => {
+    if (!data?.table?.start) {
+      setAutoAction(null);
+      setAutoActionBetValue(0);
+    }
+  }, [data?.table?.start])
 
   const onStart = async () => {
     setLoadingDealerAction(true)
