@@ -99,6 +99,40 @@ export default function Report({ user }) {
     }
   }
 
+  const onResetBalanceAll = async () => {
+    if (!window.confirm('Bạn có chắc chắn muốn reset số dư của TẤT CẢ người chơi về 0?')) return
+    setLoading(true)
+    try {
+      await api.resetBalanceAllPlayers()
+      addToast('Reset số dư thành công', { appearance: 'success' })
+      fetchSummary()
+    } catch (err) {
+      addToast(err?.response?.data?.error || 'Reset số dư thất bại', { appearance: 'error' })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const copyReport = () => {
+    if (summaryData.length === 0) return
+    const reportText = summaryData.map(item => {
+      const profit = Number(item.currentBalance || 0) + Number(item.totalWithdraw || 0) - Number(item.totalDeposit || 0);
+      return `${item.username}: ${profit}`;
+    }).join('\n');
+    
+    navigator.clipboard.writeText(reportText).then(() => {
+      addToast('Đã copy báo cáo vào clipboard', { appearance: 'success' });
+    }).catch(err => {
+      addToast('Không thể copy báo cáo', { appearance: 'error' });
+    });
+  }
+
+  const totalPL = summaryData.reduce((acc, item) => acc + (Number(item.currentBalance || 0) + Number(item.totalWithdraw || 0) - Number(item.totalDeposit || 0)), 0);
+  const totalDeposit = summaryData.reduce((acc, item) => acc + Number(item.totalDeposit || 0), 0);
+  const totalWithdraw = summaryData.reduce((acc, item) => acc + Number(item.totalWithdraw || 0), 0);
+  const totalBalance = summaryData.reduce((acc, item) => acc + Number(item.currentBalance || 0), 0);
+  const totalGames = summaryData.reduce((acc, item) => acc + Number(item.totalGame || 0), 0);
+
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900 p-4 md:p-8">
       <Head>
@@ -138,79 +172,126 @@ export default function Report({ user }) {
         </div>
 
         {activeTab === 'summary' ? (
-          <div className="bg-white rounded-3xl border border-gray-100 overflow-hidden shadow-xl shadow-gray-200/50">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left">
-                <thead className="bg-gray-50/50 text-gray-400 uppercase text-[10px] font-black tracking-[0.2em] border-b border-gray-100">
-                  <tr>
-                    <th className="px-8 py-6">Thành viên</th>
-                    <th className="px-6 py-6 text-center">Nạp tiền</th>
-                    <th className="px-6 py-6 text-center">Rút tiền</th>
-                    <th className="px-6 py-6 text-center">Số dư</th>
-                    <th className="px-6 py-6 text-center">Lợi nhuận (P/L)</th>
-                    <th className="px-6 py-6 text-right pr-10">Hoạt động</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-50/50">
-                  {summaryData.map((item, idx) => {
-                    const profit = Number(item.currentBalance || 0) + Number(item.totalWithdraw || 0) - Number(item.totalDeposit || 0);
-                    return (
-                      <tr key={idx} className="hover:bg-indigo-50/20 transition-all duration-300 group">
-                        <td className="px-8 py-6">
-                          <div 
-                            className="flex items-center space-x-3 cursor-pointer group/name"
-                            onClick={() => { setViewingUser(item.username); setPage(1); setActiveTab('logs'); }}
-                          >
-                            <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-xs shadow-lg shadow-indigo-200 uppercase group-hover/name:scale-110 transition-transform">
-                              {item.username.substring(0, 2)}
+          <div className="space-y-6">
+            <div className="flex justify-end space-x-3">
+              <button 
+                onClick={copyReport}
+                className="flex items-center space-x-2 px-5 py-2.5 bg-white text-gray-700 rounded-2xl font-bold text-sm hover:bg-gray-50 transition-all border border-gray-100 shadow-sm transition-all active:scale-95"
+              >
+                <svg className="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                </svg>
+                <span>Copy Report</span>
+              </button>
+              <button 
+                onClick={onResetBalanceAll}
+                className="flex items-center space-x-2 px-5 py-2.5 bg-rose-50 text-rose-600 rounded-2xl font-bold text-sm hover:bg-rose-100 transition-all border border-rose-100 shadow-sm transition-all active:scale-95"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                <span>Reset Balance</span>
+              </button>
+            </div>
+            <div className="bg-white rounded-3xl border border-gray-100 overflow-hidden shadow-xl shadow-gray-200/50">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left">
+                  <thead className="bg-gray-50/50 text-gray-400 uppercase text-[10px] font-black tracking-[0.2em] border-b border-gray-100">
+                    <tr>
+                      <th className="px-8 py-6">Thành viên</th>
+                      <th className="px-6 py-6 text-center">Lợi nhuận (P/L)</th>
+                      <th className="px-6 py-6 text-center">Nạp tiền</th>
+                      <th className="px-6 py-6 text-center">Rút tiền</th>
+                      <th className="px-6 py-6 text-center">Số dư</th>
+                      <th className="px-6 py-6 text-right pr-10">Hoạt động</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-50/50">
+                    {summaryData.map((item, idx) => {
+                      const profit = Number(item.currentBalance || 0) + Number(item.totalWithdraw || 0) - Number(item.totalDeposit || 0);
+                      return (
+                        <tr key={idx} className="hover:bg-indigo-50/20 transition-all duration-300 group">
+                          <td className="px-8 py-6">
+                            <div
+                              className="flex items-center space-x-3 cursor-pointer group/name"
+                              onClick={() => { setViewingUser(item.username); setPage(1); setActiveTab('logs'); }}
+                            >
+                              <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-xs shadow-lg shadow-indigo-200 uppercase group-hover/name:scale-110 transition-transform">
+                                {item.username.substring(0, 2)}
+                              </div>
+                              <span className="font-bold text-gray-700 group-hover/name:text-indigo-600 transition-colors tracking-tight border-b border-transparent group-hover/name:border-indigo-400">
+                                {item.username}
+                              </span>
                             </div>
-                            <span className="font-bold text-gray-700 group-hover/name:text-indigo-600 transition-colors tracking-tight border-b border-transparent group-hover/name:border-indigo-400">
-                              {item.username}
+                          </td>
+                          <td className="px-6 py-6 text-center">
+                            <div className={`inline-flex items-center px-6 py-2.5 rounded-2xl text-sm font-black shadow-lg transition-all duration-300 group-hover:shadow-indigo-200/50 ${profit > 0 ? 'text-green-500' : 'text-rose-500'}`}>
+                              {profit > 0 ? '+' : ''}{profit.toLocaleString()}
+                            </div>
+                          </td>
+                          <td className="px-6 py-6 text-center">
+                            <span className="inline-flex px-4 py-2 rounded-2xl text-sm font-bold bg-emerald-50 text-emerald-600 border border-emerald-100/50">
+                              {Number(item.totalDeposit).toLocaleString()}
                             </span>
+                          </td>
+                          <td className="px-6 py-6 text-center">
+                            <span className="inline-flex px-4 py-2 rounded-2xl text-sm font-bold bg-rose-50 text-rose-600 border border-rose-100/50">
+                              {Number(item.totalWithdraw).toLocaleString()}
+                            </span>
+                          </td>
+                          <td className="px-6 py-6 text-center">
+                            <span className="inline-flex px-4 py-2 rounded-2xl text-sm font-black bg-gray-900 text-white shadow-lg shadow-gray-300">
+                              {Number(item.currentBalance).toLocaleString()}
+                            </span>
+                          </td>
+
+                          <td className="px-6 py-6 text-right pr-10">
+                            <span className="text-xs font-bold text-gray-400 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-100">
+                              {item.totalGame} ván
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                    {summaryData.length > 0 && (
+                      <tr className="bg-gray-900 text-white font-black uppercase">
+                        <td className="px-8 py-6 text-xs tracking-widest italic">TỔNG CỘNG</td>
+                        <td className="px-6 py-6 text-center">
+                          <div className={`inline-flex items-center px-6 py-2.5 rounded-2xl text-sm font-black shadow-lg ${totalPL >= 0 ? 'text-green-400' : 'text-rose-400'}`}>
+                            {totalPL > 0 ? '+' : ''}{totalPL.toLocaleString()}
                           </div>
                         </td>
-                        <td className="px-6 py-6 text-center">
-                          <span className="inline-flex px-4 py-2 rounded-2xl text-sm font-bold bg-emerald-50 text-emerald-600 border border-emerald-100/50">
-                            {item.totalDeposit}
-                          </span>
+                        <td className="px-6 py-6 text-center text-emerald-400 text-sm">
+                          {totalDeposit.toLocaleString()}
                         </td>
-                        <td className="px-6 py-6 text-center">
-                          <span className="inline-flex px-4 py-2 rounded-2xl text-sm font-bold bg-rose-50 text-rose-600 border border-rose-100/50">
-                            {item.totalWithdraw}
-                          </span>
+                        <td className="px-6 py-6 text-center text-rose-400 text-sm">
+                          {totalWithdraw.toLocaleString()}
                         </td>
-                        <td className="px-6 py-6 text-center">
-                          <span className="inline-flex px-4 py-2 rounded-2xl text-sm font-black bg-gray-900 text-white shadow-lg shadow-gray-300">
-                            {item.currentBalance}
-                          </span>
-                        </td>
-                        <td className="px-6 py-6 text-center">
-                          <div className={`inline-flex items-center px-6 py-2.5 rounded-2xl text-sm font-black shadow-lg transition-all duration-300 group-hover:shadow-indigo-200/50 ${profit > 0 ? 'text-green-500' : 'text-rose-500'}`}>
-                            {profit > 0 ? '+' : ''}{profit}
-                          </div>
+                        <td className="px-6 py-6 text-center text-indigo-400 text-sm">
+                          {totalBalance.toLocaleString()}
                         </td>
                         <td className="px-6 py-6 text-right pr-10">
-                          <span className="text-xs font-bold text-gray-400 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-100">
-                            {item.totalGame} ván
+                          <span className="text-[10px] opacity-60">
+                            {totalGames} ván
                           </span>
                         </td>
                       </tr>
-                    );
-                  })}
-                  {summaryData.length === 0 && (
-                    <tr>
-                      <td colSpan="5" className="px-8 py-20 text-center text-gray-400 font-medium">
-                        <div className="flex flex-col items-center">
-                          <svg className="w-12 h-12 mb-4 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                          </svg>
-                          Chưa có dữ liệu báo cáo
-                        </div>
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+                    )}
+                    {summaryData.length === 0 && (
+                      <tr>
+                        <td colSpan="6" className="px-8 py-20 text-center text-gray-400 font-medium">
+                          <div className="flex flex-col items-center">
+                            <svg className="w-12 h-12 mb-4 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            Chưa có dữ liệu báo cáo
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         ) : (
@@ -218,7 +299,7 @@ export default function Report({ user }) {
             <div className="flex flex-wrap gap-4 items-center justify-between">
               <div className="flex items-center space-x-4">
                 {viewingUser !== user.userName && (
-                  <button 
+                  <button
                     onClick={() => { setViewingUser(user.userName); setPage(1); }}
                     className="flex items-center space-x-2 px-4 py-2 bg-indigo-50 text-indigo-600 rounded-xl font-bold text-sm hover:bg-indigo-100 transition-colors border border-indigo-100"
                   >
@@ -317,12 +398,12 @@ export default function Report({ user }) {
                         <td className="px-6 py-5 text-right">
                           <span className={`text-2xl font-black italic tracking-tighter ${log.type === 'win' ? 'text-emerald-500' : 'text-rose-500'
                             }`}>
-                            {log.type === 'win' ? '+' : '-'}{log.amount}
+                            {log.type === 'win' ? '+' : '-'}{log.amount.toLocaleString()}
                           </span>
                         </td>
                         <td className="px-8 py-5 text-right font-mono font-bold text-gray-900 relative">
                           <div className="absolute inset-0 bg-gray-50/50 -z-10 group-hover:bg-blue-50/50 transition-colors"></div>
-                          {log.balance_after}
+                          {log.balance_after.toLocaleString()}
                         </td>
                       </tr>
                     ))}
