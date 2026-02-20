@@ -215,7 +215,7 @@ export default function position({
               }
             </div>
             {
-              !!result && !isFold && <span className="whitespace-nowrap z-20 rounded pl-1 pr-1 absolute -top-6 bg-blue-900 text-white bg-opacity-70 font-bold">{MAP_RS[result]}</span>
+              !!result && !isFold && <span className="whitespace-nowrap z-20 rounded pl-1 pr-1 absolute -bottom-12 bg-blue-900 text-white bg-opacity-70 font-bold">{MAP_RS[result]}</span>
             }
             <div onClick={() => onEditClick(userName)} className="text-white pr-1 pl-1 rounded border-yellow-600 border bg-gray-900 text-xs z-10 cursor-pointer">{userName}</div>
             {

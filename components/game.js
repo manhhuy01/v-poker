@@ -10,6 +10,7 @@ import {
   showAllCards, playerTipDealer,
 } from '../api/poker'
 import Modal from './modal'
+import BetModal from './betModal'
 import Spin from './spin'
 import ChatFloating from './chatFloating'
 import QuickChatInput from './quickChatInput'
@@ -23,7 +24,6 @@ export default function Game({ data, onEditClick, onAddClick, onChatOpen, messag
   const [isOpenModalBet, setOpenModalBet] = useState(false);
   const [isOpenModalTip, setOpenModalTip] = useState(false);
   const [isHiddenCard, setHiddenCard] = useState(false)
-  const betInput = useRef(null);
   const tipInput = useRef(null);
   const [autoAction, setAutoAction] = useState(null); // 'FOLD', 'CALL_CHECK'
   const [autoActionBetValue, setAutoActionBetValue] = useState(0);
@@ -178,10 +178,10 @@ export default function Game({ data, onEditClick, onAddClick, onChatOpen, messag
     setLoadingPlayerAction(false)
   }
 
-  const onActionBet = async () => {
+  const onActionBet = async (betBalance) => {
     setLoadingPlayerAction(true)
-    let betBalance = betInput.current.value;
     if (+betBalance == 'NaN' && betBalance != 'all-in') {
+      setLoadingPlayerAction(false)
       return addToast('Bet sai định dạng', {
         appearance: 'error',
       })
@@ -447,55 +447,13 @@ export default function Game({ data, onEditClick, onAddClick, onChatOpen, messag
           )
         }
       </div>
-      {
-        isOpenModalBet && (
-          <Modal
-            isOpen={isOpenModalBet}
-            onClose={() => setOpenModalBet(false)}
-            loading={loadingPlayerAction}
-            onCancel={() => setOpenModalBet(false)}
-            onConfirm={() => onActionBet()}
-          >
-            <div className="flex flex-col w-full space-y-6">
-              <div className="text-center">
-                <h3 className="text-lg font-black uppercase tracking-widest text-white mb-1">Đưa ra mức cược</h3>
-                <p className="text-[10px] text-gray-500 font-bold uppercase tracking-tighter">Số dư khả dụng: <span className="text-emerald-400">{(data?.user?.accBalance || 0).toLocaleString()}</span></p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                {[
-                  { label: '1x BB', value: (data?.setting?.smallBlind || 0) * 2 },
-                  { label: '2x BB', value: (data?.setting?.smallBlind || 0) * 4 },
-                  { label: '6x BB', value: (data?.setting?.smallBlind || 0) * 12 },
-                  { label: 'ALL-IN', value: 'all-in', color: 'bg-gradient-to-br from-red-600 to-rose-800 border border-red-500/40' }
-                ].map((opt, i) => (
-                  <button
-                    key={i}
-                    type="button"
-                    onClick={() => { if (betInput.current) betInput.current.value = opt.value }}
-                    className={`py-3 rounded-xl border border-white/10 font-black text-xs transition-all active:scale-95 flex flex-col items-center justify-center gap-1 ${opt.color ? `bg-gradient-to-br ${opt.color} text-white` : 'bg-white/5 text-gray-300 hover:bg-white/10'}`}
-                  >
-                    <span className="opacity-60 text-[8px]">{opt.label}</span>
-                    <span>{opt.value.toLocaleString()}</span>
-                  </button>
-                ))}
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-[10px] uppercase font-black tracking-widest text-gray-500 ml-1">Số tiền cược tùy chỉnh</label>
-                <div className="relative group">
-                  <input
-                    ref={betInput}
-                    autoFocus
-                    className="w-full bg-gray-800 border border-white/10 rounded-2xl px-5 py-4 text-white font-bold text-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all hover:bg-gray-750"
-                  />
-                  <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 font-bold">CHIPS</div>
-                </div>
-              </div>
-            </div>
-          </Modal>
-        )
-      }
+      <BetModal
+        isOpen={isOpenModalBet}
+        onClose={() => setOpenModalBet(false)}
+        loading={loadingPlayerAction}
+        onConfirm={onActionBet}
+        data={data}
+      />
       {
         isOpenModalTip && (
           <Modal

@@ -9,6 +9,7 @@ export default function modal({
   onCancel,
   loading,
   noConfirm,
+  position = 'center',
 }) {
   const [mounted, setMounted] = useState(false);
 
@@ -27,7 +28,7 @@ export default function modal({
   if (!isOpen || !mounted) return null;
 
   return createPortal(
-    <div className="modal-container fixed inset-0 z-[9999] overflow-y-auto outline-none focus:outline-none flex items-center justify-center p-4">
+    <div className={`modal-container fixed inset-0 z-[9999] overflow-y-auto outline-none focus:outline-none flex justify-center p-4 ${position === 'top' ? 'items-start pt-10 sm:items-center sm:pt-4' : 'items-center'}`}>
       <div onClick={onClose} className="fixed inset-0 bg-black/80 backdrop-blur-md transition-opacity" aria-hidden="true"></div>
       <div className="relative inline-block w-full max-w-lg bg-gray-900 border border-white/10 rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all backdrop-blur-xl animate-fade-in-up">
         <div className="px-8 py-8">

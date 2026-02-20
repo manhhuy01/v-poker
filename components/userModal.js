@@ -77,6 +77,7 @@ export default function userModel({ profile: { userName, accBalance }, isOpen, o
       onClose={onClose}
       loading={loading}
       noConfirm={true}
+      position="top"
     >
       <div className="w-full space-y-8">
         <div className="text-center">

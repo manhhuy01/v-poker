@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import { updateSetting } from '../api/poker'
+import { updateSetting, resetBalanceAllPlayers } from '../api/poker'
 import { useToasts } from 'react-toast-notifications'
 import Spin from './spin'
 import Modal from './modal'
@@ -8,6 +8,7 @@ export default function setting({ data }) {
   const [isOpen, setOpen] = useState(false);
   const sbInput = useRef(null);
   const [loading, setLoading] = useState(false)
+  const [loadingReset, setLoadingReset] = useState(false)
   const { addToast } = useToasts()
 
   const confirm = async () => {
@@ -28,6 +29,25 @@ export default function setting({ data }) {
     }
   }
 
+  const handleResetBalanceAll = async () => {
+    if (!window.confirm('Bạn có chắc chắn muốn reset số dư của TẤT CẢ người chơi về 0?')) return
+    
+    setLoadingReset(true)
+    try {
+      await resetBalanceAllPlayers()
+      addToast('Reset số dư thành công', { appearance: 'success' })
+      setOpen(false)
+    } catch (err) {
+      if (err?.response?.data?.error) {
+        addToast(err?.response?.data?.error, { appearance: 'error' })
+      } else {
+        addToast('Reset số dư thất bại', { appearance: 'error' })
+      }
+    } finally {
+      setLoadingReset(false)
+    }
+  }
+
   return (
     <>
       <button onClick={() => setOpen(true)} className="w-full text-left px-4 py-3 text-sm font-medium hover:bg-white/5 transition-colors flex items-center space-x-3 text-white">
@@ -44,6 +64,7 @@ export default function setting({ data }) {
         loading={loading}
         onCancel={() => setOpen(false)}
         onConfirm={confirm}
+        position="top"
       >
         <div className="space-y-6">
           <div className="text-center">
@@ -74,6 +95,20 @@ export default function setting({ data }) {
             <div className="p-4 bg-indigo-500/10 border border-indigo-500/20 rounded-2xl">
               <p className="text-xs text-indigo-300 font-medium leading-relaxed">
                 Big Blind (BB) sẽ tự động gấp đôi Small Blind.
+              </p>
+            </div>
+
+            <div className="pt-4 border-t border-white/5">
+              <button 
+                onClick={handleResetBalanceAll}
+                disabled={loadingReset}
+                className="w-full flex items-center justify-center space-x-2 py-4 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-500 font-bold text-sm tracking-widest uppercase hover:bg-rose-500/20 active:scale-[0.98] transition-all disabled:opacity-50"
+              >
+                {loadingReset && <Spin loading={true} />}
+                <span>Reset tất cả số dư</span>
+              </button>
+              <p className="text-center text-[10px] text-gray-500 mt-2 font-bold uppercase tracking-tight">
+                * Hành động này không thể hoàn tác
               </p>
             </div>
           </div>

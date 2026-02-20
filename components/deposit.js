@@ -67,6 +67,7 @@ export default function Deposit({ user, onAccountUpdate, variant = 'button' }) {
         loading={loading}
         onCancel={() => setOpen(false)}
         onConfirm={handleDeposit}
+        position="top"
       >
         <div className="space-y-6">
           <div className="text-center">
