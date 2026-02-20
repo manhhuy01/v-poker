@@ -1,0 +1,3 @@
+1. ở trang report, tab lịch sử của tôi, cần bổ sung thêm: 
+- limit là số lượng game log mỗi trang, default 20, là dropdown select, có các option là 20, 50, 100, 500
+2. tab lịch sử của tôi cần thêm chart thống kê dạng line, trục X là ván đấu, trục Y là tổng tiền bắt đầu từ 0 phần trên màu xanh là số dương, phần dưới màu đỏ là số âm, data đầu vào là tất cả các history của user, dựa vào amount và type là win hay lose để tính tổng tiền.

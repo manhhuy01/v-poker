@@ -4,6 +4,9 @@ import Link from 'next/link'
 import { useToasts } from 'react-toast-notifications'
 import * as api from '../api/poker'
 import Loading from '../components/loading'
+import {
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart, ReferenceLine
+} from 'recharts';
 
 export async function getServerSideProps(context) {
   const { token } = context.req.cookies;
@@ -53,24 +56,29 @@ export default function Report({ user }) {
   // Game logs filters
   const [days, setDays] = useState(7)
   const [page, setPage] = useState(1)
-  const [limit, setLimit] = useState(20)
+  const [limit, setLimit] = useState(100)
 
   const [summaryLoaded, setSummaryLoaded] = useState(false)
   const [logsCache, setLogsCache] = useState({})
   const [viewingUser, setViewingUser] = useState(user.userName)
+  const [chartData, setChartData] = useState([])
+  const [rangeStart, setRangeStart] = useState(0)
+  const [rangeEnd, setRangeEnd] = useState(0)
+  const [selectionPhase, setSelectionPhase] = useState('none') // none, start, both
 
   useEffect(() => {
     if (activeTab === 'summary') {
       if (!summaryLoaded) fetchSummary()
     } else {
-      const cacheKey = `${viewingUser}-${days}-${page}`
+      const cacheKey = `${viewingUser}-${days}-${page}-${limit}`
       if (logsCache[cacheKey]) {
         setGameLogs(logsCache[cacheKey])
+        updateChartData(logsCache[cacheKey])
       } else {
         fetchGameLogs(cacheKey)
       }
     }
-  }, [activeTab, days, page, viewingUser])
+  }, [activeTab, days, page, viewingUser, limit])
 
   const fetchSummary = async () => {
     setLoading(true)
@@ -85,6 +93,26 @@ export default function Report({ user }) {
     }
   }
 
+  const updateChartData = (data) => {
+    let cumulative = 0;
+    const processed = [...data].reverse().map((log, index) => {
+      const amount = Number(log.amount || 0);
+      if (log.type === 'win') cumulative += amount;
+      else if (log.type === 'lose') cumulative -= amount;
+      return {
+        ...log,
+        game: index + 1,
+        profit: cumulative,
+        time: new Date(log.created_at).toLocaleTimeString()
+      }
+    });
+    const finalData = [{ game: 0, profit: 0, time: '', id: 0 }, ...processed];
+    setChartData(finalData);
+    setRangeStart(0);
+    setRangeEnd(finalData[finalData.length - 1].id);
+    setSelectionPhase('none');
+  }
+
   const fetchGameLogs = async (cacheKey) => {
     setLoading(true)
     try {
@@ -92,6 +120,7 @@ export default function Report({ user }) {
       const data = res.data.data || []
       setGameLogs(data)
       setLogsCache(prev => ({ ...prev, [cacheKey]: data }))
+      updateChartData(data)
     } catch (err) {
       addToast('Không thể tải lịch sử chơi', { appearance: 'error' })
     } finally {
@@ -132,6 +161,17 @@ export default function Report({ user }) {
   const totalWithdraw = summaryData.reduce((acc, item) => acc + Number(item.totalWithdraw || 0), 0);
   const totalBalance = summaryData.reduce((acc, item) => acc + Number(item.currentBalance || 0), 0);
   const totalGames = summaryData.reduce((acc, item) => acc + Number(item.totalGame || 0), 0);
+
+  // Calculate display chart data based on selected range
+  const sIdx = chartData.findIndex(d => d.id === rangeStart);
+  const eIdx = chartData.findIndex(d => d.id === rangeEnd);
+  const start = sIdx === -1 ? 0 : Math.min(sIdx, eIdx);
+  const end = eIdx === -1 ? (chartData.length > 0 ? chartData.length - 1 : 0) : Math.max(sIdx, eIdx);
+  const displayChartData = chartData.length > 0 ? chartData.slice(start, end + 1).map((d, i, arr) => ({
+    ...d,
+    profit: d.profit - arr[0].profit, // Re-base to 0 for the selected segment
+    displayGame: i
+  })) : [];
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900 p-4 md:p-8">
@@ -340,29 +380,132 @@ export default function Report({ user }) {
               </div>
 
               <div className="flex items-center space-x-3">
-                <button
-                  disabled={page === 1}
-                  onClick={() => setPage(page - 1)}
-                  className="p-2.5 bg-white text-gray-400 border border-gray-100 rounded-xl shadow-sm disabled:opacity-30 hover:text-blue-600 transition-colors"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
-                </button>
-                <span className="px-5 py-2.5 bg-white rounded-xl border border-gray-100 font-bold text-gray-700 shadow-sm">
-                  {page}
-                </span>
-                <button
-                  disabled={gameLogs.length < limit}
-                  onClick={() => setPage(page + 1)}
-                  className="p-2.5 bg-white text-gray-400 border border-gray-100 rounded-xl shadow-sm disabled:opacity-30 hover:text-blue-600 transition-colors"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
+                <div className="flex items-center space-x-2 bg-white px-3 py-1.5 rounded-xl border border-gray-100 shadow-sm">
+                   <span className="text-[10px] font-black text-gray-400 uppercase">Giới hạn:</span>
+                   <select 
+                    value={limit}
+                    onChange={(e) => { setLimit(Number(e.target.value)); setPage(1); }}
+                    className="bg-transparent text-sm font-bold text-gray-700 outline-none"
+                   >
+                     <option value={100}>100</option>
+                     <option value={500}>500</option>
+                   </select>
+                </div>
+
+                <div className="flex items-center space-x-3">
+                  <button
+                    disabled={page === 1}
+                    onClick={() => setPage(page - 1)}
+                    className="p-2.5 bg-white text-gray-400 border border-gray-100 rounded-xl shadow-sm disabled:opacity-30 hover:text-blue-600 transition-colors"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                  </button>
+                  <span className="px-5 py-2.5 bg-white rounded-xl border border-gray-100 font-bold text-gray-700 shadow-sm">
+                    {page}
+                  </span>
+                  <button
+                    disabled={gameLogs.length < limit}
+                    onClick={() => setPage(page + 1)}
+                    className="p-2.5 bg-white text-gray-400 border border-gray-100 rounded-xl shadow-sm disabled:opacity-30 hover:text-blue-600 transition-colors"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                </div>
               </div>
             </div>
+
+            {/* Chart Section */}
+            {chartData.length > 1 && (
+              <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-xl shadow-gray-200/50">
+                <div className="flex flex-wrap justify-between items-center mb-8 gap-4">
+                  <div>
+                    <h3 className="text-sm font-black uppercase tracking-widest text-gray-400">Biểu đồ lợi nhuận</h3>
+                    <p className="text-[10px] text-gray-500 font-bold">Thống kê biến động số dư theo ván đấu</p>
+                  </div>
+                  
+                  <div className="flex items-center space-x-4">
+                    <div className="flex items-center space-x-3 bg-gray-50 px-4 py-2 rounded-2xl border border-gray-100">
+                      <div className="flex items-center space-x-2">
+                        <span className="text-[10px] font-black text-gray-400 uppercase">Phạm vi:</span>
+                        <span className="text-xs font-bold text-gray-700">
+                          {selectionPhase === 'none' ? 'Toàn bộ' : selectionPhase === 'start' ? `Từ #${rangeStart}...` : `Từ #${rangeStart} đến #${rangeEnd}`}
+                        </span>
+                      </div>
+                    </div>
+                    {selectionPhase !== 'none' && (
+                      <button 
+                        onClick={() => {
+                          setRangeStart(chartData[0].id);
+                          setRangeEnd(chartData[chartData.length - 1].id);
+                          setSelectionPhase('none');
+                        }}
+                        className="p-2 bg-rose-50 text-rose-600 rounded-xl hover:bg-rose-100 transition-colors border border-rose-100 shadow-sm group"
+                        title="Reset phạm vi"
+                      >
+                        <svg className="w-4 h-4 group-hover:rotate-180 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                <div className="h-[300px] w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={displayChartData}>
+                      <defs>
+                        <linearGradient id="colorProfit" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
+                          <stop offset="95%" stopColor="#ef4444" stopOpacity={0.3}/>
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
+                      <XAxis 
+                        dataKey="game" 
+                        stroke="#94a3b8" 
+                        fontSize={10} 
+                        tickLine={false} 
+                        axisLine={false}
+                        label={{ value: 'Ván đấu', position: 'insideBottomRight', offset: -5, fontSize: 10, fontWeight: 'bold' }}
+                      />
+                      <YAxis 
+                        stroke="#94a3b8" 
+                        fontSize={10} 
+                        tickLine={false} 
+                        axisLine={false}
+                        tickFormatter={(value) => value.toLocaleString()}
+                      />
+                      <Tooltip 
+                        contentStyle={{ 
+                          backgroundColor: '#111827', 
+                          border: 'none', 
+                          borderRadius: '12px', 
+                          color: '#fff',
+                          fontSize: '12px',
+                          fontWeight: 'bold'
+                        }}
+                        itemStyle={{ color: '#fff' }}
+                        formatter={(value) => [value.toLocaleString() + ' CHIPS', 'Lợi nhuận']}
+                      />
+                      <ReferenceLine y={0} stroke="#cbd5e1" strokeWidth={2} strokeDasharray="3 3" />
+                      <Area 
+                        type="monotone" 
+                        dataKey="profit" 
+                        stroke="#6366f1" 
+                        strokeWidth={3}
+                        fillOpacity={1} 
+                        fill="url(#colorProfit)" 
+                        animationDuration={1500}
+                      />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            )}
 
             <div className="bg-white rounded-3xl border border-gray-100 overflow-hidden shadow-xl shadow-gray-200/50">
               <div className="overflow-x-auto">
@@ -377,13 +520,46 @@ export default function Report({ user }) {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-50">
-                    {gameLogs.map((log) => (
-                      <tr key={log.id} className="hover:bg-blue-50/30 transition-colors group">
-                        <td className="px-8 py-5">
-                          <span className="font-mono text-xs font-bold text-gray-400 group-hover:text-blue-500 transition-colors">
-                            #{log.id}
-                          </span>
-                        </td>
+                    {gameLogs.map((log) => {
+                      const startIdx = chartData.findIndex(d => d.id === rangeStart);
+                      const endIdx = chartData.findIndex(d => d.id === rangeEnd);
+                      const currentIdx = chartData.findIndex(d => d.id === log.id);
+                      const isSelected = selectionPhase !== 'none' && currentIdx >= Math.min(startIdx, endIdx) && currentIdx <= Math.max(startIdx, endIdx);
+                      const isBoundary = log.id === rangeStart || log.id === rangeEnd;
+
+                      const onRowClick = () => {
+                        if (selectionPhase === 'none' || selectionPhase === 'both') {
+                          setRangeStart(log.id);
+                          setRangeEnd(log.id);
+                          setSelectionPhase('start');
+                        } else if (selectionPhase === 'start') {
+                          if (currentIdx < startIdx) {
+                            // Selected a point before the start, make it the new start
+                            setRangeStart(log.id);
+                            setRangeEnd(log.id);
+                          } else {
+                            setRangeEnd(log.id);
+                            setSelectionPhase('both');
+                          }
+                        }
+                      };
+
+                      return (
+                        <tr 
+                          key={log.id} 
+                          onClick={onRowClick}
+                          className={`hover:bg-blue-50/50 transition-all cursor-pointer group relative ${
+                            isSelected ? 'bg-indigo-50/40 text-indigo-900 font-bold' : ''
+                          } ${isBoundary ? 'ring-2 ring-inset ring-indigo-500/30' : ''}`}
+                        >
+                          <td className="px-8 py-5 relative">
+                            {isBoundary && (
+                              <div className={`absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 rounded-r-full ${log.id === rangeStart ? 'bg-indigo-500' : 'bg-emerald-500'}`}></div>
+                            )}
+                            <span className="font-mono text-xs font-bold text-gray-400 group-hover:text-blue-500 transition-colors">
+                              #{log.id}
+                            </span>
+                          </td>
                         <td className="px-6 py-5 text-gray-600 font-medium whitespace-nowrap">
                           {new Date(log.created_at).toLocaleString('vi-VN')}
                         </td>
@@ -406,10 +582,11 @@ export default function Report({ user }) {
                           {log.balance_after.toLocaleString()}
                         </td>
                       </tr>
-                    ))}
+                    );
+                  })}
                     {gameLogs.length === 0 && (
                       <tr>
-                        <td colSpan="5" className="px-8 py-20 text-center text-gray-400 font-medium">
+                        <td colSpan="6" className="px-8 py-20 text-center text-gray-400 font-medium">
                           <div className="flex flex-col items-center">
                             <svg className="w-12 h-12 mb-4 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
