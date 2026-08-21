@@ -517,6 +517,7 @@ export default function Report({ user }) {
                       <th className="px-6 py-5 text-center">Loại</th>
                       <th className="px-6 py-5 text-right">Số lượng</th>
                       <th className="px-8 py-5 text-right">Số dư sau</th>
+                      <th className="px-8 py-5 text-right">Chi tiết</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-50">
@@ -580,6 +581,19 @@ export default function Report({ user }) {
                         <td className="px-8 py-5 text-right font-mono font-bold text-gray-900 relative">
                           <div className="absolute inset-0 bg-gray-50/50 -z-10 group-hover:bg-blue-50/50 transition-colors"></div>
                           {log.balance_after.toLocaleString()}
+                        </td>
+                        <td className="px-8 py-5 text-right">
+                          {
+                            !!log.poker_log_id && (
+                              <Link
+                                href={`/report/game/${log.poker_log_id}`}
+                                onClick={(e) => e.stopPropagation()}
+                                className="inline-flex items-center rounded-xl border border-blue-100 bg-blue-50 px-3 py-2 text-xs font-black uppercase tracking-wider text-blue-600 transition-all hover:bg-blue-100"
+                              >
+                                Chi tiết game
+                              </Link>
+                            )
+                          }
                         </td>
                       </tr>
                     );

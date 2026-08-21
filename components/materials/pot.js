@@ -7,10 +7,10 @@ const Pot = ({ balance }) => (
   </div>
 )
 
-export default function pot({ cards, pot, start, onClickTipDealer, finish }) {
+export default function pot({ cards, pot, start, onClickTipDealer, finish, hideTipDealer }) {
   return (
     <div className="w-full md:w-1/2 flex flex-col items-center">
-      {!(start && !finish) && <button onClick={onClickTipDealer} className="italic bg-white p-1 pl-2 pr-2 rounded mb-4 focus:outline-none" type="button">Tip Dealer</button>}
+      {!(start && !finish) && !hideTipDealer && <button onClick={onClickTipDealer} className="italic bg-white p-1 pl-2 pr-2 rounded mb-4 focus:outline-none" type="button">Tip Dealer</button>}
       <div className="flex justify-around w-3/4 mb-4 sm:mb-0 flex-wrap md:mb-10">
         {
           !!pot && pot.map((p, i) => !!p.balance && <Pot key={i} balance={p.balance} />)
