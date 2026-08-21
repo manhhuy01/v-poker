@@ -1,1 +1,0 @@
-hãy move socket.subscribeToGetMessage vào trong component chat và cả chat floating, vì để bên ngoài mỗi lần có message mới là sẽ phải render lại component

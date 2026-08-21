@@ -1,1 +1,0 @@
-1. Làm lại setting component cho giống với UI của topMenu.

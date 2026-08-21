@@ -1,1 +1,0 @@
-Thêm vào 1 button trong game setting là reset số dư toàn bộ người chơi, khi bấm vào nút này sẽ gọi api post tới game/resetBalanceAllPlayers

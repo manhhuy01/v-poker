@@ -302,6 +302,7 @@ export default function Game({ data, onEditClick, onAddClick, onChatOpen, messag
                 balance={data?.position[position]?.user?.accBalance}
                 rawPosition={data?.position[position]?.rawPosition}
                 bet={data?.position[position]?.betBalance}
+                action={data?.position[position]?.action}
                 cards={data?.position[position]?.cards}
                 isFold={data?.position[position]?.isFold}
                 onEditClick={onEditClick}

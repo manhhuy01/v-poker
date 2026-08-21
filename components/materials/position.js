@@ -23,6 +23,7 @@ export default function position({
   onEditClick,
   onAddClick,
   rawPosition,
+  action,
   isFold,
   isPlaying,
   winBalance,
@@ -69,7 +70,7 @@ export default function position({
 
   let chipClassName = 'opacity-0';
 
-  if (bet) {
+  if (bet || (action && action !== 'fold')) {
     chipClassName = 'opacity-100 '
     switch (+pos) {
       case 1:
@@ -195,6 +196,13 @@ export default function position({
       break;
 
   }
+  const visibleAction = action && action !== 'fold' ? action : '';
+  const actionClassName = {
+    'all-in': 'bg-red-600 text-white border-red-200 shadow-red-900/80',
+    raise: 'bg-yellow-400 text-black border-yellow-100 shadow-yellow-900/70',
+    call: 'bg-white/20 text-white border-white/30 shadow-black/40',
+    check: 'bg-emerald-500/80 text-white border-emerald-200 shadow-emerald-900/50',
+  }[visibleAction] || 'bg-blue-500 text-white border-blue-100 shadow-blue-900/60';
   return (
     <div className={`items-center flex flex-col absolute w-0 h-0 ${className}`}>
       <div className={`${isThinking ? 'border-gray-700 animate-pulse bg-yellow-500' : 'border-gray-700 bg-gray-600'} rounded-full w-20 h-20  -top-8 absolute  border-4`} />
@@ -224,9 +232,18 @@ export default function position({
             <div className="bg-gray-900 text-blue-400 pr-2 pl-2 rounded z-10 text-xs w-max">${isPlaying && !balance && start ? 'ALL IN' : balance}</div>
             { isUserPlaying && <div onClick={hideCard} className={`${isHiddenCard ? 'text-red-500' : 'text-white'} absolute left-16 top-0 text-xl text-white cursor-pointer`}>Θ</div>}
 
-            <div className={`${chipClassName} transform transition transition-transform absolute flex items-center justify-center text-xs font-bold text-white`}>
-              <img className="w-4 h-4 max-w-none mr-1" src="/chip.svg" alt="chip" />
-              <span>{bet}</span>
+            <div className={`${chipClassName} transform transition transition-transform absolute flex w-max flex-col items-center justify-center text-xs font-bold text-white`}>
+              {
+                !!bet && (
+                  <div className="flex items-center justify-center">
+                    <img className="w-4 h-4 max-w-none mr-1" src="/chip.svg" alt="chip" />
+                    <span>{bet}</span>
+                  </div>
+                )
+              }
+              {
+                !!visibleAction && <span className={`${actionClassName} ${bet ? 'mt-0.5' : ''} w-max whitespace-nowrap rounded border px-1 uppercase leading-tight shadow-lg`}>{visibleAction}</span>
+              }
             </div>
               
             <div className={`${winChipClassName} transform transition transition-transform w-max absolute flex items-center justify-center text-xs font-bold text-white`}>

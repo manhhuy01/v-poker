@@ -1,1 +1,0 @@
-Hiện tại, với UI của mobile, các nút game action ở bottom đang rất lớn, hãy reponsive cho phù hợp
