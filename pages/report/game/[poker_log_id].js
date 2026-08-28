@@ -7,53 +7,6 @@ import * as api from '../../../api/poker'
 import Position from '../../../components/materials/position'
 import Pot from '../../../components/materials/pot'
 
-const emptyPosition = () => ({
-  user: undefined,
-  betBalance: 0,
-  isFold: false,
-  namePos: '',
-  cards: [],
-  isThinking: false,
-  isPlaying: false,
-  winBalance: 0,
-  showCard: false,
-  action: '',
-})
-
-const initTable = () => ({
-  start: false,
-  preFlop: '',
-  flop: '',
-  turn: '',
-  river: '',
-  finish: false,
-  firstActionPlayer: undefined,
-  pot: [{ users: [], balance: 0, isHavePlayerAllIn: false }],
-  currentBet: 0,
-  isShowDown: false,
-  showDownAt: undefined,
-  actions: [],
-})
-
-const initReplay = () => ({
-  dealer: undefined,
-  setting: { smallBlind: 1 },
-  players: [],
-  position: {
-    1: emptyPosition(),
-    2: emptyPosition(),
-    3: emptyPosition(),
-    4: emptyPosition(),
-    5: emptyPosition(),
-    6: emptyPosition(),
-    7: emptyPosition(),
-    8: emptyPosition(),
-    9: emptyPosition(),
-  },
-  table: initTable(),
-  cards: [],
-})
-
 export async function getServerSideProps(context) {
   const { token } = context.req.cookies;
   if (!token) {
@@ -73,234 +26,225 @@ const clone = (value) => value === undefined ? undefined : JSON.parse(JSON.strin
 
 const getPlayerPosition = (state, userName) => Object.keys(state.position).find((p) => state.position[p].user?.userName === userName)
 
-const getPlayingPositions = (state) => Object.keys(state.position)
-  .filter((p) => state.position[p].user && state.position[p].isPlaying)
-
-const findNextPosition = (state, position) => {
-  const positions = Object.keys(state.position)
-  let next = +position
-  let guard = 0
-  do {
-    next += 1
-    if (next > positions.length) next = 1
-    guard += 1
-    if (state.position[next]?.isPlaying) return `${next}`
-  } while (guard <= positions.length)
-  return `${position}`
-}
-
-const resetLatestActions = (state) => {
-  Object.keys(state.position).forEach((p) => {
-    if (state.position[p].user) {
-      state.position[p].action = ''
-    }
-  })
-}
-
-const setupBlinds = (state) => {
-  const dealerPosition = Object.keys(state.position).find((p) => state.position[p].namePos === 'D')
-  if (!dealerPosition) return
-  const smallBlind = Number(state.setting?.smallBlind || 0)
-  const smallBlindPosition = findNextPosition(state, dealerPosition)
-  const bigBlindPosition = findNextPosition(state, smallBlindPosition)
-
-  const applyBlind = (position, amount) => {
-    const pos = state.position[position]
-    if (!pos?.user || !amount) return
-    const spend = Math.min(amount, Number(pos.user.accBalance || 0))
-    pos.betBalance = spend
-    pos.user.accBalance = Math.max(Number(pos.user.accBalance || 0) - spend, 0)
-  }
-
-  applyBlind(smallBlindPosition, smallBlind)
-  applyBlind(bigBlindPosition, smallBlind * 2)
-  state.table.currentBet = smallBlind * 2
-}
-
-const collectRoundPot = (state) => {
-  const positions = getPlayingPositions(state)
-  const roundTotal = positions.reduce((sum, p) => sum + Number(state.position[p].betBalance || 0), 0)
-  if (roundTotal) {
-    state.table.pot = [{ users: [], balance: (state.table.pot?.[0]?.balance || 0) + roundTotal, isHavePlayerAllIn: false }]
-  }
-  positions.forEach((p) => {
-    state.position[p].betBalance = 0
-  })
-  state.table.currentBet = 0
-  resetLatestActions(state)
-}
-
-const revealNextStreet = (state, result) => {
-  if (!state.table.flop && result?.table?.flop) {
-    state.table.flop = clone(result.table.flop)
-    return
-  }
-  if (!state.table.turn && result?.table?.turn) {
-    state.table.turn = result.table.turn
-    return
-  }
-  if (!state.table.river && result?.table?.river) {
-    state.table.river = result.table.river
-  }
-}
-
-const settleAfterAction = (state, action, result) => {
-  const next = clone(state)
-  const canStillAct = getPlayingPositions(next).some((p) => {
-    const player = next.position[p]
-    return !player.isFold
-      && Number(player.user?.accBalance || 0) > 0
-      && (!player.action || Number(player.betBalance || 0) < Number(next.table.currentBet || 0))
-  })
-
-  const isActionEndingRound = !canStillAct
-
-  if (isActionEndingRound) {
-    collectRoundPot(next)
-    revealNextStreet(next, result)
-  }
-
-  return next
-}
-
-const isRoundComplete = (state) => {
-  const canStillAct = getPlayingPositions(state).some((p) => {
-    const pos = state.position[p]
-    return !pos.isFold
-      && Number(pos.user?.accBalance || 0) > 0
-      && (!pos.action || Number(pos.betBalance || 0) < Number(state.table.currentBet || 0))
-  })
-  return !canStillAct
-}
-
-const applyAction = (state, action) => {
-  const next = clone(state)
-  const position = getPlayerPosition(next, action.user)
-  if (!position) return next
-
-  const pos = next.position[position]
-  const amount = Number(action.amount || 0)
-  const kind = action.action
-
-  pos.action = kind
-  pos.isThinking = false
-
-  if (kind === 'fold') {
-    pos.isFold = true
-    return next
-  }
-
-  if (kind === 'check') {
-    return next
-  }
-
-  if (kind === 'call' || kind === 'bet' || kind === 'raise' || kind === 'all-in') {
-    const spend = Math.min(amount, Number(pos.user.accBalance || 0))
-    pos.user.accBalance = Math.max(Number(pos.user.accBalance || 0) - spend, 0)
-    if (kind === 'raise') {
-      pos.betBalance = Number(next.table.currentBet || 0) + spend
-    } else {
-      pos.betBalance = Number(pos.betBalance || 0) + spend
-    }
-    if (pos.betBalance > next.table.currentBet) {
-      next.table.currentBet = pos.betBalance
-    }
-    return next
-  }
-
-  return next
-}
-
-const getTimelineActionLabel = (state, action, index) => {
-  if (action.action === 'raise') {
-    return `${index + 1}. ${action.user} raise ${Number(state.table.currentBet || 0) + Number(action.amount || 0)}`
-  }
-  return `${index + 1}. ${action.user} ${action.action}`
-}
-
-const applyResult = (state, result) => {
-  const next = clone(state)
-  next.dealer = result.dealer
-  next.setting = result.setting || next.setting
-  next.players = result.players || next.players
-  next.cards = result.cards || []
-  next.table = clone(result.table || next.table)
-  Object.keys(next.position).forEach((p) => {
-    next.position[p] = clone(result.position?.[p] || next.position[p] || emptyPosition())
-  })
-  return next
-}
-
-const buildInitialState = (result) => {
-  const state = initReplay()
-  state.dealer = result?.dealer
-  state.setting = result?.setting || state.setting
-  state.players = clone(result?.players || [])
-  state.cards = clone(result?.cards || [])
-  state.table.start = !!result?.table?.start
-  state.table.preFlop = !!result?.table?.preFlop
-  state.table.finish = false
-  state.table.firstActionPlayer = result?.table?.firstActionPlayer
-  state.table.currentBet = 0
-  state.table.pot = [{ users: [], balance: 0, isHavePlayerAllIn: false }]
-  state.table.actions = []
-
-  Object.keys(state.position).forEach((pos) => {
-    const source = result?.position?.[pos]
-    if (source?.user) {
-      state.position[pos] = {
-        ...emptyPosition(),
-        user: {
-          ...clone(source.user),
-          accBalance: source.user.startBalance ?? source.user.accBalance ?? 0,
-        },
-        namePos: source.namePos,
-        cards: clone(source.cards || []),
-        isPlaying: source.isPlaying,
-      }
-    }
-  })
-  setupBlinds(state)
-
-  return state
-}
-
-const buildTimeline = (payload) => {
+const normalizeData = (payload) => {
   const result = payload?.data || payload || {}
-  const actions = result?.table?.actions || []
-  const base = buildInitialState(result)
-  const steps = [{ label: 'Bắt đầu', state: base, isFinal: false }]
-  let current = clone(base)
+  if (!result?.table) return { steps: [], setting: { smallBlind: 1 }, dealer: undefined, players: [] }
 
-  actions.forEach((action, index) => {
-    const prev = clone(current)
-    current = applyAction(current, action)
-    steps.push({
-      label: getTimelineActionLabel(prev, action, index),
-      state: clone(current),
-      isFinal: false,
-    })
+  const actions = result.table.actions || []
+  const setting = result.setting || { smallBlind: 1 }
+  const dealer = result.dealer
 
-    const settled = settleAfterAction(current, action, result)
-    const changed = JSON.stringify(settled) !== JSON.stringify(current)
-    if (changed) {
-      current = settled
-      if (result?.table?.finish && index === actions.length - 1) {
-        steps.push({
-          label: 'Sau all-in',
-          state: clone(current),
-          isFinal: false,
-        })
+  const players = (result.players || []).map((p) => ({
+    userName: p.userName,
+    startBalance: p.startBalance ?? p.accBalance ?? 0,
+    finalBalance: p.accBalance ?? 0,
+  }))
+
+  const buildStepPositions = (posState) => {
+    const out = {}
+    for (let i = 1; i <= 9; i++) {
+      const s = posState[i]
+      if (!s) {
+        out[i] = {
+          user: undefined, betBalance: 0, chips: 0, isFold: false,
+          namePos: '', cards: [], isPlaying: false, winBalance: 0,
+          action: '', resultCard: null,
+        }
+        continue
       }
+      const shouldHideCards = s.isFold && s.action !== 'fold'
+      out[i] = {
+        user: s.user ? { userName: s.user.userName } : undefined,
+        betBalance: s.betBalance || 0,
+        chips: s.chips ?? 0,
+        isFold: s.isFold || false,
+        namePos: s.namePos || '',
+        cards: shouldHideCards ? [] : (s.cards || []),
+        isPlaying: s.isPlaying || false,
+        winBalance: s.winBalance || 0,
+        action: s.action || '',
+        resultCard: s.resultCard || null,
+      }
+    }
+    return out
+  }
+
+  const buildStepTable = (flop, turn, river, currentBet) => ({
+    flop: flop || null,
+    turn: turn || null,
+    river: river || null,
+    currentBet: currentBet || 0,
+  })
+
+  const isRoundComplete = (posState, currentBet, actedThisRound) => {
+    const active = Object.keys(posState).filter((p) => posState[p].user && posState[p].isPlaying)
+    const nonFolded = active.filter((p) => !posState[p].isFold)
+    if (nonFolded.length === 0) return false
+    if (nonFolded.some((p) => !actedThisRound.has(p))) return false
+    return nonFolded.every((p) => {
+      const pos = posState[p]
+      return pos.chips === 0 || pos.betBalance >= currentBet
+    })
+  }
+
+  const collectBets = (posState, pot) => {
+    const active = Object.keys(posState).filter((p) => posState[p].user && posState[p].isPlaying)
+    const total = active.reduce((sum, p) => sum + (posState[p].betBalance || 0), 0)
+    if (total > 0) {
+      pot.balance += total
+    }
+    active.forEach((p) => {
+      posState[p].betBalance = 0
+      posState[p].action = ''
+    })
+  }
+
+  const posState = {}
+  for (let i = 1; i <= 9; i++) {
+    const src = result.position?.[i]
+    if (src?.user) {
+      posState[i] = {
+        user: { userName: src.user.userName },
+        chips: src.user.startBalance ?? src.user.accBalance ?? 0,
+        betBalance: src.betBalance || 0,
+        isFold: false,
+        namePos: src.namePos || '',
+        cards: clone(src.cards || []),
+        isPlaying: src.isPlaying || false,
+        winBalance: 0,
+        action: '',
+        resultCard: null,
+      }
+    } else {
+      posState[i] = {
+        user: undefined, chips: 0, betBalance: 0, isFold: false,
+        namePos: '', cards: [], isPlaying: false, winBalance: 0,
+        action: '', resultCard: null,
+      }
+    }
+  }
+
+  const pot = { balance: 0 }
+  let currentBet = 0
+
+  const dealerPosition = Object.keys(posState).find((p) => posState[p].namePos === 'D')
+  if (dealerPosition) {
+    let sbPos = +dealerPosition
+    for (let g = 0; g < 9; g++) { sbPos = sbPos >= 9 ? 1 : sbPos + 1; if (posState[sbPos]?.isPlaying) break }
+    let bbPos = sbPos
+    for (let g = 0; g < 9; g++) { bbPos = bbPos >= 9 ? 1 : bbPos + 1; if (posState[bbPos]?.isPlaying) break }
+
+    const sb = Math.min(Number(setting.smallBlind || 0), posState[sbPos]?.chips || 0)
+    posState[sbPos].betBalance = sb
+    posState[sbPos].chips -= sb
+
+    const bb = Math.min(Number(setting.smallBlind || 0) * 2, posState[bbPos]?.chips || 0)
+    posState[bbPos].betBalance = bb
+    posState[bbPos].chips -= bb
+
+    currentBet = bb
+  }
+
+  const communityCards = { flop: null, turn: null, river: null }
+  const steps = []
+
+  const addStep = (label, isFinal = false) => {
+    steps.push({
+      label,
+      positions: buildStepPositions(posState),
+      table: buildStepTable(communityCards.flop, communityCards.turn, communityCards.river, currentBet),
+      pot: pot.balance > 0 ? [{ users: [], balance: pot.balance, isHavePlayerAllIn: false }] : [],
+      isFinal,
+    })
+  }
+
+  addStep('Bắt đầu')
+  addStep('Pre-flop')
+
+  const doReveal = () => {
+    if (!pendingReveal) return
+    addStep(pendingReveal.label)
+    pendingReveal = null
+  }
+
+  let pendingReveal = null
+  let actedThisRound = new Set()
+
+  actions.forEach((action) => {
+    const position = getPlayerPosition({ position: posState }, action.user)
+    if (position) {
+      const pos = posState[position]
+      pos.action = action.action
+      actedThisRound.add(position)
+
+      if (action.action === 'fold') {
+        pos.isFold = true
+      } else if (action.action === 'check') {
+        // no chip change
+      } else if (action.action === 'call') {
+        const spend = Math.min(Number(action.amount || 0), pos.chips)
+        pos.chips -= spend
+        pos.betBalance += spend
+      } else if (action.action === 'bet' || action.action === 'raise' || action.action === 'all-in') {
+        const amount = Number(action.amount || 0)
+        const spend = Math.min(amount - pos.betBalance, pos.chips)
+        pos.chips -= spend
+        pos.betBalance = amount
+        if (pos.betBalance > currentBet) currentBet = pos.betBalance
+      }
+
+    }
+
+    const label = action.action === 'raise'
+      ? `${action.user} raise to ${posState[position]?.betBalance || 0}`
+      : `${action.user} ${action.action}`
+
+    addStep(label)
+
+    if (action.action === 'fold' && position) {
+      posState[position].action = ''
+    }
+
+    if (isRoundComplete(posState, currentBet, actedThisRound)) {
+      const totalBets = Object.keys(posState)
+        .filter((p) => posState[p].user && posState[p].isPlaying)
+        .reduce((sum, p) => sum + (posState[p].betBalance || 0), 0)
+
+      if (totalBets > 0) {
+        collectBets(posState, pot)
+        currentBet = 0
+
+        if (!communityCards.flop && result.table.flop) {
+          communityCards.flop = clone(result.table.flop)
+          pendingReveal = { label: `Flop - ${(result.table.flop || []).join(' ')}` }
+        } else if (!communityCards.turn && result.table.turn) {
+          communityCards.turn = result.table.turn
+          pendingReveal = { label: `Turn - ${result.table.turn}` }
+        } else if (!communityCards.river && result.table.river) {
+          communityCards.river = result.table.river
+          pendingReveal = { label: `River - ${result.table.river}` }
+        }
+      }
+
+      actedThisRound = new Set()
+      doReveal()
     }
   })
 
-  if (result?.table?.finish) {
-    const finished = applyResult(current, result)
-    steps.push({ label: 'Kết thúc', state: finished, isFinal: true })
+  doReveal()
+
+  if (result.table.finish) {
+    for (let i = 1; i <= 9; i++) {
+      const src = result.position?.[i]
+      if (src?.user && posState[i]) {
+        posState[i].winBalance = src.winBalance || 0
+        posState[i].resultCard = src.resultCard || null
+      }
+    }
+    addStep('Kết thúc', true)
   }
 
-  return steps
+  return { setting, dealer: dealerPosition, players, steps }
 }
 
 export default function GameHistoryDetailPage() {
@@ -328,11 +272,11 @@ export default function GameHistoryDetailPage() {
     fetchData()
   }, [poker_log_id])
 
-  const timeline = useMemo(() => buildTimeline(gameLog), [gameLog])
-  const currentStep = timeline[step]
-  const current = currentStep?.state || initReplay()
+  const normalized = useMemo(() => normalizeData(gameLog), [gameLog])
+  const steps = normalized.steps
+  const currentStep = steps[step]
   const canGoPrev = step > 0
-  const canGoNext = step < timeline.length - 1
+  const canGoNext = step < steps.length - 1
   const prevButtonClassName = canGoPrev
     ? 'bg-white text-black'
     : 'bg-slate-200 text-slate-400 md:bg-white/10 md:text-white/30'
@@ -340,10 +284,13 @@ export default function GameHistoryDetailPage() {
     ? 'bg-white text-black'
     : 'bg-slate-200 text-slate-400 md:bg-white/10 md:text-white/30'
 
+  const currentPositions = currentStep?.positions || {}
+  const currentTable = currentStep?.table || {}
+  const currentPot = currentStep?.pot || []
   const currentCards = [
-    ...(current.table.flop || []),
-    current.table.turn,
-    current.table.river,
+    ...(currentTable.flop || []),
+    currentTable.turn,
+    currentTable.river,
   ].filter(Boolean)
 
   return (
@@ -380,23 +327,23 @@ export default function GameHistoryDetailPage() {
           <div className="relative aspect-[1/1.55] w-full overflow-hidden rounded-3xl bg-green-700 sm:aspect-[1.35/1] md:aspect-[2/1] xl:aspect-[2.15/1]">
             <div className="absolute inset-x-12 bottom-24 top-24 overflow-visible rounded-[2rem] border-2 border-emerald-500/30 bg-green-700 sm:inset-x-14 sm:bottom-16 sm:top-16 md:inset-x-12 md:bottom-10 md:top-10 lg:inset-x-16 lg:bottom-14 lg:top-14">
               <div className="absolute inset-0 overflow-visible">
-                {Object.keys(current.position || {}).map((position) => (
+                {Object.keys(currentPositions).map((position) => (
                   <Position
                     key={position}
                     pos={position}
-                    namePos={current.position[position].namePos}
-                    userName={current.position[position]?.user?.userName}
-                    balance={current.position[position]?.user?.accBalance}
-                    bet={current.position[position]?.betBalance}
-                    cards={current.position[position]?.cards}
-                    isThinking={current.position[position]?.isThinking}
-                    isFold={current.position[position]?.isFold}
-                    isPlaying={current.position[position]?.isPlaying}
-                    winBalance={current.position[position]?.winBalance}
-                    start={current.table.start}
+                    namePos={currentPositions[position].namePos}
+                    userName={currentPositions[position]?.user?.userName}
+                    balance={currentPositions[position]?.chips}
+                    bet={currentPositions[position]?.betBalance}
+                    cards={currentPositions[position]?.cards}
+                    isThinking={false}
+                    isFold={currentPositions[position]?.isFold}
+                    isPlaying={currentPositions[position]?.isPlaying}
+                    winBalance={currentPositions[position]?.winBalance}
+                    start={true}
                     isHiddenCard={false}
-                    result={current.position[position]?.resultCard?.name}
-                    action={currentStep?.isFinal ? '' : current.position[position]?.action}
+                    result={currentPositions[position]?.resultCard?.name}
+                    action={currentStep?.isFinal ? '' : currentPositions[position]?.action}
                     onEditClick={() => {}}
                     onAddClick={() => {}}
                     hideCard={() => {}}
@@ -405,10 +352,10 @@ export default function GameHistoryDetailPage() {
 
                 <div className="absolute left-1/2 top-1/2 w-[78%] -translate-x-1/2 -translate-y-1/2">
                   <Pot
-                    pot={current.table.pot}
+                    pot={currentPot}
                     cards={currentCards}
-                    start={current.table.start}
-                    finish={current.table.finish}
+                    start={true}
+                    finish={currentStep?.isFinal}
                     hideTipDealer
                   />
                 </div>
@@ -421,8 +368,8 @@ export default function GameHistoryDetailPage() {
         {!!gameLog && (
         <div className="mx-auto mt-4 w-full max-w-[1400px] rounded-2xl border border-white/20 bg-white/80 p-3 text-slate-900 backdrop-blur-sm md:border-white/10 md:bg-black/30 md:text-white">
           <div className="mb-3 flex items-center justify-between text-sm text-slate-600 md:text-white/70">
-            <span>{step}/{Math.max(timeline.length - 1, 0)}</span>
-            <span>{timeline[step]?.label}</span>
+            <span>{step}/{Math.max(steps.length - 1, 0)}</span>
+            <span>{steps[step]?.label}</span>
           </div>
           <div className="flex items-center gap-2">
             <button
@@ -434,7 +381,7 @@ export default function GameHistoryDetailPage() {
               {'<'}
             </button>
             <div className="flex flex-1 gap-2 overflow-x-auto">
-              {timeline.map((item, index) => (
+              {steps.map((item, index) => (
                 <button
                   key={`${item.label}-${index}`}
                   onClick={() => setStep(index)}
@@ -447,7 +394,7 @@ export default function GameHistoryDetailPage() {
             <button
               type="button"
               disabled={!canGoNext}
-              onClick={() => setStep((value) => Math.min(value + 1, timeline.length - 1))}
+              onClick={() => setStep((value) => Math.min(value + 1, steps.length - 1))}
               className={`h-10 min-w-10 rounded-xl text-lg font-black ${nextButtonClassName}`}
             >
               {'>'}
