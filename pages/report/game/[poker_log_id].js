@@ -250,6 +250,7 @@ const normalizeData = (payload) => {
 export default function GameHistoryDetailPage() {
   const router = useRouter()
   const { poker_log_id } = router.query
+  const returnTo = typeof router.query.returnTo === 'string' ? router.query.returnTo : '/report'
   const { addToast } = useToasts()
   const [loading, setLoading] = useState(true)
   const [gameLog, setGameLog] = useState(null)
@@ -264,7 +265,11 @@ export default function GameHistoryDetailPage() {
         setGameLog(res.data.data)
         setStep(0)
       } catch (err) {
-        addToast(err?.response?.data?.error || 'Không tải được game detail', { appearance: 'error' })
+        if (err?.response?.data?.code === 'POKER_LOG_NOT_AVAILABLE_YET') {
+          addToast('Game này chưa mở xem được. Vui lòng quay lại sau 1 giờ kể từ lúc tạo.', { appearance: 'warning' })
+        } else {
+          addToast(err?.response?.data?.error || 'Không tải được game detail', { appearance: 'error' })
+        }
       } finally {
         setLoading(false)
       }
@@ -301,7 +306,7 @@ export default function GameHistoryDetailPage() {
 
       <div className="mx-auto flex w-full max-w-7xl flex-col px-3 py-3 sm:px-4 md:min-h-screen">
         <div className="mb-4 flex items-center justify-between gap-4">
-          <Link href="/report" className="rounded-xl bg-green-900/10 px-4 py-2 text-sm font-semibold text-green-950 md:bg-white/10 md:text-white">
+          <Link href={returnTo} className="rounded-xl bg-green-900/10 px-4 py-2 text-sm font-semibold text-green-950 md:bg-white/10 md:text-white">
             Quay lại
           </Link>
           <div className="text-right">

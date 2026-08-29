@@ -1,12 +1,18 @@
 import { useState, useEffect } from 'react'
 import Head from 'next/head'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { useToasts } from 'react-toast-notifications'
 import * as api from '../api/poker'
 import Loading from '../components/loading'
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart, ReferenceLine
 } from 'recharts';
+
+const reportCache = {
+  summary: null,
+  logs: {},
+}
 
 export async function getServerSideProps(context) {
   const { token } = context.req.cookies;
@@ -47,6 +53,7 @@ const TabButton = ({ active, onClick, children }) => (
 )
 
 export default function Report({ user }) {
+  const router = useRouter()
   const { addToast } = useToasts()
   const [activeTab, setActiveTab] = useState('summary')
   const [summaryData, setSummaryData] = useState([])
@@ -60,17 +67,57 @@ export default function Report({ user }) {
 
   const [summaryLoaded, setSummaryLoaded] = useState(false)
   const [logsCache, setLogsCache] = useState({})
-  const [viewingUser, setViewingUser] = useState(user.userName)
+  const [viewingUserId, setViewingUserId] = useState(user.id)
+  const [viewingUserName, setViewingUserName] = useState(user.userName)
   const [chartData, setChartData] = useState([])
   const [rangeStart, setRangeStart] = useState(0)
   const [rangeEnd, setRangeEnd] = useState(0)
   const [selectionPhase, setSelectionPhase] = useState('none') // none, start, both
 
   useEffect(() => {
+    if (!router.isReady) return
+
+    const nextTab = typeof router.query.tab === 'string' ? router.query.tab : 'summary'
+    const nextUserId = typeof router.query.userId === 'string' ? Number(router.query.userId) : user.id
+    const nextUserName = typeof router.query.userName === 'string' ? router.query.userName : user.userName
+    const nextDays = typeof router.query.days === 'string' ? Number(router.query.days) : 7
+    const nextPage = typeof router.query.page === 'string' ? Number(router.query.page) : 1
+    const nextLimit = typeof router.query.limit === 'string' ? Number(router.query.limit) : 100
+
+    setActiveTab(nextTab === 'logs' ? 'logs' : 'summary')
+    setViewingUserId(Number.isFinite(nextUserId) ? nextUserId : user.id)
+    setViewingUserName(nextUserName || user.userName)
+    setDays([7, 30, 365].includes(nextDays) ? nextDays : 7)
+    setPage(Number.isFinite(nextPage) && nextPage > 0 ? nextPage : 1)
+    setLimit([100, 500].includes(nextLimit) ? nextLimit : 100)
+  }, [router.isReady, router.query.tab, router.query.userId, router.query.userName, router.query.days, router.query.page, router.query.limit, user.id, user.userName])
+
+  const updateReportQuery = (nextState) => {
+    if (!router.isReady) return
+    const nextQuery = { ...router.query, ...nextState }
+    Object.keys(nextQuery).forEach((key) => {
+      if (nextQuery[key] === undefined || nextQuery[key] === null || nextQuery[key] === '') {
+        delete nextQuery[key]
+      }
+    })
+    router.replace({ pathname: router.pathname, query: nextQuery }, undefined, { shallow: true })
+  }
+
+  const saveScrollPosition = () => {
+    if (typeof window === 'undefined') return
+    window.sessionStorage.setItem('vpoker-report-scroll', String(window.scrollY || 0))
+  }
+
+  const activateTab = (tab) => {
+    setActiveTab(tab)
+    updateReportQuery({ tab })
+  }
+
+  useEffect(() => {
     if (activeTab === 'summary') {
       if (!summaryLoaded) fetchSummary()
     } else {
-      const cacheKey = `${viewingUser}-${days}-${page}-${limit}`
+      const cacheKey = `${viewingUserId}-${days}-${page}-${limit}`
       if (logsCache[cacheKey]) {
         setGameLogs(logsCache[cacheKey])
         updateChartData(logsCache[cacheKey])
@@ -78,13 +125,36 @@ export default function Report({ user }) {
         fetchGameLogs(cacheKey)
       }
     }
-  }, [activeTab, days, page, viewingUser, limit])
+  }, [activeTab, days, page, viewingUserId, limit])
+
+  useEffect(() => {
+    if (!router.isReady || loading) return
+    if (typeof window === 'undefined') return
+
+    const savedScroll = window.sessionStorage.getItem('vpoker-report-scroll')
+    if (savedScroll === null) return
+
+    window.sessionStorage.removeItem('vpoker-report-scroll')
+    const y = Number(savedScroll)
+    if (!Number.isFinite(y)) return
+
+    window.requestAnimationFrame(() => {
+      window.scrollTo({ top: y, behavior: 'auto' })
+    })
+  }, [router.isReady, loading, activeTab, summaryData.length, gameLogs.length])
 
   const fetchSummary = async () => {
+    if (reportCache.summary) {
+      setSummaryData(reportCache.summary)
+      setSummaryLoaded(true)
+      return
+    }
     setLoading(true)
     try {
       const res = await api.getReportSummary()
-      setSummaryData(res.data.data || [])
+      const data = res.data.data || []
+      reportCache.summary = data
+      setSummaryData(data)
       setSummaryLoaded(true)
     } catch (err) {
       addToast('Không thể tải báo cáo tổng hợp', { appearance: 'error' })
@@ -114,10 +184,17 @@ export default function Report({ user }) {
   }
 
   const fetchGameLogs = async (cacheKey) => {
+    if (reportCache.logs[cacheKey]) {
+      const data = reportCache.logs[cacheKey]
+      setGameLogs(data)
+      updateChartData(data)
+      return
+    }
     setLoading(true)
     try {
-      const res = await api.getGameLogs(viewingUser, { days, page, limit })
+      const res = await api.getGameLogs(viewingUserId, { days, page, limit })
       const data = res.data.data || []
+      reportCache.logs[cacheKey] = data
       setGameLogs(data)
       setLogsCache(prev => ({ ...prev, [cacheKey]: data }))
       updateChartData(data)
@@ -203,10 +280,19 @@ export default function Report({ user }) {
         </div>
 
         <div className="flex space-x-4 mb-8">
-          <TabButton active={activeTab === 'summary'} onClick={() => setActiveTab('summary')}>
+          <TabButton active={activeTab === 'summary'} onClick={() => activateTab('summary')}>
             Tổng hợp
           </TabButton>
-          <TabButton active={activeTab === 'logs'} onClick={() => { setViewingUser(user.userName); setPage(1); setActiveTab('logs'); }}>
+          <TabButton
+            active={activeTab === 'logs'}
+            onClick={() => {
+              setViewingUserId(user.id)
+              setViewingUserName(user.userName)
+              setPage(1)
+              setActiveTab('logs')
+              updateReportQuery({ tab: 'logs', userId: user.id, userName: user.userName, page: 1 })
+            }}
+          >
             Lịch sử của tôi
           </TabButton>
         </div>
@@ -254,7 +340,13 @@ export default function Report({ user }) {
                           <td className="px-8 py-6">
                             <div
                               className="flex items-center space-x-3 cursor-pointer group/name"
-                              onClick={() => { setViewingUser(item.username); setPage(1); setActiveTab('logs'); }}
+                              onClick={() => {
+                                setViewingUserId(item.id)
+                                setViewingUserName(item.username)
+                                setPage(1)
+                                setActiveTab('logs')
+                                updateReportQuery({ tab: 'logs', userId: item.id, userName: item.username, page: 1 })
+                              }}
                             >
                               <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white font-bold text-xs shadow-lg shadow-indigo-200 uppercase group-hover/name:scale-110 transition-transform">
                                 {item.username.substring(0, 2)}
@@ -338,9 +430,14 @@ export default function Report({ user }) {
           <div className="space-y-6">
             <div className="flex flex-wrap gap-4 items-center justify-between">
               <div className="flex items-center space-x-4">
-                {viewingUser !== user.userName && (
+                {viewingUserId !== user.id && (
                   <button
-                    onClick={() => { setViewingUser(user.userName); setPage(1); }}
+                    onClick={() => {
+                      setViewingUserId(user.id)
+                      setViewingUserName(user.userName)
+                      setPage(1)
+                      updateReportQuery({ tab: 'logs', userId: user.id, userName: user.userName, page: 1 })
+                    }}
                     className="flex items-center space-x-2 px-4 py-2 bg-indigo-50 text-indigo-600 rounded-xl font-bold text-sm hover:bg-indigo-100 transition-colors border border-indigo-100"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -351,11 +448,11 @@ export default function Report({ user }) {
                 )}
                 <div className="bg-white px-5 py-2.5 rounded-xl border border-gray-100 shadow-sm flex items-center space-x-3">
                   <div className="w-6 h-6 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center font-black text-[10px] uppercase">
-                    {viewingUser.substring(0, 2)}
+                    {viewingUserName.substring(0, 2)}
                   </div>
                   <div>
                     <span className="text-xs text-gray-400 font-bold uppercase tracking-tight block leading-none mb-1">Đang xem lịch sử của</span>
-                    <span className="text-sm font-black text-gray-900 leading-none">{viewingUser}</span>
+                    <span className="text-sm font-black text-gray-900 leading-none">{viewingUserName}</span>
                   </div>
                 </div>
               </div>
@@ -368,7 +465,11 @@ export default function Report({ user }) {
                 ].map((opt) => (
                   <button
                     key={opt.value}
-                    onClick={() => { setDays(opt.value); setPage(1); }}
+                    onClick={() => {
+                      setDays(opt.value)
+                      setPage(1)
+                      updateReportQuery({ tab: 'logs', days: opt.value, page: 1 })
+                    }}
                     className={`px-6 py-2 rounded-lg text-sm font-bold transition-all ${days === opt.value
                       ? 'bg-gray-900 text-white shadow-md'
                       : 'text-gray-500 hover:text-gray-900'
@@ -384,7 +485,12 @@ export default function Report({ user }) {
                    <span className="text-[10px] font-black text-gray-400 uppercase">Giới hạn:</span>
                    <select 
                     value={limit}
-                    onChange={(e) => { setLimit(Number(e.target.value)); setPage(1); }}
+                    onChange={(e) => {
+                      const nextLimit = Number(e.target.value)
+                      setLimit(nextLimit)
+                      setPage(1)
+                      updateReportQuery({ tab: 'logs', limit: nextLimit, page: 1 })
+                    }}
                     className="bg-transparent text-sm font-bold text-gray-700 outline-none"
                    >
                      <option value={100}>100</option>
@@ -395,7 +501,11 @@ export default function Report({ user }) {
                 <div className="flex items-center space-x-3">
                   <button
                     disabled={page === 1}
-                    onClick={() => setPage(page - 1)}
+                    onClick={() => {
+                      const nextPage = page - 1
+                      setPage(nextPage)
+                      updateReportQuery({ tab: 'logs', page: nextPage })
+                    }}
                     className="p-2.5 bg-white text-gray-400 border border-gray-100 rounded-xl shadow-sm disabled:opacity-30 hover:text-blue-600 transition-colors"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -407,7 +517,11 @@ export default function Report({ user }) {
                   </span>
                   <button
                     disabled={gameLogs.length < limit}
-                    onClick={() => setPage(page + 1)}
+                    onClick={() => {
+                      const nextPage = page + 1
+                      setPage(nextPage)
+                      updateReportQuery({ tab: 'logs', page: nextPage })
+                    }}
                     className="p-2.5 bg-white text-gray-400 border border-gray-100 rounded-xl shadow-sm disabled:opacity-30 hover:text-blue-600 transition-colors"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -586,8 +700,11 @@ export default function Report({ user }) {
                           {
                             !!log.poker_log_id && (
                               <Link
-                                href={`/report/game/${log.poker_log_id}`}
-                                onClick={(e) => e.stopPropagation()}
+                                href={`/report/game/${log.poker_log_id}?returnTo=${encodeURIComponent(router.asPath)}`}
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  saveScrollPosition()
+                                }}
                                 className="inline-flex items-center rounded-xl border border-blue-100 bg-blue-50 px-3 py-2 text-xs font-black uppercase tracking-wider text-blue-600 transition-all hover:bg-blue-100"
                               >
                                 Chi tiết game
