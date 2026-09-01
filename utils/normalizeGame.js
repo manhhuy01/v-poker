@@ -23,22 +23,22 @@ const normalizeData = (payload) => {
         out[i] = {
           user: undefined, betBalance: 0, chips: 0, isFold: false,
           namePos: '', cards: [], isPlaying: false, winBalance: 0,
-          action: '', resultCard: null,
+          action: '', resultCard: null, isAllIn: false,
         }
         continue
       }
-      const shouldHideCards = s.isFold && s.action !== 'fold'
       out[i] = {
         user: s.user ? { userName: s.user.userName } : undefined,
         betBalance: s.betBalance || 0,
         chips: s.chips ?? 0,
         isFold: s.isFold || false,
         namePos: s.namePos || '',
-        cards: shouldHideCards ? [] : (s.cards || []),
+        cards: s.cards,
         isPlaying: s.isPlaying || false,
         winBalance: s.winBalance || 0,
         action: s.action || '',
         resultCard: s.resultCard || null,
+        isAllIn: s.isAllIn || false,
       }
     }
     return out
@@ -55,11 +55,10 @@ const normalizeData = (payload) => {
     const active = Object.keys(posState).filter((p) => posState[p].user && posState[p].isPlaying)
     const nonFolded = active.filter((p) => !posState[p].isFold)
     if (nonFolded.length === 0) return false
-    if (nonFolded.some((p) => !actedThisRound.has(p))) return false
-    return nonFolded.every((p) => {
-      const pos = posState[p]
-      return pos.chips === 0 || pos.betBalance >= currentBet
-    })
+    const canAct = nonFolded.filter((p) => posState[p].chips > 0 && !posState[p].isAllIn)
+    if (canAct.some((p) => !actedThisRound.has(p))) return false
+    if (nonFolded.every((p) => posState[p].chips === 0 || posState[p].betBalance >= currentBet)) return true
+    return false
   }
 
   const collectBets = (posState, pot) => {
@@ -89,12 +88,13 @@ const normalizeData = (payload) => {
         winBalance: 0,
         action: '',
         resultCard: null,
+        isAllIn: false,
       }
     } else {
       posState[i] = {
         user: undefined, chips: 0, betBalance: 0, isFold: false,
         namePos: '', cards: [], isPlaying: false, winBalance: 0,
-        action: '', resultCard: null,
+        action: '', resultCard: null, isAllIn: false,
       }
     }
   }
@@ -160,12 +160,34 @@ const normalizeData = (payload) => {
         const spend = Math.min(Number(action.amount || 0), pos.chips)
         pos.chips -= spend
         pos.betBalance += spend
-      } else if (action.action === 'bet' || action.action === 'raise' || action.action === 'all-in') {
+      } else if (action.action === 'bet' || action.action === 'raise') {
         const amount = Number(action.amount || 0)
         const spend = Math.min(amount - pos.betBalance, pos.chips)
         pos.chips -= spend
         pos.betBalance = amount
-        if (pos.betBalance > currentBet) currentBet = pos.betBalance
+        if (pos.betBalance > currentBet) {
+          const oldBet = currentBet
+          currentBet = pos.betBalance
+          for (const p of Object.keys(posState)) {
+            if (posState[p].user && posState[p].isPlaying && !posState[p].isFold && posState[p].chips > 0 && posState[p].betBalance < currentBet && posState[p].betBalance < oldBet) {
+              actedThisRound.delete(p)
+            }
+          }
+        }
+      } else if (action.action === 'all-in') {
+        const spend = Math.min(pos.chips, Number(action.amount || 0))
+        pos.chips -= spend
+        pos.betBalance += spend
+        pos.isAllIn = true
+        if (pos.betBalance > currentBet) {
+          const oldBet = currentBet
+          currentBet = pos.betBalance
+          for (const p of Object.keys(posState)) {
+            if (posState[p].user && posState[p].isPlaying && !posState[p].isFold && posState[p].chips > 0 && posState[p].betBalance < currentBet && posState[p].betBalance < oldBet) {
+              actedThisRound.delete(p)
+            }
+          }
+        }
       }
 
     }
@@ -209,6 +231,10 @@ const normalizeData = (payload) => {
   doReveal()
 
   if (result.table.finish) {
+    if (!communityCards.river && result.table.river) {
+      communityCards.river = result.table.river
+      addStep(`River - ${result.table.river}`)
+    }
     for (let i = 1; i <= 9; i++) {
       const src = result.position?.[i]
       if (src?.user && posState[i]) {

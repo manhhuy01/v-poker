@@ -76,291 +76,415 @@ const mockGameData = {
   },
 }
 
-let passed = 0
-let failed = 0
-
-function assert(condition, message) {
-  if (condition) {
-    passed++
-  } else {
-    failed++
-    console.error(`FAIL: ${message}`)
-  }
+const mockGameDataCase2 = {
+  data: {
+    cards: [
+      'Jh', '7c', '7s', '3s', '9d', '10s', '10c', '4c', '6c', '2d', '10d',
+      '8d', 'Kc', 'Js', 'Ad', '6s', '6d', '7h', '7d', '3c', 'As', '9c', '4d',
+      '2c', 'Ac', 'Kd', '4s', '8h', '3h', 'Qs', 'Kh', 'Qd', '10h',
+    ],
+    table: {
+      pot: [{ users: [], balance: 0, isHavePlayerAllIn: false }],
+      flop: ['5c', 'Qc', '5d'],
+      turn: '2h',
+      river: 'Ks',
+      start: true,
+      finish: true,
+      actions: [
+        { user: 'tuan', action: 'call', amount: 2 },
+        { user: 'haha', action: 'call', amount: 2 },
+        { user: 'cuongvu', action: 'fold', amount: 0 },
+        { user: 'manhhuy01', action: 'call', amount: 2 },
+        { user: 'nhat', action: 'call', amount: 2 },
+        { user: 'daodaobao', action: 'fold', amount: 0 },
+        { user: 'lycuong99', action: 'check', amount: 0 },
+        { user: 'lycuong99', action: 'check', amount: 0 },
+        { user: 'tuan', action: 'check', amount: 0 },
+        { user: 'haha', action: 'check', amount: 0 },
+        { user: 'manhhuy01', action: 'bet', amount: 4 },
+        { user: 'nhat', action: 'raise', amount: 8 },
+        { user: 'lycuong99', action: 'fold', amount: 0 },
+        { user: 'tuan', action: 'call', amount: 8 },
+        { user: 'haha', action: 'call', amount: 8 },
+        { user: 'manhhuy01', action: 'raise', amount: 16 },
+        { user: 'nhat', action: 'all-in', amount: 6 },
+        { user: 'tuan', action: 'call', amount: 8 },
+        { user: 'haha', action: 'fold', amount: 0 },
+        { user: 'tuan', action: 'check', amount: 0 },
+        { user: 'manhhuy01', action: 'bet', amount: 8 },
+        { user: 'tuan', action: 'call', amount: 8 },
+        { user: 'tuan', action: 'check', amount: 0 },
+        { user: 'manhhuy01', action: 'bet', amount: 20 },
+        { user: 'tuan', action: 'call', amount: 20 },
+      ],
+      preFlop: true,
+      currentBet: 0,
+      isShowDown: true,
+      firstActionPlayer: 2,
+    },
+    dealer: 'nhat',
+    players: [
+      { userId: '7', userName: 'nhat', accBalance: 0, startBalance: 16 },
+      { userId: '31', userName: 'nhat2', accBalance: 18, startBalance: 18 },
+      { userId: '32', userName: 'nhat3', accBalance: 20, startBalance: 20 },
+      { userId: '28', userName: 'cuongvu', accBalance: 127, startBalance: 127 },
+      { userId: '3', userName: 'lycuong99', accBalance: 74, startBalance: 76 },
+      { userId: '10', userName: 'daodaobao', accBalance: 33, startBalance: 34 },
+      { userId: '1', userName: 'manhhuy01', accBalance: 63, startBalance: 109 },
+      { userId: '2', userName: 'tuan', accBalance: 66, startBalance: 112 },
+      { userId: '24', userName: 'haha', accBalance: 116, startBalance: 126 },
+      { userId: '19', userName: 'jemp', accBalance: 0 },
+      { userId: '22', userName: 'dealerfromhell2', accBalance: 0 },
+    ],
+    setting: { smallBlind: 1 },
+    position: {
+      1: {
+        user: { userId: '28', userName: 'cuongvu', accBalance: 127, startBalance: 127 },
+        cards: ['6h', '9h'],
+        action: '',
+        isFold: true,
+        namePos: '',
+        showCard: false,
+        isPlaying: true,
+        betBalance: 0,
+        isThinking: false,
+      },
+      2: {
+        user: { userId: '1', userName: 'manhhuy01', accBalance: 63, startBalance: 109 },
+        cards: ['4h', '5h'],
+        action: '',
+        isFold: false,
+        namePos: '',
+        showCard: false,
+        isPlaying: true,
+        betBalance: 0,
+        isThinking: false,
+      },
+      3: {
+        user: { userId: '7', userName: 'nhat', accBalance: 0, startBalance: 16 },
+        cards: ['5s', 'Jd'],
+        action: '',
+        isFold: false,
+        namePos: 'D',
+        showCard: false,
+        isPlaying: true,
+        betBalance: 0,
+        isThinking: false,
+      },
+      4: {
+        user: { userId: '10', userName: 'daodaobao', accBalance: 33, startBalance: 34 },
+        cards: ['2s', '8s'],
+        action: '',
+        isFold: true,
+        namePos: '',
+        showCard: false,
+        isPlaying: true,
+        betBalance: 0,
+        isThinking: false,
+      },
+      5: {
+        user: { userId: '3', userName: 'lycuong99', accBalance: 74, startBalance: 76 },
+        cards: ['9s', '8c'],
+        action: '',
+        isFold: true,
+        namePos: '',
+        showCard: false,
+        isPlaying: true,
+        betBalance: 0,
+        isThinking: false,
+      },
+      6: {
+        cards: [],
+        action: '',
+        isFold: false,
+        namePos: '',
+        showCard: false,
+        isPlaying: false,
+        betBalance: 0,
+        isThinking: false,
+        winBalance: 0,
+      },
+      7: {
+        user: { userId: '2', userName: 'tuan', accBalance: 66, startBalance: 112 },
+        cards: ['Qh', 'Jc'],
+        action: '',
+        isFold: false,
+        namePos: '',
+        showCard: false,
+        isPlaying: true,
+        betBalance: 0,
+        isThinking: false,
+      },
+      8: {
+        user: { userId: '24', userName: 'haha', accBalance: 116, startBalance: 126 },
+        cards: ['Ah', '3d'],
+        action: '',
+        isFold: true,
+        namePos: '',
+        showCard: false,
+        isPlaying: true,
+        betBalance: 0,
+        isThinking: false,
+      },
+      9: {
+        user: { userId: '22', userName: 'dealerfromhell2', accBalance: 0 },
+        cards: [],
+        action: '',
+        isFold: false,
+        namePos: '',
+        showCard: false,
+        isPlaying: false,
+        betBalance: 0,
+        isThinking: false,
+        winBalance: 0,
+      },
+    },
+  },
 }
 
-function assertEqual(actual, expected, message) {
-  if (actual === expected) {
-    passed++
-  } else {
-    failed++
-    console.error(`FAIL: ${message} — expected "${expected}", got "${actual}"`)
-  }
-}
+describe('normalizeData - Case 1', () => {
+  const { steps } = normalizeData(mockGameData)
 
-function assertPos(step, pos, field, expected, steps) {
-  const s = steps[step]
-  if (!s) {
-    failed++
-    console.error(`FAIL: Step ${step} does not exist`)
-    return
-  }
-  const actual = s.positions[pos]?.[field]
-  const expStr = JSON.stringify(expected)
-  const actStr = JSON.stringify(actual)
-  if (expStr === actStr) {
-    passed++
-  } else {
-    failed++
-    console.error(`FAIL: Step ${step} pos ${pos} ${field} — expected ${expStr}, got ${actStr}`)
-  }
-}
+  it('Step 0: Bắt đầu', () => {
+    expect(steps[0].label).toBe('Bắt đầu')
+    expect(steps[0].positions[1].chips).toBe(99)
+    expect(steps[0].positions[2].chips).toBe(78)
+    expect(steps[0].positions[1].betBalance).toBe(1)
+    expect(steps[0].positions[2].betBalance).toBe(2)
+    expect(steps[0].positions[9].namePos).toBe('D')
+  })
 
-function assertTable(step, field, expected, steps) {
-  const s = steps[step]
-  if (!s) {
-    failed++
-    console.error(`FAIL: Step ${step} does not exist`)
-    return
-  }
-  const actual = s.table?.[field]
-  const expStr = JSON.stringify(expected)
-  const actStr = JSON.stringify(actual)
-  if (expStr === actStr) {
-    passed++
-  } else {
-    failed++
-    console.error(`FAIL: Step ${step} table.${field} — expected ${expStr}, got ${actStr}`)
-  }
-}
+  it('Step 1: Pre-flop', () => {
+    expect(steps[1].label).toBe('Pre-flop')
+  })
 
-function assertPot(step, expectedBalance, steps) {
-  const s = steps[step]
-  if (!s) {
-    failed++
-    console.error(`FAIL: Step ${step} does not exist`)
-    return
-  }
-  const actual = s.pot?.[0]?.balance ?? 0
-  if (actual === expectedBalance) {
-    passed++
-  } else {
-    failed++
-    console.error(`FAIL: Step ${step} pot.balance — expected ${expectedBalance}, got ${actual}`)
-  }
-}
+  it('Step 2: dealerfromhell2 call', () => {
+    expect(steps[2].label).toBe('dealerfromhell2 call')
+    expect(steps[2].positions[3].betBalance).toBe(2)
+    expect(steps[2].positions[3].chips).toBe(42)
+  })
 
-function assertEmptyPot(step, steps) {
-  const s = steps[step]
-  if (!s) {
-    failed++
-    console.error(`FAIL: Step ${step} does not exist`)
-    return
-  }
-  if (s.pot.length === 0) {
-    passed++
-  } else {
-    failed++
-    console.error(`FAIL: Step ${step} pot — expected empty, got ${JSON.stringify(s.pot)}`)
-  }
-}
+  it('Step 3: daodaobao fold', () => {
+    expect(steps[3].label).toBe('daodaobao fold')
+    expect(steps[3].positions[4].isFold).toBe(true)
+    expect(steps[3].positions[4].cards).toEqual(['5c', '4d'])
+  })
 
-// Run normalizeData
-const result = normalizeData(mockGameData)
-const steps = result.steps
+  it('Step 4: viet raise to 4', () => {
+    expect(steps[4].label).toBe('viet raise to 4')
+    expect(steps[4].positions[5].betBalance).toBe(4)
+    expect(steps[4].positions[5].chips).toBe(48)
+    expect(steps[4].table.currentBet).toBe(4)
+  })
 
-console.log(`Total steps: ${steps.length}`)
-console.log('Step labels:')
-steps.forEach((s, i) => console.log(`  ${i}: ${s.label}`))
-console.log('')
+  it('Step 5: mytrang fold', () => {
+    expect(steps[5].label).toBe('mytrang fold')
+    expect(steps[5].positions[9].isFold).toBe(true)
+  })
 
-// ============================================================
-// BASIC STRUCTURE
-// ============================================================
-assertEqual(steps.length, 27, 'Total steps = 27')
+  it('Step 6: nhat fold', () => {
+    expect(steps[6].label).toBe('nhat fold')
+    expect(steps[6].positions[1].isFold).toBe(true)
+  })
 
-// Step 0: Bắt đầu
-assertEqual(steps[0].label, 'Bắt đầu', 'Step 0 label')
-assertPos(0, 1, 'chips', 99, steps)      // nhat after SB
-assertPos(0, 2, 'chips', 78, steps)      // cuongvu after BB
-assertPos(0, 1, 'betBalance', 1, steps)  // nhat SB=1
-assertPos(0, 2, 'betBalance', 2, steps)  // cuongvu BB=2
-assertPos(0, 9, 'namePos', 'D', steps)   // dealer mytrang
+  it('Step 7: cuongvu call', () => {
+    expect(steps[7].label).toBe('cuongvu call')
+    expect(steps[7].positions[2].betBalance).toBe(4)
+    expect(steps[7].positions[2].chips).toBe(76)
+  })
 
-// Step 1: Pre-flop
-assertEqual(steps[1].label, 'Pre-flop', 'Step 1 label')
+  it('Step 8: dealerfromhell2 call', () => {
+    expect(steps[8].label).toBe('dealerfromhell2 call')
+    expect(steps[8].positions[3].betBalance).toBe(4)
+    expect(steps[8].positions[3].chips).toBe(40)
+  })
 
-// ============================================================
-// PREFLOP ACTIONS
-// ============================================================
+  it('Step 9: Flop - As 9d 4c', () => {
+    expect(steps[9].label).toBe('Flop - As 9d 4c')
+    expect(steps[9].table.flop).toEqual(['As', '9d', '4c'])
+    expect(steps[9].pot[0].balance).toBe(13)
+  })
 
-// Step 2: dealerfromhell2 call
-assertEqual(steps[2].label, 'dealerfromhell2 call', 'Step 2 label')
-assertPos(2, 3, 'betBalance', 2, steps)
-assertPos(2, 3, 'chips', 42, steps)
+  it('Step 10: cuongvu check', () => {
+    expect(steps[10].label).toBe('cuongvu check')
+    expect(steps[10].positions[2].action).toBe('check')
+  })
 
-// Step 3: daodaobao fold
-assertEqual(steps[3].label, 'daodaobao fold', 'Step 3 label')
-assertPos(3, 4, 'isFold', true, steps)
-assertPos(3, 4, 'cards', ['5c', '4d'], steps) // cards shown on fold step
+  it('Step 11: dealerfromhell2 bet', () => {
+    expect(steps[11].label).toBe('dealerfromhell2 bet')
+    expect(steps[11].positions[3].betBalance).toBe(6)
+    expect(steps[11].positions[3].chips).toBe(34)
+    expect(steps[11].table.currentBet).toBe(6)
+  })
 
-// Step 4: viet raise to 4
-assertEqual(steps[4].label, 'viet raise to 4', 'Step 4 label')
-assertPos(4, 5, 'betBalance', 4, steps)
-assertPos(4, 5, 'chips', 48, steps)
-assertTable(4, 'currentBet', 4, steps)
+  it('Step 12: viet call', () => {
+    expect(steps[12].label).toBe('viet call')
+    expect(steps[12].positions[5].betBalance).toBe(6)
+    expect(steps[12].positions[5].chips).toBe(42)
+  })
 
-// Step 5: mytrang fold
-assertEqual(steps[5].label, 'mytrang fold', 'Step 5 label')
-assertPos(5, 9, 'isFold', true, steps)
+  it('Step 13: cuongvu call', () => {
+    expect(steps[13].label).toBe('cuongvu call')
+    expect(steps[13].positions[2].betBalance).toBe(6)
+    expect(steps[13].positions[2].chips).toBe(70)
+  })
 
-// Step 6: nhat fold
-assertEqual(steps[6].label, 'nhat fold', 'Step 6 label')
-assertPos(6, 1, 'isFold', true, steps)
+  it('Step 14: Turn - 7h', () => {
+    expect(steps[14].label).toBe('Turn - 7h')
+    expect(steps[14].table.turn).toBe('7h')
+    expect(steps[14].pot[0].balance).toBe(31)
+  })
 
-// Step 7: cuongvu call
-assertEqual(steps[7].label, 'cuongvu call', 'Step 7 label')
-assertPos(7, 2, 'betBalance', 4, steps)
-assertPos(7, 2, 'chips', 76, steps)
+  it('Step 15: cuongvu check', () => {
+    expect(steps[15].label).toBe('cuongvu check')
+  })
 
-// Step 8: dealerfromhell2 call
-assertEqual(steps[8].label, 'dealerfromhell2 call', 'Step 8 label')
-assertPos(8, 3, 'betBalance', 4, steps)
-assertPos(8, 3, 'chips', 40, steps)
+  it('Step 16: dealerfromhell2 check', () => {
+    expect(steps[16].label).toBe('dealerfromhell2 check')
+  })
 
-// ============================================================
-// FLOP REVEAL (step 9)
-// ============================================================
-assertEqual(steps[9].label, 'Flop - As 9d 4c', 'Step 9 label = Flop')
-assertTable(9, 'flop', ['As', '9d', '4c'], steps)
-assertPot(9, 13, steps) // pot collected: 1+2+2+4+4=13
+  it('Step 17: viet bet', () => {
+    expect(steps[17].label).toBe('viet bet')
+    expect(steps[17].positions[5].betBalance).toBe(8)
+    expect(steps[17].positions[5].chips).toBe(34)
+    expect(steps[17].table.currentBet).toBe(8)
+  })
 
-// ============================================================
-// FLOP ACTIONS
-// ============================================================
+  it('Step 18: cuongvu call', () => {
+    expect(steps[18].label).toBe('cuongvu call')
+    expect(steps[18].positions[2].betBalance).toBe(8)
+    expect(steps[18].positions[2].chips).toBe(62)
+  })
 
-// Step 10: cuongvu check
-assertEqual(steps[10].label, 'cuongvu check', 'Step 10 label')
-assertPos(10, 2, 'action', 'check', steps)
+  it('Step 19: dealerfromhell2 call', () => {
+    expect(steps[19].label).toBe('dealerfromhell2 call')
+    expect(steps[19].positions[3].betBalance).toBe(8)
+    expect(steps[19].positions[3].chips).toBe(26)
+  })
 
-// Step 11: dealerfromhell2 bet
-assertEqual(steps[11].label, 'dealerfromhell2 bet', 'Step 11 label')
-assertPos(11, 3, 'betBalance', 6, steps)
-assertPos(11, 3, 'chips', 34, steps)
-assertTable(11, 'currentBet', 6, steps)
+  it('Step 20: River - 2s', () => {
+    expect(steps[20].label).toBe('River - 2s')
+    expect(steps[20].table.river).toBe('2s')
+    expect(steps[20].pot[0].balance).toBe(55)
+  })
 
-// Step 12: viet call
-assertEqual(steps[12].label, 'viet call', 'Step 12 label')
-assertPos(12, 5, 'betBalance', 6, steps)
-assertPos(12, 5, 'chips', 42, steps)
+  it('Step 21: cuongvu check', () => {
+    expect(steps[21].label).toBe('cuongvu check')
+  })
 
-// Step 13: cuongvu call
-assertEqual(steps[13].label, 'cuongvu call', 'Step 13 label')
-assertPos(13, 2, 'betBalance', 6, steps)
-assertPos(13, 2, 'chips', 70, steps)
+  it('Step 22: dealerfromhell2 check', () => {
+    expect(steps[22].label).toBe('dealerfromhell2 check')
+  })
 
-// ============================================================
-// TURN REVEAL (step 14)
-// ============================================================
-assertEqual(steps[14].label, 'Turn - 7h', 'Step 14 label = Turn')
-assertTable(14, 'turn', '7h', steps)
-assertPot(14, 31, steps) // pot: 13 + 18(6*3) = 31
+  it('Step 23: viet bet', () => {
+    expect(steps[23].label).toBe('viet bet')
+    expect(steps[23].positions[5].betBalance).toBe(12)
+    expect(steps[23].positions[5].chips).toBe(22)
+    expect(steps[23].table.currentBet).toBe(12)
+  })
 
-// ============================================================
-// TURN ACTIONS
-// ============================================================
+  it('Step 24: cuongvu fold', () => {
+    expect(steps[24].label).toBe('cuongvu fold')
+    expect(steps[24].positions[2].isFold).toBe(true)
+    expect(steps[24].positions[2].cards).toEqual(['Jd', 'Td'])
+  })
 
-// Step 15: cuongvu check
-assertEqual(steps[15].label, 'cuongvu check', 'Step 15 label')
+  it('Step 25: dealerfromhell2 call', () => {
+    expect(steps[25].label).toBe('dealerfromhell2 call')
+    expect(steps[25].positions[3].betBalance).toBe(12)
+    expect(steps[25].positions[3].chips).toBe(14)
+    expect(steps[25].pot[0].balance).toBe(55)
+  })
 
-// Step 16: dealerfromhell2 check
-assertEqual(steps[16].label, 'dealerfromhell2 check', 'Step 16 label')
+  it('Step 26: Kết thúc', () => {
+    expect(steps[26].label).toBe('Kết thúc')
+    expect(steps[26].isFinal).toBe(true)
+    expect(steps[26].pot[0].balance).toBe(79)
+  })
 
-// Step 17: viet bet
-assertEqual(steps[17].label, 'viet bet', 'Step 17 label')
-assertPos(17, 5, 'betBalance', 8, steps)
-assertPos(17, 5, 'chips', 34, steps)
-assertTable(17, 'currentBet', 8, steps)
+  it('fold cards should be hidden', () => {
+    expect(steps[4].positions[4].cards).toEqual([])
+    expect(steps[7].positions[1].cards).toEqual([])
+    expect(steps[25].positions[2].cards).toEqual([])
+  })
 
-// Step 18: cuongvu call
-assertEqual(steps[18].label, 'cuongvu call', 'Step 18 label')
-assertPos(18, 2, 'betBalance', 8, steps)
-assertPos(18, 2, 'chips', 62, steps)
+  it('final chip counts', () => {
+    expect(steps[26].positions[1].chips).toBe(99)
+    expect(steps[26].positions[2].chips).toBe(62)
+    expect(steps[26].positions[3].chips).toBe(14)
+    expect(steps[26].positions[4].chips).toBe(50)
+    expect(steps[26].positions[5].chips).toBe(22)
+    expect(steps[26].positions[9].chips).toBe(50)
+  })
+})
 
-// Step 19: dealerfromhell2 call
-assertEqual(steps[19].label, 'dealerfromhell2 call', 'Step 19 label')
-assertPos(19, 3, 'betBalance', 8, steps)
-assertPos(19, 3, 'chips', 26, steps)
+describe('case-2-normalizeData', () => {
+  const { steps } = normalizeData(mockGameDataCase2)
 
-// ============================================================
-// RIVER REVEAL (step 20)
-// ============================================================
-assertEqual(steps[20].label, 'River - 2s', 'Step 20 label = River')
-assertTable(20, 'river', '2s', steps)
-assertPot(20, 55, steps) // pot: 31 + 24(8*3) = 55
+  it('should have 31 steps', () => {
+    expect(steps.length).toBe(31)
+  })
 
-// ============================================================
-// RIVER ACTIONS
-// ============================================================
+  it('Step 0-8: Pre-flop', () => {
+    expect(steps[0].label).toBe('Bắt đầu')
+    expect(steps[1].label).toBe('Pre-flop')
+    expect(steps[2].label).toBe('tuan call')
+    expect(steps[3].label).toBe('haha call')
+    expect(steps[4].label).toBe('cuongvu fold')
+    expect(steps[4].positions[1].cards).toEqual(['6h', '9h'])
+    expect(steps[5].label).toBe('manhhuy01 call')
+    expect(steps[6].label).toBe('nhat call')
+    expect(steps[7].label).toBe('daodaobao fold')
+    expect(steps[7].positions[4].cards).toEqual(['2s', '8s'])
+    expect(steps[8].label).toBe('lycuong99 check')
+  })
 
-// Step 21: cuongvu check
-assertEqual(steps[21].label, 'cuongvu check', 'Step 21 label')
+  it('Step 9: Flop - 5c Qc 5d', () => {
+    expect(steps[9].label).toBe('Flop - 5c Qc 5d')
+    expect(steps[9].table.flop).toEqual(['5c', 'Qc', '5d'])
+  })
 
-// Step 22: dealerfromhell2 check
-assertEqual(steps[22].label, 'dealerfromhell2 check', 'Step 22 label')
+  it('Step 10-19: Flop actions', () => {
+    expect(steps[10].label).toBe('lycuong99 check')
+    expect(steps[11].label).toBe('tuan check')
+    expect(steps[12].label).toBe('haha check')
+    expect(steps[13].label).toBe('manhhuy01 bet')
+    expect(steps[14].label).toBe('nhat raise to 8')
+    expect(steps[15].label).toBe('lycuong99 fold')
+    expect(steps[15].positions[5].cards).toEqual(['9s', '8c'])
+    expect(steps[16].label).toBe('tuan call')
+    expect(steps[17].label).toBe('haha call')
+    expect(steps[18].label).toBe('manhhuy01 raise to 16')
+    expect(steps[19].label).toBe('nhat all-in')
+    expect(steps[20].label).toBe('tuan call')
+    expect(steps[21].label).toBe('haha fold')
+  })
 
-// Step 23: viet bet
-assertEqual(steps[23].label, 'viet bet', 'Step 23 label')
-assertPos(23, 5, 'betBalance', 12, steps)
-assertPos(23, 5, 'chips', 22, steps)
-assertTable(23, 'currentBet', 12, steps)
+  it('Step 22: Turn - 2h', () => {
+    expect(steps[22].label).toBe('Turn - 2h')
+    expect(steps[22].table.turn).toBe('2h')
+  })
 
-// Step 24: cuongvu fold
-assertEqual(steps[24].label, 'cuongvu fold', 'Step 24 label')
-assertPos(24, 2, 'isFold', true, steps)
-assertPos(24, 2, 'cards', ['Jd', 'Td'], steps) // cards shown on fold step
+  it('Step 23-28: Turn actions', () => {
+    expect(steps[23].label).toBe('tuan check')
+    expect(steps[24].label).toBe('manhhuy01 bet')
+    expect(steps[25].label).toBe('tuan call')
+  })
 
-// Step 25: dealerfromhell2 call
-assertEqual(steps[25].label, 'dealerfromhell2 call', 'Step 25 label')
-assertPos(25, 3, 'betBalance', 12, steps)
-assertPos(25, 3, 'chips', 14, steps)
-assertPot(25, 55, steps) // pot before river collect: 55
+  it('Step 26-28: River - Ks', () => {
+    expect(steps[26].label).toBe('River - Ks')
+    expect(steps[26].table.river).toBe('Ks')
+    expect(steps[27].label).toBe('tuan check')
+    expect(steps[28].label).toBe('manhhuy01 bet')
+    expect(steps[29].label).toBe('tuan call')
+  })
 
-// ============================================================
-// FINAL STEP (step 26)
-// ============================================================
-assertEqual(steps[26].label, 'Kết thúc', 'Step 26 label = Kết thúc')
-assertEqual(steps[26].isFinal, true, 'Step 26 isFinal = true')
-assertPot(26, 79, steps) // pot after river collect: 55 + 24(12*2) = 79
-
-// ============================================================
-// FOLD CARD HIDING: After fold step, cards should be hidden
-// ============================================================
-// After daodaobao fold (step3), on step4 daodaobao cards should be hidden
-assertPos(4, 4, 'cards', [], steps) // daodaobao cards hidden after fold step
-
-// After cuongvu fold (step24), on step25 cuongvu cards should be hidden
-assertPos(25, 2, 'cards', [], steps) // cuongvu cards hidden after fold step
-
-// After nhat fold (step6), on step7 nhat cards should be hidden
-assertPos(7, 1, 'cards', [], steps) // nhat cards hidden after fold step
-
-// ============================================================
-// FINAL CHIP COUNTS
-// ============================================================
-assertPos(26, 1, 'chips', 99, steps)   // nhat: 100-1=99
-assertPos(26, 2, 'chips', 62, steps)   // cuongvu: 80-2-2-6-8=62
-assertPos(26, 3, 'chips', 14, steps)   // dealerfromhell2: 44-30=14
-assertPos(26, 4, 'chips', 50, steps)   // daodaobao: 50 (folded, no spend)
-assertPos(26, 5, 'chips', 22, steps)   // viet: 52-30=22
-assertPos(26, 9, 'chips', 50, steps)   // mytrang: 50 (folded, no spend)
-
-// ============================================================
-// SUMMARY
-// ============================================================
-console.log('')
-console.log(`Results: ${passed} passed, ${failed} failed`)
-if (failed > 0) {
-  process.exit(1)
-} else {
-  console.log('All tests passed!')
-}
+  it('Step 30: Kết thúc', () => {
+    expect(steps[30].label).toBe('Kết thúc')
+    expect(steps[30].isFinal).toBe(true)
+    expect(steps[30].positions[2].chips).toBe(63)
+    expect(steps[30].positions[3].chips).toBe(0)
+    expect(steps[30].positions[7].chips).toBe(66)
+    expect(steps[30].positions[8].chips).toBe(116)
+  })
+})
