@@ -131,7 +131,7 @@ export default function GameHistoryDetailPage() {
                   />
                 ))}
 
-                <div className="absolute left-1/2 top-1/2 w-[78%] -translate-x-1/2 -translate-y-1/2">
+                <div className="flex justify-center absolute left-1/2 top-1/2 w-1/2 -translate-x-1/2 -translate-y-1/2 md:w-2/3">
                   <Pot
                     pot={currentPot}
                     cards={currentCards}

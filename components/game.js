@@ -289,7 +289,7 @@ export default function Game({ data, onEditClick, onAddClick, onChatOpen, messag
   return (
     <div className="game-container relative w-full h-dvh bg-gray-800 overflow-hidden">
       <div className="game-layout pt-16 pb-40 w-full h-dvh flex items-center justify-center">
-        <div className="w-10/12 h-5/6 relative border-8 border-black rounded-large bg-green-700">
+        <div className="w-10/12 h-5/6 relative border-8 border-black border-emerald-500/30 rounded-[2rem] bg-green-700">
           {
             Object.keys(data?.position || {}).map((position) => (
               <Position
@@ -318,7 +318,7 @@ export default function Game({ data, onEditClick, onAddClick, onChatOpen, messag
             ))
           }
 
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-2/3 flex flex-col items-center pointer-events-none gap-8">
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-1/2 md:w-2/3 flex flex-col items-center pointer-events-none gap-8">
             <ChatFloating
               user={data?.user}
               onChatOpen={onChatOpen}

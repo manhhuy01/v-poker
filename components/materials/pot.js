@@ -16,10 +16,17 @@ export default function pot({ cards, pot, start, onClickTipDealer, finish, hideT
           !!pot && pot.map((p, i) => !!p.balance && <Pot key={i} balance={p.balance} />)
         }
       </div>
-      <div className="flex justify-center w-full ">
-        {
-          start && [0, 1, 2, 3, 4].map((i) => <Card key={i} data={cards[i] || 'u'} />)
-        }
+      <div className="flex flex-wrap justify-center w-full gap-y-2 ">
+        <div className="flex">
+          {
+            start && [0, 1, 2].map((i) => <Card key={i} data={cards[i] || 'u'} />)
+          }
+        </div>
+        <div className="flex">
+          {
+            start && [3, 4].map((i) => <Card key={i} data={cards[i] || 'u'} />)
+          }
+        </div>
       </div>
     </div>
   )

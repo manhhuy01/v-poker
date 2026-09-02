@@ -80,10 +80,10 @@ export default function position({
         chipClassName += '-translate-y-8 translate-x-16 sm:-translate-y-20 sm:translate-x-0 md:-translate-y-24';
         break;
       case 3:
-        chipClassName += 'translate-x-20 sm:-translate-y-8';
+        chipClassName += 'translate-x-16 sm:-translate-y-8';
         break;
       case 4:
-        chipClassName += 'translate-x-20 translate-y-8';
+        chipClassName += 'translate-x-16 translate-y-8';
         break;
       case 5:
         chipClassName += 'translate-x-4 translate-y-16 sm:translate-x-0 md:translate-y-20';
@@ -92,10 +92,10 @@ export default function position({
         chipClassName += 'translate-y-16 -translate-x-4 sm:translate-x-0 md:translate-y-20';
         break;
       case 7:
-        chipClassName += '-translate-x-20 translate-y-8';
+        chipClassName += '-translate-x-16 translate-y-8';
         break;
       case 8:
-        chipClassName += '-translate-x-20 sm:-translate-y-8';
+        chipClassName += '-translate-x-16 sm:-translate-y-8';
         break;
       case 9:
         chipClassName += '-translate-y-8 -translate-x-16 sm:-translate-y-20 sm:translate-x-0 md:-translate-y-24';
