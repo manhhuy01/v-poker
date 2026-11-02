@@ -14,6 +14,14 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
 
+## Chuyển giao diện bàn chơi (V1/V2)
+
+- Mở menu user ở góc trên bên phải → **Giao diện bàn chơi** → chọn V1 hoặc V2.
+- Lựa chọn được lưu ở `localStorage` theo từng user, key dạng `v-poker:ui-version:<userName>`.
+- Không gọi API/server; lựa chọn của user này không ảnh hưởng tới user khác.
+- Nếu chưa có giá trị trong `localStorage`, mặc định dùng V1 (giao diện trên nhánh `main`).
+- Code V1 nằm ở `components/game-v1/`, V2 nằm ở `components/game.js` + `components/poker/`.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:

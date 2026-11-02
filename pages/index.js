@@ -8,10 +8,13 @@ import NoSleep from 'nosleep.js';
 import * as api from '../api/poker'
 import * as socket from '../api/socket'
 import MenuSide from '../components/menuSide'
-import Game from '../components/game'
+import GameV1 from '../components/game-v1/game'
+import GameV2 from '../components/game'
 import Setting from '../components/setting'
 import TopMenu from '../components/topMenu'
 import { transformPosition } from '../utils'
+import { UI_VERSIONS } from '../utils/uiVersion'
+import { UiVersionProvider, useUiVersion } from '../components/uiVersion'
 import UserModal from '../components/userModal'
 import AddModal from '../components/addModal'
 import Loading from '../components/loading'
@@ -47,8 +50,9 @@ export async function getServerSideProps(context) {
 
 }
 
-export default function Home({ user, token }) {
+function HomeContent({ user, token }) {
   const [data, setData] = useState({});
+  const { version, ready } = useUiVersion();
 
   const [openMenuEdit, setMenuEdit] = useState(false)
   const [profileEdit, setProfileEdit] = useState();
@@ -215,6 +219,8 @@ export default function Home({ user, token }) {
     setAddModal(false)
   }
 
+  const GameView = version === UI_VERSIONS.V2 ? GameV2 : GameV1;
+
   return (
     <div>
       <Head>
@@ -238,15 +244,18 @@ export default function Home({ user, token }) {
               onLobbyClick={() => setOpenLobby(true)}
               onChatOpen={() => setOpenChat(true)}
             />
-            <Game
-              data={data}
-              user={user}
-              onEditClick={onEditClick}
-              onAddClick={onAddClick}
-              onChatOpen={() => setOpenChat(true)}
-              messages={messages}
-              countChat={countChat}
-            />
+            {ready && (
+              <GameView
+                key={version}
+                data={data}
+                user={user}
+                onEditClick={onEditClick}
+                onAddClick={onAddClick}
+                onChatOpen={() => setOpenChat(true)}
+                messages={messages}
+                countChat={countChat}
+              />
+            )}
           </div>
           <Chat
             user={user}
@@ -280,10 +289,18 @@ export default function Home({ user, token }) {
         }
 
         {
-          !data.players && <Loading />
+          (!data.players || !ready) && <Loading />
         }
       </main>
     </div>
 
+  )
+}
+
+export default function Home(props) {
+  return (
+    <UiVersionProvider userName={props?.user?.userName}>
+      <HomeContent {...props} />
+    </UiVersionProvider>
   )
 }

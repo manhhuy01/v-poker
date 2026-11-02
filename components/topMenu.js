@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import Setting from './setting';
 import Deposit from './deposit';
+import ViewSetting from './viewSetting';
 import { removeFromTable } from '../api/poker';
 import { useToasts } from 'react-toast-notifications';
 
@@ -97,6 +98,8 @@ export default function TopMenu({ data, user, onLobbyClick, chatCount, onChatOpe
             </div>
             
             <Deposit user={currentUser} variant="menuItem" />
+
+            <ViewSetting onCloseMenu={() => setProfileOpen(false)} />
 
             <Link href="/report" className="flex items-center space-x-3 px-4 py-3 text-sm font-medium hover:bg-white/5 transition-colors">
               <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
