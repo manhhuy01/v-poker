@@ -4,6 +4,7 @@ import { useToasts } from 'react-toast-notifications'
 import useSound from 'use-sound';
 
 import Position from './materials/position'
+import CharmPicker from '../charm/charmPicker'
 import Pot from './materials/pot'
 import {
   startGame, shuffleCards, preFlop, playerAction, reset,
@@ -15,7 +16,7 @@ import Spin from '../spin'
 import ChatFloating from './chatFloating'
 import QuickChatInput from './quickChatInput'
 
-export default function Game({ data, onEditClick, onAddClick, onChatOpen, messages, countChat, charms = {} }) {
+export default function Game({ data, onEditClick, onAddClick, onChatOpen, messages, countChat, charms = {}, onPickCharm }) {
   const [playDingSound] = useSound('/ding.mp3');
   const [isFullScreen, setFullScreen] = useState(false)
   const [isLoadingDealerAction, setLoadingDealerAction] = useState(false)
@@ -339,8 +340,13 @@ export default function Game({ data, onEditClick, onAddClick, onChatOpen, messag
       </div>
       <div onClick={onFullScreen} className="absolute top-24 left-1/2 z-10 cursor-pointer text-2xl text-white transform -translate-x-2/4 hover:scale-125 transition-all bg-black/20 p-2.5 rounded-2xl backdrop-blur-md border border-white/10 shadow-lg">&#x26F6;</div>
       <div className="absolute bottom-16 sm:bottom-24 left-0 w-full flex justify-center z-20 pointer-events-none">
-        <div className="w-full max-w-md pointer-events-auto">
-          <QuickChatInput user={data?.user} />
+        <div className="w-full max-w-md pointer-events-auto flex items-center gap-2 px-2">
+          <div className="flex-1 min-w-0">
+            <QuickChatInput user={data?.user} />
+          </div>
+          {data?.user?.position?.user && (
+            <div className="md:hidden"><CharmPicker onPick={onPickCharm} /></div>
+          )}
         </div>
       </div>
       <div className="sticky game-action bottom-0 left-0 flex flex-row items-center p-2 sm:p-6 justify-center gap-2 sm:gap-8 bg-black/90 backdrop-blur-3xl border-t border-white/10 w-full overflow-x-auto no-scrollbar">
@@ -448,6 +454,9 @@ export default function Game({ data, onEditClick, onAddClick, onChatOpen, messag
             </div>
           )
         }
+        {data?.user?.position?.user && (
+          <div className="hidden md:flex shrink-0"><CharmPicker onPick={onPickCharm} /></div>
+        )}
       </div>
       <BetModal
         isOpen={isOpenModalBet}

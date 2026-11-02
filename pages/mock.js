@@ -10,7 +10,6 @@ import normalFull2Data from '../mocks/normalFull2Data.json'
 import { transformPosition } from '../utils'
 import { UI_VERSIONS, UI_VERSION_VALUES } from '../utils/uiVersion'
 import { UiVersionProvider, useUiVersion } from '../components/uiVersion'
-import CharmPicker from '../components/charm/charmPicker'
 import { CHARM_TYPES, CHARM_DURATION_MS } from '../utils/charms'
 
 const rawData = normalFull2Data
@@ -101,9 +100,9 @@ function MockContent() {
                 messages={[]}
                 countChat={0}
                 charms={charms}
+                onPickCharm={onPickCharm}
               />
             )}
-            {ready && <CharmPicker onPick={onPickCharm} />}
           </div>
         </div>
       </main>

@@ -17,12 +17,13 @@ import BetModal from './betModal'
 import ChatFloating from './chatFloating'
 import QuickChatInput from './quickChatInput'
 import ActionDock from './poker/actionDock'
+import CharmPicker from './charm/charmPicker'
 import { IconCollapse, IconExpand, IconEye, IconEyeOff } from './poker/icons'
 import styles from './poker/game.module.css'
 
 const TIP_PRESETS = [1, 5, 10, 20, 50]
 
-export default function Game({ data, onEditClick, onAddClick, onChatOpen, messages, countChat, uiVersion, charms }) {
+export default function Game({ data, onEditClick, onAddClick, onChatOpen, messages, countChat, uiVersion, charms, onPickCharm }) {
   const isCute = uiVersion === UI_VERSIONS.V3
   const [playDingSound] = useSound('/ding.mp3');
   const [isFullScreen, setFullScreen] = useState(false)
@@ -422,6 +423,7 @@ export default function Game({ data, onEditClick, onAddClick, onChatOpen, messag
         loadingPlayer={loadingPlayerAction}
         hint={hint}
         quickChat={<QuickChatInput user={data?.user} />}
+        charm={data?.user?.position?.user ? <CharmPicker onPick={onPickCharm} /> : null}
         cute={isCute}
       />
 

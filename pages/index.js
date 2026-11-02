@@ -19,7 +19,6 @@ import UserModal from '../components/userModal'
 import AddModal from '../components/addModal'
 import Loading from '../components/loading'
 import Chat from '../components/chat';
-import CharmPicker from '../components/charm/charmPicker'
 import { CHARM_DURATION_MS } from '../utils/charms'
 
 
@@ -273,7 +272,6 @@ function HomeContent({ user, token }) {
                 charms={charms}
               />
             )}
-            {ready && !!data?.user?.position?.user && <CharmPicker />}
           </div>
           <Chat
             user={user}

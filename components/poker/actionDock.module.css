@@ -82,6 +82,11 @@
   order: 2;
 }
 
+/* On portrait phones the charm sits next to quick chat in the top bar. */
+.groupCharm {
+  display: none;
+}
+
 /* ---------------- buttons ---------------- */
 .btn {
   composes: pk-btn from global;
@@ -342,6 +347,11 @@
     order: 0;
   }
 
+  .groupCharm {
+    display: flex;
+    order: 1;
+  }
+
   .group + .group {
     padding-left: 10px;
     border-left: 1px solid rgba(255, 255, 255, 0.08);
@@ -412,6 +422,10 @@
   .group + .group {
     padding-left: 0;
     border-left: 0;
+  }
+
+  .groupCharm {
+    display: flex;
   }
 
   .btn {

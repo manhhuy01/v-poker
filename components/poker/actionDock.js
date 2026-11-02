@@ -63,6 +63,7 @@ export default function ActionDock({
   loadingPlayer = false,
   hint = '',
   quickChat = null,
+  charm = null,
   cute = false,
 }) {
   const actionIcons = cute
@@ -74,9 +75,10 @@ export default function ActionDock({
   return (
     <div className={styles.dock}>
       <div className={styles.inner}>
-        {!!quickChat && (
+        {(!!quickChat || !!charm) && (
           <div className={styles.topBar}>
             <div className={styles.chatSlot}>{quickChat}</div>
+            {charm}
           </div>
         )}
 
@@ -185,6 +187,10 @@ export default function ActionDock({
                 Tự động call/check
               </button>
             </div>
+          )}
+
+          {!!charm && (
+            <div className={`${styles.group} ${styles.groupCharm}`}>{charm}</div>
           )}
         </div>
 
