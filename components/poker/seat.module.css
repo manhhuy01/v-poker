@@ -541,6 +541,12 @@
       0 0 14px -3px rgba(233, 196, 106, 0.35);
   }
 
+  /* The hero's gold avatar ring hangs ~3.5px below the avatar; push the name
+     clear of it. */
+  .seat[data-hero='true'] .info {
+    padding-top: 10px;
+  }
+
   .seat[data-thinking='true'] .info {
     border-color: rgba(251, 191, 36, 0.7);
     box-shadow:
@@ -604,6 +610,10 @@
     margin-top: -4px;
     padding: 2px 4px 3px;
     border-radius: 8px;
+  }
+
+  .seat[data-hero='true'] .info {
+    padding-top: 9px;
   }
 
   .name {
