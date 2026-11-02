@@ -1,5 +1,6 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Head from 'next/head'
+import { useRouter } from 'next/router'
 
 import MenuSide from '../components/menuSide'
 import GameV1 from '../components/game-v1/game'
@@ -7,17 +8,27 @@ import GameV2 from '../components/game'
 import TopMenu from '../components/topMenu'
 import normalFull2Data from '../mocks/normalFull2Data.json'
 import { transformPosition } from '../utils'
-import { UI_VERSIONS } from '../utils/uiVersion'
+import { UI_VERSIONS, UI_VERSION_VALUES } from '../utils/uiVersion'
 import { UiVersionProvider, useUiVersion } from '../components/uiVersion'
 
 const rawData = normalFull2Data
 const MOCK_USER_NAME = 'manhhuy01'
 
 function MockContent() {
+  const router = useRouter()
   const [mode, setMode] = useState('playing')
   const [json, setJson] = useState(() => JSON.stringify(rawData, null, 2))
   const [error, setError] = useState('')
-  const { version, ready } = useUiVersion()
+  const { version, ready, setVersion } = useUiVersion()
+
+  // Dev convenience: /mock?ui=v3 previews a skin without touching the menu.
+  useEffect(() => {
+    const fromQuery = router.query?.ui
+    if (typeof fromQuery === 'string' && UI_VERSION_VALUES.includes(fromQuery)) {
+      setVersion(fromQuery)
+    }
+  }, [router.query?.ui, setVersion])
+
   const user = {
     userName: MOCK_USER_NAME,
     accBalance: 50,
@@ -34,7 +45,7 @@ function MockContent() {
     } catch (err) { setError(err.message); return rawData }
   }, [json, mode])
   const noop = () => {}
-  const GameView = version === UI_VERSIONS.V2 ? GameV2 : GameV1
+  const GameView = version === UI_VERSIONS.V1 ? GameV1 : GameV2
   return (
    <div>
       <Head>
@@ -61,6 +72,7 @@ function MockContent() {
             {ready && (
               <GameView
                 key={version}
+                uiVersion={version}
                 data={data}
                 user={user}
                 onEditClick={noop}

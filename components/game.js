@@ -1,10 +1,13 @@
 import { useState, useRef, useEffect } from 'react'
+import Head from 'next/head'
 import { useToasts } from 'react-toast-notifications'
 
 import useSound from 'use-sound';
 
 import TableStage from '../components/poker/tableStage'
 import Pot from './materials/pot'
+import CuteDecor from './poker/cuteDecor'
+import { UI_VERSIONS } from '../utils/uiVersion'
 import {
   startGame, shuffleCards, preFlop, playerAction, reset,
   showAllCards, playerTipDealer,
@@ -19,7 +22,8 @@ import styles from './poker/game.module.css'
 
 const TIP_PRESETS = [1, 5, 10, 20, 50]
 
-export default function Game({ data, onEditClick, onAddClick, onChatOpen, messages, countChat }) {
+export default function Game({ data, onEditClick, onAddClick, onChatOpen, messages, countChat, uiVersion }) {
+  const isCute = uiVersion === UI_VERSIONS.V3
   const [playDingSound] = useSound('/ding.mp3');
   const [isFullScreen, setFullScreen] = useState(false)
   const [isLoadingDealerAction, setLoadingDealerAction] = useState(false)
@@ -317,10 +321,21 @@ export default function Game({ data, onEditClick, onAddClick, onChatOpen, messag
   }
 
   return (
-    <div className={styles.shell}>
+    <div className={styles.shell} data-ui-version={uiVersion || 'v2'}>
+      {isCute && (
+        <Head>
+          <link rel="preconnect" href="https://fonts.googleapis.com" />
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+          <link
+            href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@600;700;800;900&display=swap"
+            rel="stylesheet"
+          />
+        </Head>
+      )}
       <div className={styles.navSpace} />
 
       <div className={styles.tableArea}>
+        {isCute && <CuteDecor />}
         <TableStage
           positions={data?.position}
           start={data?.table?.start}
@@ -406,6 +421,7 @@ export default function Game({ data, onEditClick, onAddClick, onChatOpen, messag
         loadingPlayer={loadingPlayerAction}
         hint={hint}
         quickChat={<QuickChatInput user={data?.user} />}
+        cute={isCute}
       />
 
       <BetModal
@@ -414,6 +430,7 @@ export default function Game({ data, onEditClick, onAddClick, onChatOpen, messag
         loading={loadingPlayerAction}
         onConfirm={onActionBet}
         data={data}
+        theme={isCute ? 'sweet' : undefined}
       />
       {
         isOpenModalTip && (
@@ -423,6 +440,7 @@ export default function Game({ data, onEditClick, onAddClick, onChatOpen, messag
             loading={false}
             onCancel={() => setOpenModalTip(false)}
             onConfirm={() => onActionTip()}
+            theme={isCute ? 'sweet' : undefined}
           >
             <div className={styles.tipBody}>
               <h3 className={styles.tipTitle}>Tip cho dealer</h3>

@@ -1,6 +1,7 @@
 /* Live table shell: top menu spacer, felt area, command deck. */
 
 .shell {
+  composes: pk-shell from global;
   position: relative;
   width: 100%;
   height: 100dvh;
@@ -46,6 +47,7 @@
 
 /* floating table utilities (fullscreen / hide hero cards) */
 .utils {
+  composes: pk-utils from global;
   position: absolute;
   top: 5px;
   right: 7px;
@@ -56,6 +58,7 @@
 }
 
 .utilBtn {
+  composes: pk-util from global;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -140,6 +143,7 @@
 
 /* ---------------- tip dealer modal ---------------- */
 .tipBody {
+  composes: pk-tip from global;
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -148,6 +152,7 @@
 }
 
 .tipTitle {
+  composes: pk-tip-title from global;
   margin: 0;
   font-size: 17px;
   font-weight: 900;
@@ -156,6 +161,7 @@
 }
 
 .tipSub {
+  composes: pk-tip-sub from global;
   margin: 0;
   font-size: 11px;
   line-height: 1.5;
@@ -163,12 +169,14 @@
 }
 
 .tipPresets {
+  composes: pk-tip-presets from global;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(48px, 1fr));
   gap: 8px;
 }
 
 .tipPreset {
+  composes: pk-tip-preset from global;
   min-width: 0;
   height: 40px;
   border-radius: 12px;
@@ -192,6 +200,7 @@
 }
 
 .tipField {
+  composes: pk-tip-field from global;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -208,12 +217,14 @@
 }
 
 .tipCurrency {
+  composes: pk-tip-currency from global;
   font-size: 15px;
   font-weight: 900;
   color: rgba(233, 196, 106, 0.9);
 }
 
 .tipInput {
+  composes: pk-tip-input from global;
   flex: 1 1 auto;
   width: 100%;
   min-width: 0;

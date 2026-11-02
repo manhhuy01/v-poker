@@ -219,7 +219,7 @@ function HomeContent({ user, token }) {
     setAddModal(false)
   }
 
-  const GameView = version === UI_VERSIONS.V2 ? GameV2 : GameV1;
+  const GameView = version === UI_VERSIONS.V1 ? GameV1 : GameV2;
 
   return (
     <div>
@@ -247,6 +247,7 @@ function HomeContent({ user, token }) {
             {ready && (
               <GameView
                 key={version}
+                uiVersion={version}
                 data={data}
                 user={user}
                 onEditClick={onEditClick}

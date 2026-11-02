@@ -1,6 +1,7 @@
 /* Chat toast shown on the felt, above the pot. */
 
 .wrap {
+  composes: pk-chat from global;
   display: flex;
   justify-content: center;
   width: 100%;
@@ -19,6 +20,7 @@
 }
 
 .toast {
+  composes: pk-chat-toast from global;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -45,6 +47,7 @@
 }
 
 .avatar {
+  composes: pk-chat-avatar from global;
   flex: 0 0 auto;
   width: 18px;
   height: 18px;
@@ -69,6 +72,7 @@
 }
 
 .user {
+  composes: pk-chat-user from global;
   flex: 0 0 auto;
   font-weight: 800;
   color: #a5b4fc;
@@ -79,6 +83,7 @@
 }
 
 .text {
+  composes: pk-chat-text from global;
   min-width: 0;
   color: rgba(241, 245, 249, 0.92);
   overflow: hidden;

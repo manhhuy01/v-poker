@@ -48,22 +48,22 @@ export default function TopMenu({ data, user, onLobbyClick, chatCount, onChatOpe
   }
 
   return (
-    <nav className="absolute top-0 left-0 w-full z-30 bg-gray-900/40 backdrop-blur-md border-b border-white/5 text-white px-4 py-2 flex items-center justify-between">
+    <nav className="pk-nav absolute top-0 left-0 w-full z-30 bg-gray-900/40 backdrop-blur-md border-b border-white/5 text-white px-4 py-2 flex items-center justify-between">
       <div className="flex items-center space-x-3 md:space-x-4">
-        <div className="text-xl font-black italic tracking-tighter text-white shrink-0">V-POKER</div>
+        <div className="pk-nav-logo text-xl font-black italic tracking-tighter text-white shrink-0">V-POKER</div>
         <div className="flex items-center space-x-1.5 overflow-x-auto no-scrollbar py-1">
           <button 
             onClick={onLobbyClick}
-            className="px-3 py-2 rounded-lg text-[13px] font-bold bg-white/10 text-white transition-all hover:bg-white/20 active:scale-95 whitespace-nowrap"
+            className="pk-nav-btn px-3 py-2 rounded-lg text-[13px] font-bold bg-white/10 text-white transition-all hover:bg-white/20 active:scale-95 whitespace-nowrap"
           >
             Phòng chờ
           </button>
           
           <button 
             onClick={onChatOpen}
-            className="relative px-3 py-2 rounded-lg text-[13px] font-bold bg-white/10 text-white transition-all hover:bg-white/20 active:scale-95 flex items-center space-x-2 whitespace-nowrap"
+            className="pk-nav-btn relative px-3 py-2 rounded-lg text-[13px] font-bold bg-white/10 text-white transition-all hover:bg-white/20 active:scale-95 flex items-center space-x-2 whitespace-nowrap"
           >
-            <svg className="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="pk-nav-icon w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
             </svg>
             <span className="hidden sm:inline-block">Trò chuyện</span>
@@ -75,22 +75,22 @@ export default function TopMenu({ data, user, onLobbyClick, chatCount, onChatOpe
       <div className="flex items-center space-x-4 relative" ref={dropdownRef}>
         <button 
           onClick={() => setProfileOpen(!profileOpen)}
-          className={`flex items-center space-x-2 px-3 py-2 rounded-xl transition-all ${profileOpen ? 'bg-white/10' : 'hover:bg-white/10'}`}
+          className={`pk-nav-profile flex items-center space-x-2 px-3 py-2 rounded-xl transition-all ${profileOpen ? 'bg-white/10' : 'hover:bg-white/10'}`}
         >
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center font-bold text-xs shadow-lg">
+          <div className="pk-nav-avatar w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center font-bold text-xs shadow-lg">
             {currentUser?.userName?.[0]?.toUpperCase()}
           </div>
           <div className="flex flex-col items-start leading-tight hidden sm:flex">
-            <span className="text-sm font-bold tracking-tight">{currentUser?.userName}</span>
-            <span className="text-[10px] font-bold text-emerald-400">{(currentUser?.accBalance || 0).toLocaleString()}</span>
+            <span className="pk-nav-name text-sm font-bold tracking-tight">{currentUser?.userName}</span>
+            <span className="pk-nav-balance text-[10px] font-bold text-emerald-400">{(currentUser?.accBalance || 0).toLocaleString()}</span>
           </div>
-          <svg className={`w-4 h-4 transition-transform duration-300 ${profileOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className={`pk-nav-caret w-4 h-4 transition-transform duration-300 ${profileOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
           </svg>
         </button>
 
         {profileOpen && (
-          <div className="absolute top-full right-0 mt-2 w-56 bg-gray-900 border border-white/10 rounded-2xl shadow-2xl overflow-hidden py-2 ">
+          <div className="pk-nav-menu absolute top-full right-0 mt-2 w-56 bg-gray-900 border border-white/10 rounded-2xl shadow-2xl overflow-hidden py-2 ">
             <div className="px-4 py-2 border-b border-white/5 mb-2">
               <p className="text-[10px] uppercase font-black tracking-widest text-gray-500">Người chơi</p>
               <p className="text-sm font-bold truncate leading-none">{currentUser?.userName}</p>

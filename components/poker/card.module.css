@@ -2,6 +2,7 @@
    --seat-card-w (player seats) inherited from the table stage. */
 
 .card {
+  composes: pk-card from global;
   --w: var(--card-w, 36px);
   position: relative;
   width: var(--w);
@@ -38,6 +39,7 @@
 
 /* ---------- front ---------- */
 .face {
+  composes: pk-face from global;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -57,14 +59,17 @@
 }
 
 .faceRed {
+  composes: pk-face-red from global;
   color: #d71f3f;
 }
 
 .faceBlack {
+  composes: pk-face-black from global;
   color: #111827;
 }
 
 .rank {
+  composes: pk-rank from global;
   position: relative;
   z-index: 1;
   font-size: calc(var(--w) * 0.52);
@@ -75,11 +80,13 @@
 }
 
 .rankSmall {
+  composes: pk-rank-small from global;
   font-size: calc(var(--w) * 0.43);
   letter-spacing: -0.07em;
 }
 
 .suit {
+  composes: pk-suit from global;
   position: relative;
   z-index: 1;
   align-self: flex-end;
@@ -88,6 +95,7 @@
 }
 
 .suitCorner {
+  composes: pk-suit-corner from global;
   position: absolute;
   z-index: 1;
   right: calc(var(--w) * 0.1);
@@ -99,6 +107,7 @@
 
 /* ---------- back ---------- */
 .back {
+  composes: pk-back from global;
   transform: rotateY(180deg);
   background:
     radial-gradient(circle at 50% 42%, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0) 58%),
@@ -137,6 +146,7 @@
 
 /* dim / folded cards */
 .folded {
+  composes: pk-folded from global;
   opacity: 0.5;
   filter: grayscale(0.55) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.4));
 }

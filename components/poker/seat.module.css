@@ -1,6 +1,7 @@
 /* A single player seat: cards, avatar pod and status pills. */
 
 .seat {
+  composes: pk-seat from global;
   position: relative;
   z-index: 2;
   display: flex;
@@ -20,6 +21,7 @@
 }
 
 .podWrap {
+  composes: pk-pod-wrap from global;
   position: relative;
   width: 100%;
   display: flex;
@@ -28,6 +30,7 @@
 
 /* ---------------- cards ---------------- */
 .cards {
+  composes: pk-cards from global;
   --card-w: var(--seat-card-w);
   position: absolute;
   left: 50%;
@@ -57,6 +60,7 @@
 
 /* ---------------- pod ---------------- */
 .pod {
+  composes: pk-pod from global;
   position: relative;
   display: flex;
   align-items: center;
@@ -97,6 +101,7 @@
 }
 
 .avatarWrap {
+  composes: pk-avatar-wrap from global;
   position: relative;
   flex: 0 0 auto;
   display: grid;
@@ -104,6 +109,7 @@
 }
 
 .avatar {
+  composes: pk-avatar from global;
   position: relative;
   width: clamp(28px, calc(var(--pod-w) * 0.3), 42px);
   aspect-ratio: 1 / 1;
@@ -154,6 +160,7 @@
 }
 
 .info {
+  composes: pk-info from global;
   display: flex;
   flex-direction: column;
   gap: 1px;
@@ -169,6 +176,7 @@
 }
 
 .name {
+  composes: pk-name from global;
   display: block;
   margin: 0;
   padding: 0;
@@ -194,6 +202,7 @@
 }
 
 .youTag {
+  composes: pk-you from global;
   flex: 0 0 auto;
   font-size: calc(var(--font-badge, 8px) * 0.95);
   font-weight: 900;
@@ -209,6 +218,7 @@
 }
 
 .stack {
+  composes: pk-stack from global;
   font-size: var(--font-stack, 10px);
   font-weight: 800;
   color: #5eead4;
@@ -218,11 +228,13 @@
 }
 
 .stackAllIn {
+  composes: pk-stack-allin from global;
   color: #fda4af;
   letter-spacing: 0.06em;
 }
 
 .pos {
+  composes: pk-pos from global;
   flex: 0 0 auto;
   padding: 2px 4px;
   border-radius: 4px;
@@ -250,6 +262,7 @@
 
 /* ---------------- status pills ---------------- */
 .status {
+  composes: pk-status from global;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -260,6 +273,7 @@
 }
 
 .action {
+  composes: pk-action from global;
   padding: 2px 5px;
   border-radius: 999px;
   font-size: var(--font-action, 10px);
@@ -306,6 +320,7 @@
 }
 
 .bet {
+  composes: pk-bet from global;
   display: inline-flex;
   align-items: center;
   gap: 3px;
@@ -321,6 +336,7 @@
 }
 
 .chip {
+  composes: pk-chip from global;
   width: 1.2em;
   height: 1.2em;
   border-radius: 50%;
@@ -331,6 +347,7 @@
 }
 
 .win {
+  composes: pk-win from global;
   display: inline-flex;
   align-items: center;
   padding: 2px 6px;
@@ -347,6 +364,7 @@
 }
 
 .hand {
+  composes: pk-hand from global;
   padding: 2px 6px;
   border-radius: 7px;
   background: rgba(49, 46, 129, 0.75);
@@ -359,6 +377,7 @@
 }
 
 .showdownWin {
+  composes: pk-showdown from global;
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -385,6 +404,7 @@
 }
 
 .thinking {
+  composes: pk-thinking from global;
   display: inline-flex;
   align-items: center;
   gap: 2px;
@@ -412,6 +432,7 @@
 
 /* ---------------- empty seat ---------------- */
 .empty {
+  composes: pk-empty from global;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -429,6 +450,7 @@
 }
 
 .emptyCircle {
+  composes: pk-empty-circle from global;
   display: grid;
   place-items: center;
   width: clamp(34px, calc(var(--pod-w) * 0.46), 52px);
@@ -450,6 +472,7 @@
 }
 
 .emptyLabel {
+  composes: pk-empty-label from global;
   font-size: var(--font-badge, 8px);
   font-weight: 800;
   letter-spacing: 0.1em;

@@ -9,14 +9,28 @@ const OPTIONS = [
   {
     value: UI_VERSIONS.V1,
     label: 'V1 · Cổ điển',
-    description: 'Giao diện bàn chơi hiện tại trên nhánh main. Quen thuộc và ổn định.',
+    description: 'Bàn chơi cơ bản, quen thuộc và ổn định.',
+    swatch: 'from-emerald-600 to-emerald-900',
   },
   {
     value: UI_VERSIONS.V2,
     label: 'V2 · Hiện đại',
-    description: 'Giao diện bàn chơi mới trên nhánh ui-v2 với bố cục được thiết kế lại.',
+    description: 'Bố cục mới, cảm giác chuyên nghiệp như sòng bài thật.',
+    swatch: 'from-slate-700 via-slate-900 to-emerald-900',
+  },
+  {
+    value: UI_VERSIONS.V3,
+    label: 'V3 · Ngọt ngào',
+    description: 'Tông sáng pastel, icon dễ thương, hợp gu nữ tính và em bé.',
+    swatch: 'from-pink-200 via-rose-200 to-amber-100',
   },
 ]
+
+const TOASTS = {
+  [UI_VERSIONS.V1]: 'Đã chuyển về giao diện V1',
+  [UI_VERSIONS.V2]: 'Đã chuyển sang giao diện V2',
+  [UI_VERSIONS.V3]: 'Đã chuyển sang giao diện V3 ngọt ngào',
+}
 
 export default function ViewSetting({ onCloseMenu }) {
   const [isOpen, setOpen] = useState(false)
@@ -27,12 +41,7 @@ export default function ViewSetting({ onCloseMenu }) {
     setVersion(nextVersion)
     setOpen(false)
     if (onCloseMenu) onCloseMenu()
-    addToast(
-      nextVersion === UI_VERSIONS.V2
-        ? 'Đã chuyển sang giao diện V2'
-        : 'Đã chuyển về giao diện V1',
-      { appearance: 'success' }
-    )
+    addToast(TOASTS[nextVersion] || TOASTS[UI_VERSIONS.V1], { appearance: 'success' })
   }
 
   return (
@@ -97,13 +106,24 @@ export default function ViewSetting({ onCloseMenu }) {
                   }`}
                 >
                   <div className="flex items-center justify-between gap-4">
-                    <div>
-                      <p className="text-sm font-black uppercase tracking-wide text-white">
-                        {option.label}
-                      </p>
-                      <p className="mt-1 text-xs leading-relaxed text-gray-400">
-                        {option.description}
-                      </p>
+                    <div className="flex items-center gap-3">
+                      <span
+                        aria-hidden="true"
+                        className={`h-10 w-10 shrink-0 rounded-xl bg-gradient-to-br ${option.swatch} border border-white/20 shadow-inner`}
+                      />
+                      <div>
+                        <p className="flex items-center gap-2 text-sm font-black uppercase tracking-wide text-white">
+                          {option.label}
+                          {option.value === UI_VERSIONS.V3 && (
+                            <span className="rounded-full bg-pink-400/20 px-2 py-0.5 text-[9px] font-black tracking-widest text-pink-200">
+                              NEW
+                            </span>
+                          )}
+                        </p>
+                        <p className="mt-1 text-xs leading-relaxed text-gray-400">
+                          {option.description}
+                        </p>
+                      </div>
                     </div>
                     <span
                       className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border ${

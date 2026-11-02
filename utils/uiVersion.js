@@ -1,14 +1,17 @@
 export const UI_VERSIONS = {
   V1: 'v1',
   V2: 'v2',
+  V3: 'v3',
 }
+
+export const UI_VERSION_VALUES = Object.values(UI_VERSIONS)
 
 export const DEFAULT_UI_VERSION = UI_VERSIONS.V1
 
 export const UI_VERSION_STORAGE_PREFIX = 'v-poker:ui-version'
 
 export function normalizeUiVersion(value) {
-  return value === UI_VERSIONS.V2 ? UI_VERSIONS.V2 : DEFAULT_UI_VERSION
+  return UI_VERSION_VALUES.includes(value) ? value : DEFAULT_UI_VERSION
 }
 
 export function uiVersionStorageKey(userName) {

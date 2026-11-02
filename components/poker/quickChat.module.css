@@ -26,6 +26,7 @@
 }
 
 .input {
+  composes: pk-quick-input from global;
   width: 100%;
   height: 38px;
   padding: 0 42px 0 14px;
@@ -49,6 +50,7 @@
 }
 
 .send {
+  composes: pk-quick-send from global;
   position: absolute;
   right: 5px;
   top: 50%;
