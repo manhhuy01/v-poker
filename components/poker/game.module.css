@@ -1,0 +1,241 @@
+/* Live table shell: top menu spacer, felt area, command deck. */
+
+.shell {
+  position: relative;
+  width: 100%;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  isolation: isolate;
+  color: #e2e8f0;
+  background:
+    radial-gradient(75% 50% at 50% -6%, rgba(16, 92, 74, 0.38) 0%, rgba(6, 10, 17, 0) 62%),
+    radial-gradient(55% 46% at 50% 56%, rgba(13, 74, 58, 0.28) 0%, rgba(6, 10, 17, 0) 72%),
+    radial-gradient(120% 80% at 50% 120%, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0) 60%),
+    linear-gradient(180deg, #080f18 0%, #060a11 46%, #04070c 100%);
+}
+
+.shell::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle at 18% 22%, rgba(255, 255, 255, 0.035) 0 0.6px, transparent 1px),
+    radial-gradient(circle at 72% 64%, rgba(255, 255, 255, 0.03) 0 0.6px, transparent 1px);
+  background-size: 6px 6px, 7px 7px;
+  opacity: 0.5;
+}
+
+/* the top menu is an absolute overlay, keep a matching slot free */
+.navSpace {
+  flex: 0 0 64px;
+  height: 64px;
+  width: 100%;
+}
+
+.tableArea {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  padding: 6px 4px 0;
+}
+
+/* floating table utilities (fullscreen / hide hero cards) */
+.utils {
+  position: absolute;
+  top: 5px;
+  right: 7px;
+  z-index: 8;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.utilBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 9px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  background: linear-gradient(180deg, rgba(24, 36, 52, 0.75), rgba(7, 12, 20, 0.85));
+  color: #cbd5e1;
+  box-shadow: 0 6px 14px -8px rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(8px);
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+
+.utilBtn:hover {
+  color: #f6e3b4;
+  border-color: rgba(233, 196, 106, 0.45);
+}
+
+.utilBtn:active {
+  transform: scale(0.94);
+}
+
+.utilBtn svg {
+  width: 14px;
+  height: 14px;
+}
+
+.utilBtn[data-active='true'] {
+  color: #fbbf24;
+  border-color: rgba(251, 191, 36, 0.45);
+}
+
+@media (min-width: 768px) {
+  .utils {
+    top: 8px;
+    right: 12px;
+    gap: 6px;
+  }
+
+  .utilBtn {
+    width: 32px;
+    height: 32px;
+  }
+
+  .utilBtn svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+/* two-row layout on narrow phones: float the tools on the felt edge */
+@media (max-width: 359px) and (orientation: portrait), (max-height: 620px) and (orientation: portrait) {
+  .utils {
+    top: 50%;
+    right: 3px;
+    transform: translateY(-50%);
+    flex-direction: column;
+    gap: 4px;
+  }
+}
+
+@media (max-height: 560px) {
+  .utils {
+    top: 2px;
+    right: 4px;
+    gap: 4px;
+  }
+
+  .utilBtn {
+    width: 26px;
+    height: 26px;
+    border-radius: 8px;
+  }
+
+  .utilBtn svg {
+    width: 13px;
+    height: 13px;
+  }
+}
+
+/* ---------------- tip dealer modal ---------------- */
+.tipBody {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+  padding: 2px 0 6px;
+}
+
+.tipTitle {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  color: #f4f6fb;
+}
+
+.tipSub {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.5;
+  color: rgba(203, 213, 225, 0.55);
+}
+
+.tipPresets {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(48px, 1fr));
+  gap: 8px;
+}
+
+.tipPreset {
+  min-width: 0;
+  height: 40px;
+  border-radius: 12px;
+  border: 1px solid rgba(233, 196, 106, 0.28);
+  background: rgba(233, 196, 106, 0.08);
+  color: #f3dfae;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+
+.tipPreset:hover {
+  background: rgba(233, 196, 106, 0.18);
+  border-color: rgba(233, 196, 106, 0.55);
+}
+
+.tipPreset:active {
+  transform: scale(0.96);
+}
+
+.tipField {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(2, 6, 12, 0.6);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.tipField:focus-within {
+  border-color: rgba(233, 196, 106, 0.55);
+  box-shadow: 0 0 0 3px rgba(233, 196, 106, 0.14);
+}
+
+.tipCurrency {
+  font-size: 15px;
+  font-weight: 900;
+  color: rgba(233, 196, 106, 0.9);
+}
+
+.tipInput {
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: #fdf6e3;
+  font-family: inherit;
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+  outline: none;
+  text-align: right;
+}
+
+.tipInput::-webkit-outer-spin-button,
+.tipInput::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.tipInput[type='number'] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}

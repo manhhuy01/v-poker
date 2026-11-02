@@ -1,0 +1,153 @@
+/* Playing card face / back. Width is driven by --card-w (community) or
+   --seat-card-w (player seats) inherited from the table stage. */
+
+.card {
+  --w: var(--card-w, 36px);
+  position: relative;
+  width: var(--w);
+  height: calc(var(--w) * 1.42);
+  border-radius: max(3px, calc(var(--w) * 0.13));
+  perspective: 700px;
+  flex: 0 0 auto;
+  filter: drop-shadow(0 max(2px, calc(var(--w) * 0.06)) max(3px, calc(var(--w) * 0.1)) rgba(0, 0, 0, 0.55));
+  will-change: transform;
+}
+
+.inner {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
+  transition: transform 0.52s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transform: rotateY(180deg);
+}
+
+.revealed {
+  transform: rotateY(0deg);
+}
+
+.face,
+.back {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  overflow: hidden;
+}
+
+/* ---------- front ---------- */
+.face {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: calc(var(--w) * 0.09) calc(var(--w) * 0.1) calc(var(--w) * 0.07);
+  background: linear-gradient(158deg, #ffffff 0%, #f6f8fb 48%, #e6ebf2 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(15, 23, 42, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.face::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0) 45%);
+  pointer-events: none;
+}
+
+.faceRed {
+  color: #d71f3f;
+}
+
+.faceBlack {
+  color: #111827;
+}
+
+.rank {
+  position: relative;
+  z-index: 1;
+  font-size: calc(var(--w) * 0.52);
+  line-height: 0.92;
+  font-weight: 900;
+  letter-spacing: -0.05em;
+  font-variant-numeric: tabular-nums;
+}
+
+.rankSmall {
+  font-size: calc(var(--w) * 0.43);
+  letter-spacing: -0.07em;
+}
+
+.suit {
+  position: relative;
+  z-index: 1;
+  align-self: flex-end;
+  font-size: calc(var(--w) * 0.46);
+  line-height: 0.8;
+}
+
+.suitCorner {
+  position: absolute;
+  z-index: 1;
+  right: calc(var(--w) * 0.1);
+  top: calc(var(--w) * 0.09);
+  font-size: calc(var(--w) * 0.26);
+  line-height: 1;
+  opacity: 0.9;
+}
+
+/* ---------- back ---------- */
+.back {
+  transform: rotateY(180deg);
+  background:
+    radial-gradient(circle at 50% 42%, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0) 58%),
+    repeating-linear-gradient(45deg, rgba(240, 200, 120, 0.16) 0 1px, rgba(0, 0, 0, 0) 1px 6px),
+    repeating-linear-gradient(-45deg, rgba(240, 200, 120, 0.12) 0 1px, rgba(0, 0, 0, 0) 1px 6px),
+    linear-gradient(160deg, #a3123b 0%, #70102b 52%, #3e0718 100%);
+  box-shadow:
+    inset 0 0 0 max(1px, calc(var(--w) * 0.045)) rgba(255, 226, 166, 0.55),
+    inset 0 0 0 max(2px, calc(var(--w) * 0.1)) rgba(0, 0, 0, 0.28),
+    inset 0 0 12px rgba(0, 0, 0, 0.45);
+}
+
+.back::before {
+  content: '';
+  position: absolute;
+  inset: calc(var(--w) * 0.13);
+  border-radius: max(2px, calc(var(--w) * 0.06));
+  border: 1px solid rgba(255, 224, 158, 0.35);
+  background:
+    repeating-linear-gradient(60deg, rgba(255, 228, 170, 0.1) 0 2px, rgba(0, 0, 0, 0) 2px 5px);
+}
+
+.back::after {
+  content: 'V';
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(var(--w) * 0.46);
+  font-weight: 900;
+  font-style: italic;
+  color: rgba(255, 228, 170, 0.5);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+/* dim / folded cards */
+.folded {
+  opacity: 0.5;
+  filter: grayscale(0.55) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.4));
+}
+
+.placeholder {
+  opacity: 0.55;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.35));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .inner {
+    transition: none;
+  }
+}

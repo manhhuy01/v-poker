@@ -1,67 +1,62 @@
 import { useState, useEffect } from 'react'
+import styles from '../poker/card.module.css'
+
 const REGEX = /(.*)(s|h|c|d)/
 
+const SUITS = {
+  s: { symbol: '♠', tone: 'black' },
+  c: { symbol: '♣', tone: 'black' },
+  h: { symbol: '♥', tone: 'red' },
+  d: { symbol: '♦', tone: 'red' },
+}
 
-
-export default function card({ data = 'u', isFold, isHidden }) {
+export default function Card({ data = 'u', isFold, isHidden }) {
   const [hide, setHide] = useState(true)
+
   useEffect(() => {
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       if (!isHidden) {
         setHide(false)
       }
-    }, 500);
+    }, 500)
+    return () => clearTimeout(timer)
   }, [])
 
   useEffect(() => {
     setHide(isHidden)
   }, [isHidden])
 
-  if (data == 'u') {
-    if (isFold) {
-      return null;
-    }
+  // Unknown card (not dealt / face down).
+  if (data === 'u' || !data) {
+    if (isFold) return null
     return (
-      <div className={`border-black bg-white shadow rounded w-8 h-10 md:w-10 md:h-14 font-bold p-1 ml-1 mr-1 bg-card-pattern`}>
+      <div className={styles.card} aria-hidden="true">
+        <div className={styles.inner}>
+          <div className={styles.face} />
+          <div className={styles.back} />
+        </div>
       </div>
     )
   }
 
-  const matchArr = data.match(REGEX);
-  const num = matchArr[1]
-  const color = matchArr[2]
-  let symbol = ''
-  let colorClass = ''
+  const match = data.match(REGEX)
+  if (!match) return null
 
-  switch (color) {
-    case 's':
-      symbol = '♠';
-      colorClass = 'text-spade'
-      break;
-    case 'd':
-      symbol = '♦';
-      colorClass = 'text-diamond'
-      break;
-    case 'h':
-      symbol = '♥';
-      colorClass = 'text-heart'
-      break;
-    case 'c':
-      symbol = '♣'
-      colorClass = 'text-club'
-      break;
-    default:
-      break;
-  }
+  const num = match[1]
+  const suit = SUITS[match[2]] || SUITS.s
+  const toneClass = suit.tone === 'red' ? styles.faceRed : styles.faceBlack
+  const faceClass = [styles.face, toneClass].join(' ')
+
   return (
-    <div className={` ${hide ? '' : 'transform-180'} duration-500 transition-transform transform-3d relative transform-gpu w-8 h-10 md:w-10 md:h-14 ml-1 mr-1`}>
-      <div className={` backface-hidden transform-180 ${colorClass} ${isFold ? 'opacity-50' : ''} w-full h-full absolute border-black bg-white shadow rounded  font-bold p-1 flex flex-col justify-evenly`}>
-        <div className="leading-4 md:text-xl">{num}</div>
-        <div className="text-lg md:text-2xl leading-4 md:leading-4 text-right ">{symbol}</div>
+    <div className={`${styles.card} ${isFold ? styles.folded : ''}`}>
+      <div className={`${styles.inner} ${hide ? '' : styles.revealed}`}>
+        <div className={faceClass}>
+          <span className={num.length > 1 ? `${styles.rank} ${styles.rankSmall}` : styles.rank}>{num}</span>
+          <span className={styles.suitCorner}>{suit.symbol}</span>
+          <span className={styles.suit}>{suit.symbol}</span>
+        </div>
+        <div className={styles.back} />
       </div>
-      { !isFold && <div className={`backface-hidden absolute w-full h-full border-black bg-white shadow rounded font-bold bg-card-pattern`}>
-      </div>}
     </div>
-
   )
 }

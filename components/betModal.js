@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import Modal from './modal'
+import styles from './poker/betModal.module.css'
 
 export default function BetModal({ isOpen, onClose, onConfirm, loading, data }) {
   const [betValue, setBetValue] = useState(0)
@@ -54,6 +55,8 @@ export default function BetModal({ isOpen, onClose, onConfirm, loading, data }) 
     onConfirm(finalVal)
   }
 
+  const showAllIn = Number(betValue) > 0 && Number(betValue) >= Number(maxBalance)
+
   return (
     <Modal
       isOpen={isOpen}
@@ -63,57 +66,73 @@ export default function BetModal({ isOpen, onClose, onConfirm, loading, data }) 
       onConfirm={handleConfirm}
       position="top"
     >
-      <div className="flex flex-col w-full max-h-[45dvh] overflow-y-auto no-scrollbar space-y-4 py-2">
-        <div className="text-center">
-          <h3 className="text-base font-black uppercase tracking-tight text-white">Đưa ra mức cược</h3>
-          <p className="text-[9px] text-gray-500 font-bold uppercase tracking-widest">
-            Min: <span className="text-white">{minBet.toLocaleString()}</span> • 
-            Max: <span className="text-emerald-400">{(maxBalance).toLocaleString()}</span>
-          </p>
+      <div className={styles.body}>
+        <div className={styles.head}>
+          <span className={styles.kicker}>Hành động của bạn</span>
+          <h3 className={styles.title}>Chọn mức cược</h3>
+          <div className={styles.ranges}>
+            <span className={styles.rangePill}>
+              Min
+              <strong>{minBet.toLocaleString('en-US')}</strong>
+            </span>
+            <span className={`${styles.rangePill} ${styles.rangePillAccent}`}>
+              Max
+              <strong>{maxBalance.toLocaleString('en-US')}</strong>
+            </span>
+          </div>
         </div>
 
-        <div className="space-y-6 px-2">
-          {/* Slider Container */}
-          <div className="relative pt-6 pb-2">
-            <input
-              type="range"
-              min="0"
-              max={finalMilestones.length - 1}
-              step="1"
-              value={sliderIndex}
-              onChange={handleSliderChange}
-              className="w-full h-1.5 bg-gray-800 rounded-lg appearance-none cursor-pointer accent-indigo-500"
-            />
-            <div className="flex justify-between mt-4">
-              {finalMilestones.map((m, i) => (
-                <div 
-                  key={i} 
-                  className={`flex flex-col items-center cursor-pointer transition-all ${i === sliderIndex ? 'scale-110' : 'opacity-40'}`}
-                  onClick={() => handleSliderChange({ target: { value: i }})}
-                >
-                  <span className={`text-[8px] font-black uppercase mb-1 ${m.isAllIn ? 'text-rose-500' : 'text-indigo-400'}`}>
-                    {m.label}
-                  </span>
-                  <span className="text-[10px] font-bold text-white whitespace-nowrap">
-                    {m.isAllIn ? '∞' : m.value.toLocaleString()}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="relative group">
+        <div className={styles.amountCard}>
+          <span className={styles.amountLabel}>Số chip đặt</span>
+          <div className={styles.amountRow}>
+            <span className={styles.amountChip} aria-hidden="true" />
             <input
               ref={betInputRef}
               type="text"
-              autoFocus={false}
+              autoComplete="off"
+              spellCheck={false}
               defaultValue={minBet}
               onChange={handleInputChange}
-              className="w-full bg-black/40 border border-white/5 rounded-2xl px-5 py-3 text-white font-black text-xl text-center focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
+              className={styles.amountInput}
+              aria-label="Số chip đặt cược"
             />
-            <div className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-gray-500 tracking-widest">CHIPS</div>
+            {showAllIn && <span className={styles.allInTag}>ALL-IN</span>}
           </div>
         </div>
+
+        <div className={styles.sliderWrap}>
+          <input
+            type="range"
+            min="0"
+            max={finalMilestones.length - 1}
+            step="1"
+            value={sliderIndex}
+            onChange={handleSliderChange}
+            className={styles.slider}
+            aria-label="Chọn nhanh mức cược"
+          />
+        </div>
+
+        <div className={styles.milestones}>
+          {finalMilestones.map((m, i) => (
+            <button
+              key={i}
+              type="button"
+              className={`${styles.milestone} ${m.isAllIn ? styles.milestoneAllIn : ''}`}
+              data-active={i === sliderIndex}
+              onClick={() => handleSliderChange({ target: { value: i } })}
+            >
+              <span className={styles.milestoneLabel}>{m.label}</span>
+              <span className={styles.milestoneValue}>
+                {m.isAllIn ? 'Tất tay' : m.value.toLocaleString('en-US')}
+              </span>
+            </button>
+          ))}
+        </div>
+
+        <p className={styles.hint}>
+          Kéo thanh trượt hoặc chọn một mốc cược, sau đó bấm xác nhận.
+        </p>
       </div>
     </Modal>
   )

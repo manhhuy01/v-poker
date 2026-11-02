@@ -1,0 +1,461 @@
+/* Bottom command deck: dealer tools, hero actions, auto-action toggles. */
+
+.dock {
+  position: relative;
+  flex: 0 0 auto;
+  z-index: 30;
+  width: 100%;
+  padding: 7px 10px max(7px, env(safe-area-inset-bottom));
+  background:
+    linear-gradient(180deg, rgba(6, 11, 18, 0.4) 0%, rgba(5, 9, 14, 0.92) 34%, #05090e 100%);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 -24px 44px -26px rgba(0, 0, 0, 0.95),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+}
+
+.dock::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(233, 196, 106, 0.45), transparent);
+  pointer-events: none;
+}
+
+.inner {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.topBar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 0;
+}
+
+.chatSlot {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+/* mobile: every group owns a full row */
+.group {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex: 1 1 100%;
+  min-width: 0;
+}
+
+.groupDealer {
+  order: 3;
+}
+
+.groupActions {
+  order: 1;
+}
+
+.groupAuto {
+  order: 2;
+}
+
+/* ---------------- buttons ---------------- */
+.btn {
+  position: relative;
+  display: inline-flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  height: 46px;
+  min-width: 0;
+  max-width: 168px;
+  padding: 0 8px;
+  border-radius: 13px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: linear-gradient(180deg, rgba(36, 49, 70, 0.9) 0%, rgba(10, 16, 26, 0.96) 100%);
+  color: #e2e8f0;
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.045em;
+  line-height: 1.1;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow:
+    0 8px 16px -10px rgba(0, 0, 0, 0.9),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transition: transform 0.14s ease, filter 0.14s ease, box-shadow 0.14s ease;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  filter: brightness(1.12);
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(0) scale(0.975);
+}
+
+.btn:focus-visible {
+  outline: 2px solid rgba(233, 196, 106, 0.8);
+  outline-offset: 2px;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.btn svg {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+}
+
+.btnLabel {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* dealer */
+.btnDealer {
+  height: 42px;
+  background: linear-gradient(180deg, rgba(26, 38, 56, 0.82) 0%, rgba(8, 13, 21, 0.94) 100%);
+  color: #c7d3e3;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.btnDealer svg {
+  color: rgba(233, 196, 106, 0.85);
+}
+
+.btnDealer:hover:not(:disabled) {
+  color: #f6e3b4;
+  border-color: rgba(233, 196, 106, 0.4);
+}
+
+/* hero actions */
+.btnFold {
+  background: linear-gradient(180deg, rgba(72, 20, 32, 0.72) 0%, rgba(28, 8, 14, 0.95) 100%);
+  border-color: rgba(244, 63, 94, 0.38);
+  color: #fecdd3;
+}
+
+.btnCheck {
+  background: linear-gradient(180deg, rgba(6, 78, 59, 0.9) 0%, rgba(3, 40, 32, 0.98) 100%);
+  border-color: rgba(52, 211, 153, 0.42);
+  color: #d1fae5;
+}
+
+.btnCall {
+  background: linear-gradient(180deg, #0ea5a4 0%, #0f766e 52%, #115e59 100%);
+  border-color: rgba(94, 234, 212, 0.45);
+  color: #f0fdfa;
+  box-shadow:
+    0 10px 22px -12px rgba(13, 148, 136, 0.9),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+.btnBet {
+  background: linear-gradient(180deg, #f8d98a 0%, #e2b34c 46%, #b9822a 100%);
+  border-color: rgba(255, 244, 205, 0.65);
+  color: #2b1a02;
+  box-shadow:
+    0 10px 24px -10px rgba(233, 196, 106, 0.65),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.btnShow {
+  background: linear-gradient(180deg, #8b5cf6 0%, #6d28d9 55%, #4c1d95 100%);
+  border-color: rgba(196, 181, 253, 0.5);
+  color: #f5f3ff;
+  box-shadow:
+    0 10px 22px -12px rgba(109, 40, 217, 0.9),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+
+.btnSpinner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+}
+
+.btnSpinner :global(svg) {
+  width: 15px;
+  height: 15px;
+  margin: 0;
+}
+
+/* ---------------- auto toggles ---------------- */
+.autoBtn {
+  display: inline-flex;
+  flex: 0 1 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 34px;
+  min-width: 0;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: linear-gradient(180deg, rgba(25, 35, 51, 0.75), rgba(8, 13, 21, 0.9));
+  color: rgba(203, 213, 225, 0.7);
+  font-family: inherit;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.16s ease;
+}
+
+.autoBtn:hover {
+  color: #e2e8f0;
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+.autoDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.45;
+  flex: 0 0 auto;
+  transition: opacity 0.16s ease, box-shadow 0.16s ease;
+}
+
+.autoBtn[data-active='true'] .autoDot {
+  opacity: 1;
+  box-shadow: 0 0 8px currentColor;
+}
+
+.autoBtn[data-tone='fold'][data-active='true'] {
+  background: linear-gradient(180deg, rgba(244, 63, 94, 0.9), rgba(159, 18, 57, 0.95));
+  border-color: rgba(255, 205, 214, 0.55);
+  color: #fff1f2;
+}
+
+.autoBtn[data-tone='call'][data-active='true'] {
+  background: linear-gradient(180deg, rgba(99, 102, 241, 0.92), rgba(67, 56, 202, 0.96));
+  border-color: rgba(199, 210, 254, 0.55);
+  color: #eef2ff;
+}
+
+/* ---------------- hint ---------------- */
+.hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 12px;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: rgba(203, 213, 225, 0.42);
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hintDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(94, 234, 212, 0.8);
+  box-shadow: 0 0 8px rgba(94, 234, 212, 0.55);
+  animation: hintPulse 1.6s ease-in-out infinite;
+  flex: 0 0 auto;
+}
+
+/* ---------------- desktop ---------------- */
+@media (min-width: 768px) {
+  .dock {
+    padding: 10px 18px 12px;
+  }
+
+  .inner {
+    gap: 7px;
+  }
+
+  .topBar {
+    display: none;
+  }
+
+  .controls {
+    gap: 10px;
+  }
+
+  .group {
+    flex: 0 1 auto;
+  }
+
+  .groupDealer,
+  .groupActions,
+  .groupAuto {
+    order: 0;
+  }
+
+  .group + .group {
+    padding-left: 10px;
+    border-left: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .btn {
+    flex: 0 0 auto;
+    flex-direction: row;
+    gap: 7px;
+    height: 46px;
+    padding: 0 18px;
+    font-size: 12px;
+    border-radius: 14px;
+  }
+
+  .btn svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .btnDealer {
+    height: 42px;
+    padding: 0 13px;
+    font-size: 11px;
+  }
+
+  .autoBtn {
+    height: 38px;
+    font-size: 10px;
+    padding: 0 14px;
+  }
+
+  .hint {
+    font-size: 10px;
+  }
+}
+
+/* very wide screens: cap the deck width and breathe */
+@media (min-width: 1280px) {
+  .btn {
+    min-width: 112px;
+  }
+}
+
+/* ---------------- short screens (landscape phones) ---------------- */
+@media (max-height: 560px) {
+  .dock {
+    padding: 4px 8px max(4px, env(safe-area-inset-bottom));
+  }
+
+  .inner {
+    gap: 0;
+  }
+
+  .topBar {
+    display: none;
+  }
+
+  .controls {
+    gap: 3px;
+  }
+
+  .group {
+    flex: 0 1 auto;
+    gap: 3px;
+  }
+
+  .group + .group {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .btn {
+    flex: 0 0 auto;
+    flex-direction: row;
+    gap: 4px;
+    height: 34px;
+    max-width: none;
+    padding: 0 8px;
+    border-radius: 9px;
+    font-size: 8.5px;
+    letter-spacing: 0.02em;
+  }
+
+  .btn svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .btnDealer {
+    height: 34px;
+    padding: 0 7px;
+  }
+
+  .btnDealer .btnLabel {
+    display: none;
+  }
+
+  .autoBtn {
+    height: 28px;
+    gap: 4px;
+    padding: 0 8px;
+    font-size: 8px;
+  }
+
+  .hint {
+    display: none;
+  }
+
+  .chatSlot {
+    display: none;
+  }
+}
+
+@keyframes hintPulse {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn,
+  .autoBtn {
+    transition: none;
+  }
+
+  .hintDot {
+    animation: none;
+  }
+}

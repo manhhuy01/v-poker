@@ -1,33 +1,54 @@
 import Card from './card'
+import { IconTip } from '../poker/icons'
+import styles from '../poker/table.module.css'
 
-const Pot = ({ balance }) => (
-  <div className="flex items-center justify-center pl-2 pr-2 pb-1">
-    <img className="w-4 h-4 md:w-8 md:h-8 max-w-none mr-1" src="/pot.svg" alt="chip" />
-    <span className="font-bold text-white">{balance}</span>
-  </div>
-)
+const formatMoney = (value) => {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return value.toLocaleString('en-US')
+  }
+  return value
+}
 
-export default function pot({ cards, pot, start, onClickTipDealer, finish, hideTipDealer }) {
+export default function Pot({ cards = [], pot, start, onClickTipDealer, finish, hideTipDealer }) {
+  const visiblePots = (pot || []).filter((p) => p && p.balance)
+
   return (
-    <div className="w-full md:w-1/2 flex flex-col items-center">
-      {!(start && !finish) && !hideTipDealer && <button onClick={onClickTipDealer} className="italic bg-white p-1 pl-2 pr-2 rounded mb-4 focus:outline-none" type="button">Tip Dealer</button>}
-      <div className="flex justify-around w-3/4 mb-4 sm:mb-0 flex-wrap md:mb-10">
-        {
-          !!pot && pot.map((p, i) => !!p.balance && <Pot key={i} balance={p.balance} />)
-        }
-      </div>
-      <div className="flex flex-wrap justify-center w-full gap-y-2 ">
-        <div className="flex">
-          {
-            start && [0, 1, 2].map((i) => <Card key={i} data={cards[i] || 'u'} />)
-          }
+    <div className={styles.centerCol}>
+      {visiblePots.length > 0 && (
+        <div className={styles.potStack}>
+          {visiblePots.map((p, i) => (
+            <div className={styles.potPill} key={i}>
+              <span className={styles.potChip} aria-hidden="true" />
+              <span className={styles.potLabel}>
+                {i === 0 ? 'Pot' : `Side ${i}`}
+              </span>
+              <span className={styles.potValue}>{formatMoney(p.balance)}</span>
+            </div>
+          ))}
         </div>
-        <div className="flex">
-          {
-            start && [3, 4].map((i) => <Card key={i} data={cards[i] || 'u'} />)
-          }
+      )}
+
+      {!!start && (
+        <div className={styles.board}>
+          <div className={styles.boardGroup}>
+            {[0, 1, 2].map((i) => (
+              <Card key={i} data={cards[i] || 'u'} />
+            ))}
+          </div>
+          <div className={styles.boardGroup}>
+            {[3, 4].map((i) => (
+              <Card key={i} data={cards[i] || 'u'} />
+            ))}
+          </div>
         </div>
-      </div>
+      )}
+
+      {!(start && !finish) && !hideTipDealer && (
+        <button type="button" className={styles.tipBtn} onClick={onClickTipDealer}>
+          <IconTip />
+          Tip dealer
+        </button>
+      )}
     </div>
   )
 }

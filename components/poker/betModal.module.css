@@ -1,0 +1,282 @@
+/* Bet sizing modal — visual layer only, all sizing logic lives in betModal.js */
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  padding: 2px 0 4px;
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.kicker {
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(233, 196, 106, 0.75);
+}
+
+.title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  color: #f4f6fb;
+}
+
+.ranges {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.rangePill {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(148, 163, 184, 0.8);
+}
+
+.rangePill strong {
+  font-size: 12px;
+  font-weight: 900;
+  color: #e2e8f0;
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.rangePillAccent {
+  border-color: rgba(94, 234, 212, 0.25);
+}
+
+.rangePillAccent strong {
+  color: #5eead4;
+}
+
+/* amount display */
+.amountCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 14px 16px 12px;
+  border-radius: 18px;
+  border: 1px solid rgba(233, 196, 106, 0.28);
+  background:
+    radial-gradient(80% 120% at 50% 0%, rgba(233, 196, 106, 0.14) 0%, rgba(0, 0, 0, 0) 70%),
+    linear-gradient(180deg, rgba(14, 22, 34, 0.9), rgba(5, 9, 15, 0.95));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 18px 40px -26px rgba(0, 0, 0, 0.95);
+}
+
+.amountLabel {
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(226, 190, 118, 0.72);
+}
+
+.amountRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.amountChip {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+  background: conic-gradient(#f7d98a 0 25%, #b45309 0 50%, #f7d98a 0 75%, #b45309 0);
+  box-shadow:
+    inset 0 0 0 2px rgba(0, 0, 0, 0.18),
+    inset 0 0 0 3px rgba(255, 244, 205, 0.55),
+    0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.amountInput {
+  flex: 0 1 auto;
+  width: 100%;
+  max-width: 260px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #fdf1cf;
+  font-family: inherit;
+  font-size: 32px;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  text-transform: uppercase;
+  outline: none;
+}
+
+.amountInput::placeholder {
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.allInTag {
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: linear-gradient(180deg, #fb7185, #be123c);
+  color: #fff1f2;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+}
+
+/* slider */
+.sliderWrap {
+  position: relative;
+  padding: 6px 2px 0;
+}
+
+.slider {
+  width: 100%;
+  height: 4px;
+  margin: 10px 0;
+  border-radius: 999px;
+  appearance: none;
+  -webkit-appearance: none;
+  background: linear-gradient(90deg, rgba(233, 196, 106, 0.65), rgba(233, 196, 106, 0.18));
+  outline: none;
+  cursor: pointer;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 3px solid #f6e3b4;
+  background: linear-gradient(180deg, #e2b34c, #a86f1d);
+  box-shadow: 0 0 0 4px rgba(233, 196, 106, 0.16), 0 4px 10px -2px rgba(0, 0, 0, 0.8);
+  cursor: grab;
+}
+
+.slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 3px solid #f6e3b4;
+  background: #c8912f;
+  box-shadow: 0 0 0 4px rgba(233, 196, 106, 0.16);
+  cursor: grab;
+}
+
+/* milestone grid */
+.milestones {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(84px, 1fr));
+  gap: 6px;
+}
+
+.milestone {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  min-width: 0;
+  padding: 7px 9px;
+  border-radius: 11px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: linear-gradient(180deg, rgba(27, 39, 58, 0.7), rgba(8, 13, 22, 0.85));
+  color: #cbd5e1;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+}
+
+.milestone:hover {
+  border-color: rgba(233, 196, 106, 0.4);
+}
+
+.milestone[data-active='true'] {
+  border-color: rgba(233, 196, 106, 0.75);
+  background: linear-gradient(180deg, rgba(233, 196, 106, 0.18), rgba(233, 196, 106, 0.06));
+  box-shadow: inset 0 0 0 1px rgba(233, 196, 106, 0.18);
+}
+
+.milestoneLabel {
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: rgba(148, 163, 184, 0.75);
+  white-space: nowrap;
+}
+
+.milestone[data-active='true'] .milestoneLabel {
+  color: rgba(246, 227, 180, 0.9);
+}
+
+.milestoneValue {
+  font-size: 12px;
+  font-weight: 900;
+  color: #e8eef7;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.milestoneAllIn {
+  border-color: rgba(244, 63, 94, 0.3);
+}
+
+.milestoneAllIn .milestoneValue {
+  color: #fda4af;
+}
+
+.milestoneAllIn[data-active='true'] {
+  border-color: rgba(244, 63, 94, 0.75);
+  background: linear-gradient(180deg, rgba(244, 63, 94, 0.22), rgba(244, 63, 94, 0.06));
+}
+
+.hint {
+  margin: 0;
+  font-size: 10px;
+  line-height: 1.5;
+  color: rgba(148, 163, 184, 0.55);
+  text-align: center;
+}
+
+@media (max-height: 600px) {
+  .body {
+    gap: 10px;
+  }
+
+  .amountInput {
+    font-size: 26px;
+  }
+
+  .milestone {
+    padding: 5px 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .milestone {
+    transition: none;
+  }
+}

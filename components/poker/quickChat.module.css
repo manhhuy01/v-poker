@@ -1,0 +1,87 @@
+/* Quick chat composer, mobile only (desktop uses the chat drawer). */
+
+.wrap {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+@media (min-width: 768px) {
+  .wrap {
+    display: none;
+  }
+}
+
+.form {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+}
+
+.field {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.input {
+  width: 100%;
+  height: 38px;
+  padding: 0 42px 0 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: linear-gradient(180deg, rgba(19, 30, 45, 0.85), rgba(7, 13, 22, 0.92));
+  color: #e9eff8;
+  font-family: inherit;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.input::placeholder {
+  color: rgba(148, 163, 184, 0.7);
+}
+
+.input:focus {
+  border-color: rgba(233, 196, 106, 0.5);
+  box-shadow: 0 0 0 3px rgba(233, 196, 106, 0.12);
+}
+
+.send {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #f8d98a, #d9a93f);
+  color: #2b1a02;
+  cursor: pointer;
+  box-shadow: 0 4px 10px -4px rgba(233, 196, 106, 0.8);
+  transition: transform 0.14s ease, filter 0.14s ease;
+}
+
+.send:hover {
+  filter: brightness(1.08);
+}
+
+.send:active {
+  transform: translateY(-50%) scale(0.92);
+}
+
+.send svg {
+  width: 14px;
+  height: 14px;
+}
+
+@media (max-height: 560px) {
+  .wrap {
+    display: none;
+  }
+}

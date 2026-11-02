@@ -3,7 +3,7 @@ import { useToasts } from 'react-toast-notifications'
 
 import useSound from 'use-sound';
 
-import Position from '../components/materials/position'
+import TableStage from '../components/poker/tableStage'
 import Pot from './materials/pot'
 import {
   startGame, shuffleCards, preFlop, playerAction, reset,
@@ -11,9 +11,13 @@ import {
 } from '../api/poker'
 import Modal from './modal'
 import BetModal from './betModal'
-import Spin from './spin'
 import ChatFloating from './chatFloating'
 import QuickChatInput from './quickChatInput'
+import ActionDock from './poker/actionDock'
+import { IconCollapse, IconExpand, IconEye, IconEyeOff } from './poker/icons'
+import styles from './poker/game.module.css'
+
+const TIP_PRESETS = [1, 5, 10, 20, 50]
 
 export default function Game({ data, onEditClick, onAddClick, onChatOpen, messages, countChat }) {
   const [playDingSound] = useSound('/ding.mp3');
@@ -273,6 +277,10 @@ export default function Game({ data, onEditClick, onAddClick, onChatOpen, messag
   }
 
   const hideCard = () => setHiddenCard(!isHiddenCard);
+  const setTipPreset = (value) => {
+    if (tipInput.current) tipInput.current.value = value
+  }
+
   const isFinish = data?.table?.finish;
   const isPlaying = data?.user?.position?.isPlaying || false;
   const isPreFlop = !!data?.table?.preFlop
@@ -286,168 +294,119 @@ export default function Game({ data, onEditClick, onAddClick, onChatOpen, messag
   const isCanFold = !isAllIn && isPreFlop && !isFold && !isFinish
   const isCanShowCard = isFinish && !isFold && !data?.table?.isShowDown
   const isCanBet = !isAllIn && !isFinish
+
+  const showActions = (!isPreFlop || isThinking || isFinish) && !!data?.user?.position
+  const showAuto = !isThinking && isPlaying && !isFold && isPreFlop && !isFinish
+  const isUserPlaying = !!data?.user?.position
+
+  const dealerActions = {
+    preFlop: !!(data?.user?.isDealer && data?.table?.start && !data?.table?.preFlop),
+    start: !!(data?.user?.isDealer && !data?.table?.start),
+    showAll: !!(data?.user?.isDealer && isFinish && !data?.table?.river),
+    reset: !!(data?.user?.isDealer),
+    shuffle: !!(data?.user?.isDealer && !data?.table?.start),
+  }
+
+  let hint = ''
+  if (!showActions) {
+    if (!isUserPlaying) hint = 'Bạn đang xem bàn chơi'
+    else if (isFold) hint = 'Bạn đã bỏ bài ở ván này'
+    else if (isFinish) hint = 'Ván đã kết thúc'
+    else if (isThinking) hint = 'Đang tới lượt bạn'
+    else if (isPreFlop) hint = 'Đang chờ người chơi khác hành động'
+  }
+
   return (
-    <div className="game-container relative w-full h-dvh bg-gray-800 overflow-hidden">
-      <div className="game-layout pt-16 pb-40 w-full h-dvh flex items-center justify-center">
-        <div className="w-10/12 h-5/6 relative border-8 border-black border-emerald-500/30 rounded-[2rem] bg-green-700">
-          {
-            Object.keys(data?.position || {}).map((position) => (
-              <Position
-                key={position}
-                namePos={data?.position[position].namePos}
-                data={data?.position[position]}
-                isThinking={data?.position[position]?.isThinking}
-                pos={position}
-                userName={data?.position[position]?.user?.userName}
-                balance={data?.position[position]?.user?.accBalance}
-                rawPosition={data?.position[position]?.rawPosition}
-                bet={data?.position[position]?.betBalance}
-                action={data?.position[position]?.action}
-                cards={data?.position[position]?.cards}
-                isFold={data?.position[position]?.isFold}
-                onEditClick={onEditClick}
-                onAddClick={onAddClick}
-                isPlaying={data?.position[position]?.isPlaying}
-                winBalance={data?.position[position]?.winBalance}
-                start={data?.table?.start}
-                isUserPlaying={data?.user?.position?.user?.userName == data?.position[position]?.user?.userName}
-                isHiddenCard={isHiddenCard}
-                hideCard={hideCard}
-                result={data?.position[position]?.resultCard?.name}
+    <div className={styles.shell}>
+      <div className={styles.navSpace} />
+
+      <div className={styles.tableArea}>
+        <TableStage
+          positions={data?.position}
+          start={data?.table?.start}
+          userName={data?.user?.userName}
+          isHiddenCard={isHiddenCard}
+          onEditClick={onEditClick}
+          onAddClick={onAddClick}
+          center={(
+            <>
+              <ChatFloating
+                user={data?.user}
+                onChatOpen={onChatOpen}
+                messages={messages}
+                count={countChat}
               />
-            ))
+              <Pot
+                pot={data?.table?.pot}
+                cards={[...(data?.table?.flop || []), data?.table?.turn, data?.table?.river].filter(Boolean)}
+                start={data?.table?.start}
+                onClickTipDealer={() => setOpenModalTip(true)}
+                finish={data?.table?.finish}
+              />
+            </>
+          )}
+        />
+
+        <div className={styles.utils}>
+          {isUserPlaying && (
+            <button
+              type="button"
+              className={styles.utilBtn}
+              data-active={!isHiddenCard}
+              onClick={hideCard}
+              title={isHiddenCard ? 'Hiện bài của tôi' : 'Ẩn bài của tôi'}
+              aria-label={isHiddenCard ? 'Hiện bài của tôi' : 'Ẩn bài của tôi'}
+            >
+              {isHiddenCard ? <IconEyeOff /> : <IconEye />}
+            </button>
+          )}
+          <button
+            type="button"
+            className={styles.utilBtn}
+            onClick={onFullScreen}
+            title={isFullScreen ? 'Thu nhỏ màn hình' : 'Toàn màn hình'}
+            aria-label={isFullScreen ? 'Thu nhỏ màn hình' : 'Toàn màn hình'}
+          >
+            {isFullScreen ? <IconCollapse /> : <IconExpand />}
+          </button>
+        </div>
+      </div>
+
+      <ActionDock
+        dealerActions={dealerActions}
+        showActions={showActions}
+        canFold={isCanFold}
+        canCheck={isCanCheck}
+        canCall={isCanCall}
+        canBet={isCanBet && !!data?.table?.start}
+        canShow={isCanShowCard}
+        showAuto={showAuto}
+        autoAction={autoAction}
+        onToggleAutoFold={() => setAutoAction(autoAction === 'FOLD' ? null : 'FOLD')}
+        onToggleAutoCall={() => {
+          if (autoAction === 'CALL_CHECK') {
+            setAutoAction(null);
+          } else {
+            setAutoAction('CALL_CHECK');
+            setAutoActionBetValue(data?.table?.currentBet || 0);
           }
+        }}
+        onPreFlop={onPreFlop}
+        onStart={onStart}
+        onShowAllCards={onShowAllCards}
+        onReset={onReset}
+        onShuffle={onShuffle}
+        onFold={onActionFold}
+        onCheck={onActionCheck}
+        onCall={onActionCall}
+        onBet={() => setOpenModalBet(true)}
+        onShow={onActionShow}
+        loadingDealer={isLoadingDealerAction}
+        loadingPlayer={loadingPlayerAction}
+        hint={hint}
+        quickChat={<QuickChatInput user={data?.user} />}
+      />
 
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-1/2 md:w-2/3 flex flex-col items-center pointer-events-none gap-8">
-            <ChatFloating
-              user={data?.user}
-              onChatOpen={onChatOpen}
-              messages={messages}
-              count={countChat}
-            />
-            <Pot
-              pot={data?.table?.pot}
-              cards={[...(data?.table?.flop || []), data?.table?.turn, data?.table?.river].filter(Boolean)}
-              start={data?.table?.start}
-              onClickTipDealer={() => setOpenModalTip(true)}
-              finish={data?.table?.finish}
-            />
-
-          </div>
-        </div>
-      </div>
-      <div onClick={onFullScreen} className="absolute top-24 left-1/2 z-10 cursor-pointer text-2xl text-white transform -translate-x-2/4 hover:scale-125 transition-all bg-black/20 p-2.5 rounded-2xl backdrop-blur-md border border-white/10 shadow-lg">&#x26F6;</div>
-      <div className="absolute bottom-16 sm:bottom-24 left-0 w-full flex justify-center z-20 pointer-events-none">
-        <div className="w-full max-w-md pointer-events-auto">
-          <QuickChatInput user={data?.user} />
-        </div>
-      </div>
-      <div className="sticky game-action bottom-0 left-0 flex flex-row items-center p-2 sm:p-6 justify-center gap-2 sm:gap-8 bg-black/90 backdrop-blur-3xl border-t border-white/10 w-full overflow-x-auto no-scrollbar">
-        {
-          data?.user?.isDealer && (
-            <div className="flex flex-row items-center gap-4 sm:gap-4 shrink-0">
-              {
-                data?.table?.start && !data?.table?.preFlop && <button onClick={onPreFlop} className="flex-none flex flex-col items-center justify-center text-white bg-gradient-to-r from-emerald-400 to-green-600 px-3 py-3 sm:px-6 sm:py-3 rounded sm:rounded-2xl font-black text-[10px] sm:text-xs shadow-lg shadow-emerald-900/40 hover:scale-105 transition-all focus:outline-none border border-emerald-400/50" type="button">
-                  <Spin loading={isLoadingDealerAction} />
-                  <span className="uppercase tracking-tighter whitespace-nowrap px-0.5">Chia bài</span>
-                </button>
-              }
-              {
-                !data?.table?.start && <button onClick={onStart} className="flex-none flex flex-col items-center justify-center text-white bg-gradient-to-r from-pink-500 to-rose-600 px-3 py-3 sm:px-6 sm:py-3 rounded sm:rounded-2xl font-black text-[10px] sm:text-xs shadow-lg shadow-pink-900/40 hover:scale-105 transition-all focus:outline-none border border-pink-400/50" type="button">
-                  <Spin loading={isLoadingDealerAction} />
-                  <span className="uppercase tracking-tighter whitespace-nowrap px-0.5">Vào ván</span>
-                </button>
-              }
-              {
-                isFinish && !data?.table?.river && <button onClick={onShowAllCards} className="flex-none flex flex-col items-center justify-center text-white bg-gradient-to-r from-violet-500 to-purple-700 px-3 py-3 sm:px-6 sm:py-3 rounded sm:rounded-2xl font-black text-[10px] sm:text-xs shadow-lg shadow-violet-900/40 hover:scale-105 transition-all focus:outline-none border border-violet-400/50" type="button">
-                  <Spin loading={isLoadingDealerAction} />
-                  <span className="uppercase tracking-tighter whitespace-nowrap px-0.5">Chia Hết</span>
-                </button>
-              }
-              {
-                <button onClick={onReset} className="flex-none flex flex-col items-center justify-center text-white bg-gradient-to-r from-slate-500 to-slate-700 px-3 py-3 sm:px-6 sm:py-3 rounded sm:rounded-2xl font-black text-[10px] sm:text-xs shadow-lg shadow-slate-900/40 hover:scale-105 transition-all focus:outline-none border border-slate-400/50" type="button">
-                  <Spin loading={isLoadingDealerAction} />
-                  <span className="uppercase tracking-tighter whitespace-nowrap px-0.5">Thu dọn</span>
-                </button>
-              }
-              {
-                !data?.table?.start && <button onClick={onShuffle} className="flex-none flex flex-col items-center justify-center text-white bg-gradient-to-r from-indigo-500 to-blue-700 px-3 py-3 sm:px-6 sm:py-3 rounded sm:rounded-2xl font-black text-[10px] sm:text-xs shadow-lg shadow-indigo-900/40 hover:scale-105 transition-all focus:outline-none border border-indigo-400/50" type="button">
-                  <Spin loading={isLoadingDealerAction} />
-                  <span className="uppercase tracking-tighter whitespace-nowrap px-0.5">Xào bài</span>
-                </button>
-              }
-            </div>
-          )
-        }
-        {
-          (!data?.table?.preFlop || isThinking || data?.table?.finish) && data?.user?.position && (
-            <div className="flex flex-row items-center gap-4 sm:gap-4 shrink-0 ml-1">
-              {
-                isCanFold && <button onClick={onActionFold} disabled={loadingPlayerAction} className="flex-none flex flex-col items-center justify-center text-gray-400 bg-gradient-to-br from-gray-900 to-black border border-rose-950/50 px-5 py-3 sm:px-8 sm:py-3 rounded sm:rounded-2xl font-bold text-[10px] sm:text-sm shadow-xl shadow-black/80 hover:bg-zinc-900 transition-all focus:outline-none" type="button">
-                  <Spin loading={loadingPlayerAction} />
-                  <span className="uppercase tracking-tighter whitespace-nowrap px-0.5">Fold</span>
-                </button>
-              }
-              {
-                isCanCheck && <button onClick={onActionCheck} disabled={loadingPlayerAction} className="flex-none flex flex-col items-center justify-center text-white bg-gradient-to-br from-cyan-600 to-cyan-800 border border-cyan-500/40 px-5 py-3 sm:px-8 sm:py-3 rounded sm:rounded-2xl font-bold text-[10px] sm:text-sm hover:scale-105 shadow-lg shadow-cyan-900/40 transition-all focus:outline-none" type="button">
-                  <Spin loading={loadingPlayerAction} />
-                  <span className="uppercase tracking-tighter whitespace-nowrap px-0.5">Check</span>
-                </button>
-              }
-              {
-                isCanCall && (
-                  <button onClick={onActionCall} disabled={loadingPlayerAction} className="flex-none flex flex-col items-center justify-center text-white bg-gradient-to-br from-amber-400 to-orange-600 border border-amber-400/40 px-5 py-3 sm:px-8 sm:py-3 rounded sm:rounded-2xl font-bold text-[10px] sm:text-sm shadow-xl shadow-amber-900/40 hover:scale-105 transition-all focus:outline-none" type="button">
-                    <Spin loading={loadingPlayerAction} />
-                    <span className="uppercase tracking-tighter whitespace-nowrap px-0.5">Call</span>
-                  </button>
-                )
-              }
-
-              {
-                isCanBet && data?.table?.start && (
-                  <button onClick={() => setOpenModalBet(true)} className="flex-none flex flex-col items-center justify-center text-white bg-gradient-to-br from-blue-500 to-indigo-700 border border-blue-400/40 px-5 py-3 sm:px-8 sm:py-3 rounded sm:rounded-2xl font-bold text-[10px] sm:text-sm shadow-xl shadow-blue-900/40 hover:scale-105 transition-all focus:outline-none" type="button">
-                    <span className="uppercase tracking-tighter whitespace-nowrap px-0.5">Bet</span>
-                  </button>
-                )
-              }
-
-              {
-                isCanShowCard && (
-                  <button onClick={onActionShow} disabled={loadingPlayerAction} className="flex-none flex flex-col items-center justify-center text-white bg-gradient-to-br from-emerald-500 to-teal-700 border border-emerald-400/40 px-5 py-3 sm:px-8 sm:py-3 rounded sm:rounded-2xl font-bold text-[10px] sm:text-sm shadow-xl shadow-emerald-900/40 hover:scale-105 transition-all focus:outline-none" type="button">
-                    <Spin loading={loadingPlayerAction} />
-                    <span className="uppercase tracking-tighter whitespace-nowrap px-0.5">Show</span>
-                  </button>
-                )
-              }
-            </div>
-          )
-        }
-        {
-          !isThinking && isPlaying && !isFold && isPreFlop && !isFinish && (
-            <div className="flex flex-row items-center gap-2 sm:gap-4 shrink-0 px-2">
-              <button 
-                onClick={() => setAutoAction(autoAction === 'FOLD' ? null : 'FOLD')}
-                className={`flex-none flex items-center justify-center px-4 py-3 rounded-xl font-bold text-[10px] sm:text-xs transition-all border ${autoAction === 'FOLD' ? 'bg-rose-600 text-white border-rose-400 shadow-lg shadow-rose-900/50 scale-105' : 'bg-gray-900/50 text-gray-400 border-white/5 hover:bg-white/5'}`}
-              >
-                AUTO FOLD
-              </button>
-              <button 
-                onClick={() => {
-                  if (autoAction === 'CALL_CHECK') {
-                    setAutoAction(null);
-                  } else {
-                    setAutoAction('CALL_CHECK');
-                    setAutoActionBetValue(data?.table?.currentBet || 0);
-                  }
-                }}
-                className={`flex-none flex items-center justify-center px-4 py-3 rounded-xl font-bold text-[10px] sm:text-xs transition-all border ${autoAction === 'CALL_CHECK' ? 'bg-indigo-600 text-white border-indigo-400 shadow-lg shadow-indigo-900/50 scale-105' : 'bg-gray-900/50 text-gray-400 border-white/5 hover:bg-white/5'}`}
-              >
-                AUTO CALL/CHECK
-              </button>
-            </div>
-          )
-        }
-      </div>
       <BetModal
         isOpen={isOpenModalBet}
         onClose={() => setOpenModalBet(false)}
@@ -464,8 +423,36 @@ export default function Game({ data, onEditClick, onAddClick, onChatOpen, messag
             onCancel={() => setOpenModalTip(false)}
             onConfirm={() => onActionTip()}
           >
-            <div className="flex flex-col items-center justify-center w-full">
-              <input className="border-2 rounded mb-4" type="input" ref={tipInput} defaultValue={0} />
+            <div className={styles.tipBody}>
+              <h3 className={styles.tipTitle}>Tip cho dealer</h3>
+              <p className={styles.tipSub}>
+                Gửi một chút cảm ơn tới người chia bài. Số dư sẽ được trừ ngay khi xác nhận.
+              </p>
+              <div className={styles.tipPresets}>
+                {TIP_PRESETS.map((value) => (
+                  <button
+                    key={value}
+                    type="button"
+                    className={styles.tipPreset}
+                    onClick={() => setTipPreset(value)}
+                  >
+                    ${value}
+                  </button>
+                ))}
+              </div>
+              <div className={styles.tipField}>
+                <span className={styles.tipCurrency}>$</span>
+                <input
+                  className={styles.tipInput}
+                  type="number"
+                  min="0"
+                  step="1"
+                  inputMode="numeric"
+                  ref={tipInput}
+                  defaultValue={0}
+                  aria-label="Số tiền tip"
+                />
+              </div>
             </div>
           </Modal>
         )

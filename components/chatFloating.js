@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import * as socket from '../api/socket'
-
+import styles from './poker/chatFloating.module.css'
 
 export default function ChatFloating({ user, onChatOpen, messages = [], count }) {
   const [isVisible, setIsVisible] = useState(false);
@@ -14,17 +13,21 @@ export default function ChatFloating({ user, onChatOpen, messages = [], count })
   }, [count]);
 
   return (
-    <div className='chat-floating flex flex-col items-center gap-2'>
-      <div className={`flex flex-col items-center space-y-1.5 pointer-events-auto transition-opacity duration-1000 ${isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+    <div className={styles.wrap}>
+      <div className={`${styles.row} ${isVisible ? '' : styles.hidden}`}>
         {messages.length > 0 && messages.slice(-1).map((msg, i) => (
-          <div
+          <button
             key={i}
+            type="button"
             onClick={onChatOpen}
-            className="bg-black/60 backdrop-blur-md px-3 py-1 md:px-4 md:py-1.5 rounded-full border border-white/10 text-[10px] md:text-[11px] font-bold text-white shadow-lg animate-fade-in-up cursor-pointer hover:bg-black/80 transition-all"
+            className={styles.toast}
           >
-            <span className="text-indigo-400 mr-1.5 tracking-tighter">{msg.userName}:</span>
-            <span className="opacity-90">{msg.message}</span>
-          </div>
+            <span className={styles.avatar}>{(msg.userName || '?').slice(0, 1)}</span>
+            <span className={styles.body}>
+              <span className={styles.user}>{msg.userName}:</span>
+              <span className={styles.text}>{msg.message}</span>
+            </span>
+          </button>
         ))}
       </div>
     </div>
