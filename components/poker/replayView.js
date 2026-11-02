@@ -120,6 +120,7 @@ export default function ReplayView({ gameLog, loading, id, returnTo = '/report' 
             positions={positions}
             start
             isHiddenCard={false}
+            showdown={!!currentStep?.isFinal}
             showEmptySeats={false}
             center={(
               <>

@@ -34,6 +34,7 @@
   --side-col: calc(var(--pod-w) + 2px);
   --gap: clamp(2px, 0.9cqw, 12px);
   --pad: clamp(3px, 1.1cqw, 18px);
+  --font-action: clamp(9px, calc(var(--pod-w) * 0.075), 11.5px);
   --seat-card-h: calc(var(--seat-card-w) * 1.42);
   --rail: clamp(6px, 1.3cqw, 22px);
   --cards-overlap: 0.18;
@@ -153,7 +154,12 @@
   transform: translate(-50%, -50%);
 }
 
-.slot[data-pos='1'] { --slot-x: 50%; --slot-y: 91%; }
+.slot[data-pos='1'] {
+  --slot-x: 50%;
+  top: auto;
+  bottom: max(2px, 1.2cqh);
+  transform: translateX(-50%);
+}
 .slot[data-pos='2'] { --slot-x: 21.4%; --slot-y: 81.4%; }
 .slot[data-pos='3'] { --slot-x: 6.2%; --slot-y: 57.1%; }
 .slot[data-pos='4'] { --slot-x: 11.5%; --slot-y: 29.5%; }
@@ -339,7 +345,12 @@
     align-items: flex-end;
   }
 
-  .slot[data-pos='1'] { grid-area: p1; }
+  .slot[data-pos='1'] {
+    top: auto;
+    bottom: auto;
+    transform: none;
+    grid-area: p1;
+  }
   .slot[data-pos='2'] { grid-area: p2; }
   .slot[data-pos='3'] { grid-area: p3; }
   .slot[data-pos='4'] { grid-area: p4; }
@@ -361,6 +372,7 @@
 @media (max-height: 700px) and (orientation: portrait) {
   .stage {
     --pod-w: clamp(58px, 18cqw, 76px);
+    --font-action: 8.5px;
     --card-w: clamp(22px, min(6.8cqw, 7cqh), 34px);
     --seat-card-w: clamp(18px, min(4.7cqw, 4.6cqh), 24px);
     --cards-overlap: 0.3;
@@ -369,7 +381,6 @@
     --side-col: calc(var(--pod-w) + 1px);
   }
 
-  .slot[data-pos='1'] { --slot-y: 88%; }
   .slot[data-pos='2'],
   .slot[data-pos='9'] { --slot-y: 79%; }
   .slot[data-pos='3'],
@@ -384,6 +395,7 @@
     --font-name: 9px;
     --font-stack: 8.5px;
     --font-badge: 7.5px;
+    --font-action: 8.5px;
     --pad: 4px;
     display: grid;
     grid-template-columns: repeat(10, minmax(0, 1fr));
@@ -405,7 +417,12 @@
     align-items: flex-end;
   }
 
-  .slot[data-pos='1'] { grid-area: p1; }
+  .slot[data-pos='1'] {
+    top: auto;
+    bottom: auto;
+    transform: none;
+    grid-area: p1;
+  }
   .slot[data-pos='2'] { grid-area: p2; }
   .slot[data-pos='3'] { grid-area: p3; }
   .slot[data-pos='4'] { grid-area: p4; }
@@ -424,8 +441,17 @@
 }
 
 @media (max-height: 430px) {
+  .stage {
+    --card-w: 20px;
+    --seat-card-w: 18px;
+  }
+
   .center {
-    padding-bottom: calc(var(--peek) + 16px);
+    padding-bottom: calc(var(--seat-card-h) * 0.82 + 2px);
+  }
+
+  .tipBtn {
+    display: none;
   }
 }
 
@@ -433,7 +459,8 @@
 @media (max-height: 340px) {
   .stage {
     --pod-w: clamp(88px, min(16cqw, 40cqh), 130px);
-    --seat-card-w: 16px;
+    --font-action: 7.5px;
+    --seat-card-w: 14px;
     --card-w: 18px;
     --cards-overlap: 0.06;
     --gap: 2px;
@@ -441,7 +468,7 @@
   }
 
   .center {
-    padding-bottom: calc(var(--peek) + 8px);
+    padding-bottom: calc(var(--peek) * 0.8);
   }
 
   .board {

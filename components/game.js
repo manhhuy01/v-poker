@@ -326,6 +326,7 @@ export default function Game({ data, onEditClick, onAddClick, onChatOpen, messag
           start={data?.table?.start}
           userName={data?.user?.userName}
           isHiddenCard={isHiddenCard}
+          showdown={!!data?.table?.finish}
           onEditClick={onEditClick}
           onAddClick={onAddClick}
           center={(

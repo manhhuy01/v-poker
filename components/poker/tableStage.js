@@ -11,6 +11,7 @@ export default function TableStage({
   start,
   userName,
   isHiddenCard = false,
+  showdown = false,
   onEditClick = () => {},
   onAddClick = () => {},
   showEmptySeats = true,
@@ -47,6 +48,7 @@ export default function TableStage({
           start={start}
           isUserPlaying={!!userName && userNameOnSeat === userName}
           isHiddenCard={isHiddenCard}
+          showdown={showdown}
           result={seat?.resultCard?.name}
         />
       </div>

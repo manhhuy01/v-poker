@@ -45,6 +45,7 @@ export default function Position({
   start,
   isUserPlaying,
   isHiddenCard = true,
+  showdown = false,
   result
 }) {
   if (!userName) {
@@ -68,7 +69,10 @@ export default function Position({
   const visibleAction = action && action !== 'fold' ? action : ''
   const isAllIn = isPlaying && !balance && start
   const resultLabel = !!result && !isFold && !isHiddenCard ? MAP_RS[result] : ''
-  const hasStatus = visibleAction || bet || winBalance || resultLabel || isThinking
+  // The hand is only known to the owner while the hand is running; only at the
+  // end of the hand should it replace the betting action.
+  const isShowdown = !!showdown && !!resultLabel
+  const hasStatus = isShowdown || visibleAction || bet || winBalance || resultLabel || isThinking
   const hue = hueFromName(userName)
 
   return (
@@ -123,26 +127,28 @@ export default function Position({
 
       {!!hasStatus && (
         <div className={styles.status}>
-          {!resultLabel && !!visibleAction && (
+          {!isShowdown && !!visibleAction && (
             <span className={styles.action} data-action={visibleAction}>
               {visibleAction}
             </span>
           )}
-          {!resultLabel && !!bet && (
+          {!isShowdown && !!bet && (
             <span className={styles.bet}>
               <span className={styles.chip} />
               {formatMoney(bet)}
             </span>
           )}
-          {!resultLabel && !!winBalance && <span className={styles.win}>+{formatMoney(winBalance)}</span>}
-          {!!resultLabel && (
+          {!isShowdown && !!winBalance && <span className={styles.win}>+{formatMoney(winBalance)}</span>}
+          {!!resultLabel && (isShowdown ? (
             <span className={winBalance ? styles.showdownWin : styles.hand}>
               {!!winBalance && (
                 <span className={styles.showdownAmount}>+{formatMoney(winBalance)}</span>
               )}
               <span>{resultLabel}</span>
             </span>
-          )}
+          ) : (
+            <span className={styles.hand}>{resultLabel}</span>
+          ))}
           {!!isThinking && (
             <span className={styles.thinking} aria-label="Đang suy nghĩ">
               <i />
