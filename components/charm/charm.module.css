@@ -1,0 +1,192 @@
+/* Spiritual lucky charms: seat badge, icons and the picker. */
+
+.svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* ---------------- seat badge ---------------- */
+.badge {
+  position: absolute;
+  z-index: 30;
+  width: 34px;
+  height: 54px;
+  pointer-events: none;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.55));
+  transform-origin: 50% 100%;
+  animation: charmLife var(--charm-life, 8s) ease-out forwards;
+}
+
+.badge[data-type='millennium-eye'] {
+  filter: drop-shadow(0 0 6px rgba(251, 191, 36, 0.8)) drop-shadow(0 4px 6px rgba(0, 0, 0, 0.5));
+}
+
+@keyframes charmLife {
+  0% { opacity: 0; transform: translateY(8px) scale(0.3); }
+  5% { opacity: 1; transform: translateY(-4px) scale(1.15); }
+  9% { transform: translateY(0) scale(1); }
+  88% { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(-10px) scale(0.9); }
+}
+
+/* ---------------- incense: smoke rising ---------------- */
+.wisp {
+  fill: none;
+  stroke: rgba(226, 232, 240, 0.85);
+  stroke-width: 2;
+  stroke-linecap: round;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: smokeRise 2.4s ease-out infinite;
+}
+
+/* Light smoke disappears on the pastel v3 table. */
+:global(html[data-ui-version='v3']) .wisp {
+  stroke: rgba(100, 116, 139, 0.75);
+}
+
+.wisp:nth-child(2) { animation-delay: 0.8s; }
+.wisp:nth-child(3) { animation-delay: 1.6s; }
+
+@keyframes smokeRise {
+  0% { opacity: 0; transform: translate(0, 6px) scale(0.6, 0.5); }
+  25% { opacity: 0.85; }
+  70% { opacity: 0.35; }
+  100% { opacity: 0; transform: translate(3px, -8px) scale(1.4, 1.2); }
+}
+
+.ember circle {
+  fill: #f97316;
+  animation: emberGlow 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes emberGlow {
+  from { fill: #ea580c; filter: drop-shadow(0 0 1px #f97316); }
+  to { fill: #fde047; filter: drop-shadow(0 0 3px #fb923c); }
+}
+
+/* ---------------- clover: swaying ---------------- */
+.sway {
+  transform-box: view-box;
+  transform-origin: 20px 60px;
+  animation: cloverSway 1.6s ease-in-out infinite alternate;
+}
+
+@keyframes cloverSway {
+  from { transform: rotate(-14deg); }
+  to { transform: rotate(14deg); }
+}
+
+.sparkle {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: sparkle 1.2s ease-in-out infinite;
+}
+
+@keyframes sparkle {
+  0%, 100% { opacity: 0; transform: scale(0.4) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1) rotate(45deg); }
+}
+
+/* ---------------- millennium eye: blinking ---------------- */
+.eye {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: eyeBlink 2.8s ease-in-out infinite;
+}
+
+@keyframes eyeBlink {
+  0%, 40%, 50%, 58%, 100% { transform: scaleY(1); }
+  44%, 54% { transform: scaleY(0.08); }
+}
+
+.aura {
+  animation: auraPulse 1.4s ease-in-out infinite alternate;
+}
+
+@keyframes auraPulse {
+  from { filter: brightness(0.95); }
+  to { filter: brightness(1.2); }
+}
+
+/* ---------------- picker ---------------- */
+.picker {
+  position: fixed;
+  top: 72px;
+  left: 10px;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.trigger {
+  order: 0;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  border: 1px solid rgba(233, 196, 106, 0.45);
+  background: linear-gradient(180deg, rgba(24, 36, 52, 0.85), rgba(7, 12, 20, 0.92));
+  box-shadow: 0 6px 14px -8px rgba(0, 0, 0, 0.9);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.trigger:active { transform: scale(0.92); }
+.trigger[data-open='true'] { border-color: #fbbf24; }
+
+.menu {
+  order: 1;
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(7, 12, 20, 0.94);
+  box-shadow: 0 16px 30px -12px rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(8px);
+  animation: menuIn 0.15s ease-out;
+}
+
+@keyframes menuIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: none; }
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px 4px 4px;
+  border-radius: 10px;
+  color: #f1f5f9;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  text-align: left;
+  cursor: pointer;
+}
+
+.option:hover { background: rgba(255, 255, 255, 0.08); }
+
+.optionIcon {
+  width: 22px;
+  height: 34px;
+  flex: 0 0 auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wisp, .ember circle, .sway, .sparkle, .eye, .aura {
+    animation: none;
+  }
+  .wisp { opacity: 0.6; }
+}

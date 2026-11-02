@@ -15,7 +15,7 @@ import Spin from '../spin'
 import ChatFloating from './chatFloating'
 import QuickChatInput from './quickChatInput'
 
-export default function Game({ data, onEditClick, onAddClick, onChatOpen, messages, countChat }) {
+export default function Game({ data, onEditClick, onAddClick, onChatOpen, messages, countChat, charms = {} }) {
   const [playDingSound] = useSound('/ding.mp3');
   const [isFullScreen, setFullScreen] = useState(false)
   const [isLoadingDealerAction, setLoadingDealerAction] = useState(false)
@@ -314,6 +314,7 @@ export default function Game({ data, onEditClick, onAddClick, onChatOpen, messag
                 isHiddenCard={isHiddenCard}
                 hideCard={hideCard}
                 result={data?.position[position]?.resultCard?.name}
+                charm={charms[data?.position[position]?.user?.userName]}
               />
             ))
           }

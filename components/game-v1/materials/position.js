@@ -1,4 +1,5 @@
 import Card from './card'
+import CharmBadge from '../../charm/charmBadge'
 
 const MAP_RS = {
   'highHand': 'Bluff',
@@ -31,7 +32,8 @@ export default function position({
   isUserPlaying,
   isHiddenCard = true,
   hideCard,
-  result
+  result,
+  charm,
 }) {
   let className;
   switch (+pos) {
@@ -225,6 +227,7 @@ export default function position({
             {
               !!result && !isFold && !isHiddenCard && <span className="whitespace-nowrap z-20 rounded pl-1 pr-1 absolute -bottom-16 bg-blue-900 text-white bg-opacity-70 font-bold">{MAP_RS[result]}</span>
             }
+            {!!charm && <CharmBadge key={charm.id} type={charm.type} className="-top-12 right-12" />}
             <div onClick={() => onEditClick(userName)} className="text-white pr-1 pl-1 rounded border-yellow-600 border bg-gray-900 text-xs z-10 cursor-pointer">{userName}</div>
             {
               !!namePos && <div className={`${posClassName} absolute font-extrabold text-xs z-10 pl-1 pr-1 rounded -bottom-12`} >{namePos}</div>

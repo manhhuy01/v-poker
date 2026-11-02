@@ -1,4 +1,5 @@
 import Card from './card'
+import CharmBadge from '../charm/charmBadge'
 import { IconPlus } from '../poker/icons'
 import styles from '../poker/seat.module.css'
 
@@ -46,7 +47,8 @@ export default function Position({
   isUserPlaying,
   isHiddenCard = true,
   showdown = false,
-  result
+  result,
+  charm,
 }) {
   if (!userName) {
     return (
@@ -123,6 +125,8 @@ export default function Position({
             </div>
           </div>
         </div>
+
+        {!!charm && <CharmBadge key={charm.id} type={charm.type} className={styles.charm} />}
       </div>
 
       {!!hasStatus && (

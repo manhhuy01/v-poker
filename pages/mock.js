@@ -10,6 +10,8 @@ import normalFull2Data from '../mocks/normalFull2Data.json'
 import { transformPosition } from '../utils'
 import { UI_VERSIONS, UI_VERSION_VALUES } from '../utils/uiVersion'
 import { UiVersionProvider, useUiVersion } from '../components/uiVersion'
+import CharmPicker from '../components/charm/charmPicker'
+import { CHARM_TYPES, CHARM_DURATION_MS } from '../utils/charms'
 
 const rawData = normalFull2Data
 const MOCK_USER_NAME = 'manhhuy01'
@@ -45,6 +47,24 @@ function MockContent() {
     } catch (err) { setError(err.message); return rawData }
   }, [json, mode])
   const noop = () => {}
+
+  // Preview every charm on the seated players, re-sent each cycle.
+  const [charms, setCharms] = useState({})
+  const [charmCycle, setCharmCycle] = useState(0)
+  useEffect(() => {
+    const id = setInterval(() => setCharmCycle((c) => c + 1), CHARM_DURATION_MS + 1000)
+    return () => clearInterval(id)
+  }, [])
+  useEffect(() => {
+    const seated = Object.values(data?.position || {}).map((p) => p?.user?.userName).filter(Boolean)
+    setCharms(Object.fromEntries(seated.map((userName, i) => [
+      userName,
+      { id: `${charmCycle}-${i}`, type: CHARM_TYPES[i % CHARM_TYPES.length] },
+    ])))
+  }, [data, charmCycle])
+  const onPickCharm = ({ type }) => {
+    setCharms((prev) => ({ ...prev, [data?.user?.userName]: { id: Date.now(), type } }))
+  }
   const GameView = version === UI_VERSIONS.V1 ? GameV1 : GameV2
   return (
    <div>
@@ -80,8 +100,10 @@ function MockContent() {
                 onChatOpen={noop}
                 messages={[]}
                 countChat={0}
+                charms={charms}
               />
             )}
+            {ready && <CharmPicker onPick={onPickCharm} />}
           </div>
         </div>
       </main>

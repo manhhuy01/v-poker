@@ -15,6 +15,7 @@ export default function TableStage({
   onEditClick = () => {},
   onAddClick = () => {},
   showEmptySeats = true,
+  charms = {},
   className = '',
 }) {
   const hasSeat = (pos) => {
@@ -50,6 +51,7 @@ export default function TableStage({
           isHiddenCard={isHiddenCard}
           showdown={showdown}
           result={seat?.resultCard?.name}
+          charm={userNameOnSeat ? charms[userNameOnSeat] : undefined}
         />
       </div>
     )

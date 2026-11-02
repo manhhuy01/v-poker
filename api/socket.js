@@ -40,6 +40,16 @@ export const sendMessage = ({ message, userName }) => {
   socket.emit('sendMessage', { userName, message })
 }
 
+export const sendCharm = ({ type }) => {
+  if (!socket) return;
+  socket.emit('sendCharm', { type })
+}
+
+export const subscribeToCharm = (cb) => {
+  if (!socket) return (true);
+  socket.on('charm', cb);
+}
+
 export const subscribeToDisconnect = (cb) => {
   if (!socket) return (true);
   socket.on('disconnect', () => {

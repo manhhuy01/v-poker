@@ -22,7 +22,7 @@ import styles from './poker/game.module.css'
 
 const TIP_PRESETS = [1, 5, 10, 20, 50]
 
-export default function Game({ data, onEditClick, onAddClick, onChatOpen, messages, countChat, uiVersion }) {
+export default function Game({ data, onEditClick, onAddClick, onChatOpen, messages, countChat, uiVersion, charms }) {
   const isCute = uiVersion === UI_VERSIONS.V3
   const [playDingSound] = useSound('/ding.mp3');
   const [isFullScreen, setFullScreen] = useState(false)
@@ -344,6 +344,7 @@ export default function Game({ data, onEditClick, onAddClick, onChatOpen, messag
           showdown={!!data?.table?.finish}
           onEditClick={onEditClick}
           onAddClick={onAddClick}
+          charms={charms}
           center={(
             <>
               <ChatFloating

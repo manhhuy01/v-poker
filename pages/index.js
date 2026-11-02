@@ -19,6 +19,8 @@ import UserModal from '../components/userModal'
 import AddModal from '../components/addModal'
 import Loading from '../components/loading'
 import Chat from '../components/chat';
+import CharmPicker from '../components/charm/charmPicker'
+import { CHARM_DURATION_MS } from '../utils/charms'
 
 
 export async function getServerSideProps(context) {
@@ -76,6 +78,8 @@ function HomeContent({ user, token }) {
   const { addToast } = useToasts()
   const [messages, setMessages] = useState([])
   const [countChat, setCountChat] = useState(0)
+  // userName -> latest charm ({ id, type }) still showing on that seat
+  const [charms, setCharms] = useState({})
 
   useEffect(() => {
     var noSleep = new NoSleep();
@@ -141,6 +145,17 @@ function HomeContent({ user, token }) {
         }
         return agg;
       }, []));
+    });
+
+    socket.subscribeToCharm((charm) => {
+      setCharms((prev) => ({ ...prev, [charm.userName]: charm }))
+      setTimeout(() => {
+        setCharms((prev) => {
+          if (prev[charm.userName]?.id !== charm.id) return prev
+          const { [charm.userName]: _expired, ...rest } = prev
+          return rest
+        })
+      }, CHARM_DURATION_MS)
     });
     return () => {
       // socket.disconnectSocket();
@@ -255,8 +270,10 @@ function HomeContent({ user, token }) {
                 onChatOpen={() => setOpenChat(true)}
                 messages={messages}
                 countChat={countChat}
+                charms={charms}
               />
             )}
+            {ready && !!data?.user?.position?.user && <CharmPicker />}
           </div>
           <Chat
             user={user}
