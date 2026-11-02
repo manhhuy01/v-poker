@@ -62,7 +62,6 @@ export default function TableStage({
           <div className={styles.felt} aria-hidden="true">
             <div className={styles.feltInner}>
               <div className={styles.feltGlow} />
-              <div className={styles.feltRing} />
               <div className={styles.feltLogo}>
                 V<span>-</span>POKER
               </div>
