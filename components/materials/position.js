@@ -49,6 +49,8 @@ export default function Position({
   showdown = false,
   result,
   charm,
+  showBet = true,
+  showWin = true,
 }) {
   if (!userName) {
     return (
@@ -74,27 +76,28 @@ export default function Position({
   // The hand is only known to the owner while the hand is running; only at the
   // end of the hand should it replace the betting action.
   const isShowdown = !!showdown && !!resultLabel
-  const hasStatus = isShowdown || visibleAction || bet || winBalance || resultLabel || isThinking
+  const hasStatus = isShowdown || visibleAction || (showBet && bet) || (showWin && winBalance) || resultLabel || isThinking
   const hue = hueFromName(userName)
 
   return (
     <div
       className={styles.seat}
+      data-chip-anchor="seat"
       data-hero={isUserPlaying ? 'true' : 'false'}
       data-thinking={isThinking ? 'true' : 'false'}
       data-fold={isFold ? 'true' : 'false'}
     >
       <div className={styles.podWrap}>
         {!!cards?.length && (
-          <div className={styles.cards}>
+          <div className={styles.cards} data-chip-anchor="cards">
             {cards.map((c, i) => (
               <Card key={i} data={c} isFold={isFold} isHidden={isHiddenCard && isUserPlaying} />
             ))}
           </div>
         )}
 
-        <div className={styles.pod}>
-          <div className={styles.avatarWrap}>
+        <div className={styles.pod} data-chip-anchor="pod">
+          <div className={styles.avatarWrap} data-chip-anchor="avatar">
             <div className={styles.avatar} style={{ '--hue': hue }}>
               {userName.slice(0, 1)}
             </div>
@@ -136,16 +139,16 @@ export default function Position({
               {visibleAction}
             </span>
           )}
-          {!isShowdown && !!bet && (
+          {!isShowdown && showBet && !!bet && (
             <span className={styles.bet}>
               <span className={styles.chip} />
               {formatMoney(bet)}
             </span>
           )}
-          {!isShowdown && !!winBalance && <span className={styles.win}>+{formatMoney(winBalance)}</span>}
+          {!isShowdown && showWin && !!winBalance && <span className={styles.win}>+{formatMoney(winBalance)}</span>}
           {!!resultLabel && (isShowdown ? (
             <span className={winBalance ? styles.showdownWin : styles.hand}>
-              {!!winBalance && (
+              {showWin && !!winBalance && (
                 <span className={styles.showdownAmount}>+{formatMoney(winBalance)}</span>
               )}
               <span>{resultLabel}</span>

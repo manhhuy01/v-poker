@@ -213,17 +213,43 @@
   backdrop-filter: blur(8px);
 }
 
-.potChip {
-  width: clamp(12px, calc(var(--card-w) * 0.42), 18px);
-  height: clamp(12px, calc(var(--card-w) * 0.42), 18px);
-  border-radius: 50%;
-  background:
-    conic-gradient(#f7d98a 0 25%, #b45309 0 50%, #f7d98a 0 75%, #b45309 0);
-  box-shadow:
-    inset 0 0 0 2px rgba(0, 0, 0, 0.18),
-    inset 0 0 0 3px rgba(255, 244, 205, 0.55),
-    0 1px 2px rgba(0, 0, 0, 0.5);
+.potIcon {
+  --c: clamp(10px, calc(var(--card-w) * 0.32), 14px);
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 1px;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.55));
 }
+
+.potPile {
+  position: relative;
+  width: var(--c);
+  height: calc(var(--c) * 0.62 + (var(--n) - 1) * var(--c) * 0.3);
+}
+
+.potIconChip {
+  --face: #f7d98a;
+  --edge: #b45309;
+  position: absolute;
+  left: 0;
+  bottom: calc(var(--i) * var(--c) * 0.3 - var(--c) * 0.19);
+  width: var(--c);
+  height: var(--c);
+  border-radius: 50%;
+  /* Seen from the side: flattened discs stacked on top of each other. */
+  transform: scaleY(0.62);
+  background:
+    radial-gradient(circle at 50% 50%, var(--face) 0 32%, transparent 33%),
+    repeating-conic-gradient(var(--face) 0 22.5deg, var(--edge) 0 45deg);
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.25),
+    inset 0 0 0 1.5px rgba(255, 255, 255, 0.4),
+    0 1.5px 0 rgba(0, 0, 0, 0.45);
+}
+
+.potIconChip[data-color='red'] { --face: #fca5a5; --edge: #b91c1c; }
+.potIconChip[data-color='blue'] { --face: #bae6fd; --edge: #1d4ed8; }
+.potIconChip[data-color='green'] { --face: #bbf7d0; --edge: #047857; }
 
 .potLabel {
   font-size: clamp(7px, calc(var(--card-w) * 0.21), 10px);

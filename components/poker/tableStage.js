@@ -1,4 +1,7 @@
+import { useRef } from 'react'
+
 import Position from '../materials/position'
+import ChipLayer from './chipLayer'
 import styles from './table.module.css'
 
 // Seat index → visual slot. The CSS grid decides where each slot sits;
@@ -17,7 +20,9 @@ export default function TableStage({
   showEmptySeats = true,
   charms = {},
   className = '',
+  animateChips = false,
 }) {
+  const stageRef = useRef(null)
   const hasSeat = (pos) => {
     const data = positions?.[pos]
     if (!data) return false
@@ -30,7 +35,7 @@ export default function TableStage({
     const userNameOnSeat = seat?.user?.userName
 
     return (
-      <div className={styles.slot} data-pos={pos} key={pos}>
+      <div className={styles.slot} data-pos={pos} data-chip-seat={pos} key={pos}>
         <Position
           pos={pos}
           namePos={seat?.namePos}
@@ -52,6 +57,8 @@ export default function TableStage({
           showdown={showdown}
           result={seat?.resultCard?.name}
           charm={userNameOnSeat ? charms[userNameOnSeat] : undefined}
+          showBet={!animateChips}
+          showWin={!animateChips}
         />
       </div>
     )
@@ -60,7 +67,7 @@ export default function TableStage({
   return (
     <div className={`${styles.root} ${className}`}>
       <div className={styles.frame}>
-        <div className={styles.stage}>
+        <div className={styles.stage} ref={stageRef}>
           <div className={styles.felt} aria-hidden="true">
             <div className={styles.feltInner}>
               <div className={styles.feltGlow} />
@@ -71,6 +78,8 @@ export default function TableStage({
           </div>
 
           <div className={styles.center}>{center}</div>
+
+          {animateChips && <ChipLayer stageRef={stageRef} positions={positions} start={start} />}
 
           {POSITIONS.map((pos) => (hasSeat(pos) ? renderSeat(pos) : null))}
         </div>

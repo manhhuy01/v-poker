@@ -331,6 +331,7 @@ export default function Game({ data, onEditClick, onAddClick, onChatOpen, messag
           onEditClick={onEditClick}
           onAddClick={onAddClick}
           charms={charms}
+          animateChips
           center={(
             <>
               <ChatFloating

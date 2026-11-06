@@ -15,12 +15,81 @@ import { CHARM_TYPES, CHARM_DURATION_MS } from '../utils/charms'
 const rawData = normalFull2Data
 const MOCK_USER_NAME = 'manhhuy01'
 
+// /mock?demo=chips loops a scripted hand so the chip animations can be checked:
+// blinds → bets/raise → collect to pot → bet/all-in → collect → winner paid.
+function buildChipDemo(base) {
+  const frame = (patch) => {
+    const d = JSON.parse(JSON.stringify(base))
+    // Fill the two empty seats so every seat of a full table gets a bet.
+    ;[[5, '91', 'dealerfromhell', 88], [6, '92', 'tuannguyen', 145]].forEach(([pos, userId, userName, accBalance]) => {
+      Object.assign(d.position[pos], {
+        user: { userId, userName, accBalance, startBalance: accBalance },
+        cards: ['u', 'u'],
+        isPlaying: true,
+      })
+      if (!d.players.some((p) => p.userName === userName)) {
+        d.players.push({ userId, userName, accBalance, startBalance: accBalance })
+      }
+    })
+    d.table = { ...d.table, start: true, finish: false, isShowDown: false, pot: [{ users: [], balance: 0, isHavePlayerAllIn: false }] }
+    Object.values(d.position).forEach((p) => {
+      Object.assign(p, { betBalance: 0, winBalance: 0, isFold: false, action: '', isThinking: false })
+    })
+    patch(d)
+    return JSON.stringify(d)
+  }
+  const bets = (d, map) => Object.entries(map).forEach(([pos, [bet, action]]) => {
+    d.position[pos].betBalance = bet
+    d.position[pos].action = action || ''
+  })
+  const pot = (d, balance) => { d.table.pot = [{ users: [], balance, isHavePlayerAllIn: false }] }
+
+  const preflop = { 2: [1], 3: [2] }
+  const call6 = (pos) => [6, pos === 7 ? 'raise' : 'call']
+  return [
+    frame(() => {}),
+    // Pre-flop: blinds, calls round the table, a raise, then everyone calls it.
+    frame((d) => bets(d, preflop)),
+    frame((d) => bets(d, { ...preflop, 4: [2, 'call'] })),
+    frame((d) => bets(d, { ...preflop, 4: [2, 'call'], 5: [2, 'call'] })),
+    frame((d) => bets(d, { ...preflop, 4: [2, 'call'], 5: [2, 'call'], 6: [2, 'call'] })),
+    frame((d) => bets(d, { ...preflop, 4: [2, 'call'], 5: [2, 'call'], 6: [2, 'call'], 7: [6, 'raise'] })),
+    frame((d) => bets(d, { ...preflop, 4: [2, 'call'], 5: [2, 'call'], 6: [2, 'call'], 7: [6, 'raise'], 8: [6, 'call'], 9: [6, 'call'], 1: [6, 'call'] })),
+    frame((d) => bets(d, Object.fromEntries([1, 2, 3, 4, 5, 6, 7, 8, 9].map((p) => [p, call6(p)])))),
+    frame((d) => pot(d, 54)),
+    // Flop: bet, calls, an all-in, then the callers match it.
+    frame((d) => { pot(d, 54); bets(d, { 3: [10, 'bet'] }) }),
+    frame((d) => { pot(d, 54); bets(d, { 3: [10, 'bet'], 5: [10, 'call'], 6: [10, 'call'] }) }),
+    frame((d) => { pot(d, 54); bets(d, { 3: [10, 'bet'], 5: [10, 'call'], 6: [10, 'call'], 7: [40, 'all-in'], 1: [40, 'call'] }) }),
+    frame((d) => { pot(d, 54); bets(d, { 3: [40, 'call'], 5: [40, 'call'], 6: [40, 'call'], 7: [40, 'all-in'], 1: [40, 'call'] }) }),
+    // Finish: like the server, the last bets are swept and the pot paid out in
+    // one snapshot (here a split pot). Held for a few ticks so the winnings can be seen.
+    ...Array(3).fill(frame((d) => {
+      d.table.finish = true
+      d.position[7].winBalance = 127
+      d.position[1].winBalance = 127
+    })),
+  ]
+}
+
 function MockContent() {
   const router = useRouter()
   const [mode, setMode] = useState('playing')
   const [json, setJson] = useState(() => JSON.stringify(rawData, null, 2))
   const [error, setError] = useState('')
   const { version, ready, setVersion } = useUiVersion()
+
+  useEffect(() => {
+    if (router.query?.demo !== 'chips') return undefined
+    const frames = buildChipDemo(rawData)
+    let i = 0
+    setJson(frames[0])
+    const id = setInterval(() => {
+      i = (i + 1) % frames.length
+      setJson(frames[i])
+    }, 1400)
+    return () => clearInterval(id)
+  }, [router.query?.demo])
 
   // Dev convenience: /mock?ui=v2 previews a table version without touching the menu.
   useEffect(() => {

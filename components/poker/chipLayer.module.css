@@ -1,0 +1,202 @@
+/* Chips on the felt: bet stacks per seat and chips in flight. */
+
+.stacks,
+.flights {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Above the seats: stacks are placed clear of the pod and cards, so the only
+   thing they can overlap is a short-lived charm, and the bet should win. */
+.stacks {
+  z-index: 5;
+}
+
+/* Flying chips pass over everything on the table. */
+.flights {
+  z-index: 9;
+  overflow: visible;
+}
+
+/* ---------------- chip faces ---------------- */
+.flyChip,
+.pileChip {
+  --face: #f7d98a;
+  --edge: #b45309;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 50%, var(--face) 0 34%, transparent 35%),
+    repeating-conic-gradient(var(--face) 0 22.5deg, var(--edge) 0 45deg);
+  box-shadow:
+    inset 0 0 0 1.5px rgba(0, 0, 0, 0.22),
+    inset 0 0 0 2.5px rgba(255, 255, 255, 0.45),
+    0 1px 2px rgba(0, 0, 0, 0.55);
+}
+
+.flyChip[data-color='red'],
+.pileChip[data-color='red'] { --face: #fca5a5; --edge: #b91c1c; }
+.flyChip[data-color='blue'],
+.pileChip[data-color='blue'] { --face: #bae6fd; --edge: #1d4ed8; }
+.flyChip[data-color='green'],
+.pileChip[data-color='green'] { --face: #bbf7d0; --edge: #047857; }
+.flyChip[data-color='black'],
+.pileChip[data-color='black'] { --face: #e5e7eb; --edge: #111827; }
+
+.flyChip {
+  --size: clamp(18px, calc(var(--card-w) * 0.57), 27px);
+  position: absolute;
+  width: var(--size);
+  height: var(--size);
+  margin: calc(var(--size) / -2) 0 0 calc(var(--size) / -2);
+  opacity: 0;
+  will-change: transform, opacity;
+  filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.45));
+}
+
+/* A whole stack tossed from the seat onto the felt. */
+.flyPile {
+  --chip: clamp(16px, calc(var(--card-w) * 0.51), 24px);
+  position: absolute;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+/* Centre the pile on the anchor point (the transform belongs to the flight). */
+.flyPile > .pile {
+  display: block;
+  margin-left: calc(var(--chip) / -2);
+  margin-top: calc((var(--chip) + (var(--pile) - 1) * var(--chip) * 0.18) / -2);
+}
+
+/* ---------------- bet stack on the felt ---------------- */
+.betStack {
+  --chip: clamp(16px, calc(var(--card-w) * 0.51), 24px);
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transform: translate(-50%, -50%);
+  /* Seats grow when an action pill appears; glide instead of jumping. */
+  transition: left 0.25s ease, top 0.25s ease;
+}
+
+/* The tossed stack becomes this pile the moment it lands; the amount pops in. */
+.betStack[data-landing='true'] .pile {
+  animation: appear 0s linear var(--land-delay, 0ms) both;
+}
+
+.betStack[data-landing='true'] .amount {
+  animation: amountIn 0.22s cubic-bezier(0.3, 1.6, 0.5, 1) var(--land-delay, 0ms) both;
+}
+
+.pile {
+  position: relative;
+  width: var(--chip);
+  height: calc(var(--chip) + (var(--pile) - 1) * var(--chip) * 0.18);
+  filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.45));
+}
+
+.pileChip {
+  position: absolute;
+  left: 0;
+  bottom: calc(var(--i) * var(--chip) * 0.18);
+  width: var(--chip);
+  height: var(--chip);
+  transform: scaleY(0.86);
+}
+
+.amount {
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: rgba(4, 10, 16, 0.82);
+  border: 1px solid rgba(233, 196, 106, 0.35);
+  color: #fbe6b0;
+  font-size: calc(var(--font-action, 10px) * 1.5);
+  font-weight: 900;
+  line-height: 1.3;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  box-shadow: 0 4px 10px -4px rgba(0, 0, 0, 0.8);
+}
+
+.amount[data-bump='true'] {
+  animation: bump 0.3s ease-out var(--land-delay, 0ms) both;
+}
+
+/* ---------------- winnings in front of the winner ---------------- */
+.winStack {
+  --chip: clamp(16px, calc(var(--card-w) * 0.51), 24px);
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  transform: translate(-50%, -50%);
+  transition: left 0.25s ease, top 0.25s ease;
+}
+
+.winPiles {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+}
+
+.winAmount {
+  background: linear-gradient(180deg, rgba(120, 78, 8, 0.92), rgba(60, 36, 4, 0.94));
+  border-color: rgba(253, 230, 138, 0.7);
+  color: #fef3c7;
+  box-shadow: 0 0 14px rgba(251, 191, 36, 0.35), 0 4px 10px -4px rgba(0, 0, 0, 0.8);
+}
+
+/* Each pile grows into view as the first chip aimed at it lands. */
+.winStack[data-landing='true'] .pile {
+  animation: pileIn 0.2s cubic-bezier(0.3, 1.5, 0.5, 1) var(--land-delay, 0ms) both;
+}
+
+.winStack[data-landing='true'] .winAmount {
+  animation: amountIn 0.24s cubic-bezier(0.3, 1.6, 0.5, 1) var(--land-delay, 0ms) both;
+}
+
+@keyframes pileIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scaleY(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes appear {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes amountIn {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes bump {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.22); color: #fff; }
+  100% { transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .winStack[data-landing='true'] .pile,
+  .winStack[data-landing='true'] .winAmount,
+  .betStack[data-landing='true'] .pile,
+  .betStack[data-landing='true'] .amount,
+  .amount[data-bump='true'] {
+    animation: none;
+  }
+}
