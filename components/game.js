@@ -332,6 +332,19 @@ export default function Game({ data, onEditClick, onAddClick, onChatOpen, messag
           onAddClick={onAddClick}
           charms={charms}
           animateChips
+          heroAction={isUserPlaying ? (
+            // Next to your own seat so it's in thumb reach, not up in the corner.
+            <button
+              type="button"
+              className={`${styles.utilBtn} ${styles.cardToggle}`}
+              data-active={!isHiddenCard}
+              onClick={hideCard}
+              title={isHiddenCard ? 'Hiện bài của tôi' : 'Ẩn bài của tôi'}
+              aria-label={isHiddenCard ? 'Hiện bài của tôi' : 'Ẩn bài của tôi'}
+            >
+              {isHiddenCard ? <IconEyeOff /> : <IconEye />}
+            </button>
+          ) : null}
           center={(
             <>
               <ChatFloating
@@ -352,18 +365,6 @@ export default function Game({ data, onEditClick, onAddClick, onChatOpen, messag
         />
 
         <div className={styles.utils}>
-          {isUserPlaying && (
-            <button
-              type="button"
-              className={styles.utilBtn}
-              data-active={!isHiddenCard}
-              onClick={hideCard}
-              title={isHiddenCard ? 'Hiện bài của tôi' : 'Ẩn bài của tôi'}
-              aria-label={isHiddenCard ? 'Hiện bài của tôi' : 'Ẩn bài của tôi'}
-            >
-              {isHiddenCard ? <IconEyeOff /> : <IconEye />}
-            </button>
-          )}
           <button
             type="button"
             className={styles.utilBtn}

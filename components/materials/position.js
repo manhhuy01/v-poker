@@ -51,6 +51,7 @@ export default function Position({
   charm,
   showBet = true,
   showWin = true,
+  heroAction = null,
 }) {
   if (!userName) {
     return (
@@ -129,7 +130,9 @@ export default function Position({
           </div>
         </div>
 
-        {!!charm && <CharmBadge key={charm.id} type={charm.type} className={styles.charm} />}
+        {!!heroAction && <div className={styles.heroAction}>{heroAction}</div>}
+
+        {!!charm && <CharmBadge key={charm.id} type={charm.type} value={charm.value} className={styles.charm} />}
       </div>
 
       {!!hasStatus && (

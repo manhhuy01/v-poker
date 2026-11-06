@@ -40,9 +40,9 @@ export const sendMessage = ({ message, userName }) => {
   socket.emit('sendMessage', { userName, message })
 }
 
-export const sendCharm = ({ type }) => {
+export const sendCharm = ({ type, value }) => {
   if (!socket) return;
-  socket.emit('sendCharm', { type })
+  socket.emit('sendCharm', type === 'dice' ? { type, value } : { type })
 }
 
 export const subscribeToCharm = (cb) => {

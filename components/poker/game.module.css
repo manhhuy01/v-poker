@@ -85,6 +85,17 @@
   height: 14px;
 }
 
+.utilBtn.cardToggle {
+  width: 34px;
+  height: 34px;
+  border-radius: 11px;
+}
+
+.utilBtn.cardToggle svg {
+  width: 18px;
+  height: 18px;
+}
+
 .utilBtn[data-active='true'] {
   color: #fbbf24;
   border-color: rgba(251, 191, 36, 0.45);

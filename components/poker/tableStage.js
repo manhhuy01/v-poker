@@ -21,6 +21,7 @@ export default function TableStage({
   charms = {},
   className = '',
   animateChips = false,
+  heroAction = null,
 }) {
   const stageRef = useRef(null)
   const hasSeat = (pos) => {
@@ -59,6 +60,7 @@ export default function TableStage({
           charm={userNameOnSeat ? charms[userNameOnSeat] : undefined}
           showBet={!animateChips}
           showWin={!animateChips}
+          heroAction={!!userName && userNameOnSeat === userName ? heroAction : null}
         />
       </div>
     )

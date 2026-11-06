@@ -4,9 +4,10 @@ import styles from './charm.module.css'
 
 // The charm floating next to a seat. Give it `key={charm.id}` so a new charm
 // from the same player restarts the animation.
-export default function CharmBadge({ type, className = '' }) {
-  const label = CHARMS.find((c) => c.type === type)?.label
-  if (!label) return null
+export default function CharmBadge({ type, value, className = '' }) {
+  const name = CHARMS.find((c) => c.type === type)?.label
+  if (!name) return null
+  const label = type === 'dice' && value ? `${name}: ${value}` : name
 
   return (
     <div
@@ -17,7 +18,7 @@ export default function CharmBadge({ type, className = '' }) {
       aria-label={label}
       title={label}
     >
-      <CharmIcon type={type} />
+      <CharmIcon type={type} value={value} roll />
     </div>
   )
 }

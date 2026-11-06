@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom'
 
 import * as socket from '../../api/socket'
 import CharmIcon from './charmIcon'
-import { CHARMS } from '../../utils/charms'
+import { CHARMS, rollDice } from '../../utils/charms'
 import styles from './charm.module.css'
 
 // Lives inside the action bar. The menu is portalled to <body> and placed above
@@ -44,7 +44,7 @@ export default function CharmPicker({ onPick: onPickProp = socket.sendCharm, cla
   }
 
   const onPick = (type) => {
-    onPickProp({ type })
+    onPickProp(type === 'dice' ? { type, value: rollDice() } : { type })
     setMenuStyle(null)
   }
 

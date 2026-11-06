@@ -127,11 +127,16 @@ function MockContent() {
     const seated = Object.values(data?.position || {}).map((p) => p?.user?.userName).filter(Boolean)
     setCharms(Object.fromEntries(seated.map((userName, i) => [
       userName,
-      { id: `${charmCycle}-${i}`, type: CHARM_TYPES[i % CHARM_TYPES.length] },
+      {
+        id: `${charmCycle}-${i}`,
+        type: CHARM_TYPES[i % CHARM_TYPES.length],
+        // Stable per cycle (data re-renders every demo tick), new roll each cycle.
+        value: ((charmCycle + i) % 6) + 1,
+      },
     ])))
   }, [data, charmCycle])
-  const onPickCharm = ({ type }) => {
-    setCharms((prev) => ({ ...prev, [data?.user?.userName]: { id: Date.now(), type } }))
+  const onPickCharm = ({ type, value }) => {
+    setCharms((prev) => ({ ...prev, [data?.user?.userName]: { id: Date.now(), type, value } }))
   }
   const GameView = version === UI_VERSIONS.V1 ? GameV1 : GameV2
   return (

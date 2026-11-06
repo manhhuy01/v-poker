@@ -1,5 +1,6 @@
 import Card from './card'
 import CharmBadge from '../../charm/charmBadge'
+import { IconEye, IconEyeOff } from '../../poker/icons'
 
 const MAP_RS = {
   'highHand': 'Bluff',
@@ -223,17 +224,28 @@ export default function position({
                   return <Card data={c} key={i} isFold={isFold} isHidden={isHiddenCard && isUserPlaying} />
                 })
               }
+              {/* The charm stands right on top of the cards: it only shows for a few seconds. */}
+              {!!charm && <CharmBadge key={charm.id} type={charm.type} value={charm.value} className="left-1/2 -ml-[17px] bottom-0" />}
             </div>
             {
               !!result && !isFold && !isHiddenCard && <span className="whitespace-nowrap z-20 rounded pl-1 pr-1 absolute -bottom-16 bg-blue-900 text-white bg-opacity-70 font-bold">{MAP_RS[result]}</span>
             }
-            {!!charm && <CharmBadge key={charm.id} type={charm.type} className="-top-12 right-12" />}
             <div onClick={() => onEditClick(userName)} className="text-white pr-1 pl-1 rounded border-yellow-600 border bg-gray-900 text-xs z-10 cursor-pointer">{userName}</div>
             {
               !!namePos && <div className={`${posClassName} absolute font-extrabold text-xs z-10 pl-1 pr-1 rounded -bottom-12`} >{namePos}</div>
             }
             <div className="bg-gray-900 text-blue-400 pr-2 pl-2 rounded z-10 text-xs w-max">${isPlaying && !balance && start ? 'ALL IN' : balance}</div>
-            { isUserPlaying && <div onClick={hideCard} className={`${isHiddenCard ? 'text-red-500' : 'text-white'} absolute left-16 top-0 text-xl text-white cursor-pointer`}>Θ</div>}
+            {isUserPlaying && (
+              <button
+                type="button"
+                onClick={hideCard}
+                className={`${isHiddenCard ? 'text-red-500' : 'text-white'} absolute left-16 -top-1 z-20 flex h-7 w-7 items-center justify-center cursor-pointer`}
+                title={isHiddenCard ? 'Hiện bài của tôi' : 'Ẩn bài của tôi'}
+                aria-label={isHiddenCard ? 'Hiện bài của tôi' : 'Ẩn bài của tôi'}
+              >
+                {isHiddenCard ? <IconEyeOff className="h-5 w-5" /> : <IconEye className="h-5 w-5" />}
+              </button>
+            )}
 
             <div className={`${chipClassName} transform transition transition-transform absolute flex w-max flex-col items-center justify-center text-xs font-bold text-white`}>
               {
