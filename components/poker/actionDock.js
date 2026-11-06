@@ -10,7 +10,6 @@ import {
   IconShow,
   IconShuffle,
 } from './icons'
-import { CuteBet, CuteCall, CuteCheck, CuteFold, CuteShow } from './cuteIcons'
 import styles from './actionDock.module.css'
 
 const Leading = ({ loading, children }) => (
@@ -64,11 +63,7 @@ export default function ActionDock({
   hint = '',
   quickChat = null,
   charm = null,
-  cute = false,
 }) {
-  const actionIcons = cute
-    ? { fold: <CuteFold />, check: <CuteCheck />, call: <CuteCall />, bet: <CuteBet />, show: <CuteShow /> }
-    : { fold: <IconFold />, check: <IconCheck />, call: <IconCall />, bet: <IconBet />, show: <IconShow /> }
   const hasDealerActions = dealerActions.preFlop || dealerActions.start || dealerActions.showAll
     || dealerActions.reset || dealerActions.shuffle
 
@@ -112,7 +107,7 @@ export default function ActionDock({
                   onClick={onFold}
                   disabled={loadingPlayer}
                 >
-                  <Leading loading={loadingPlayer}>{actionIcons.fold}</Leading>
+                  <Leading loading={loadingPlayer}><IconFold /></Leading>
                   <span className={styles.btnLabel}>Fold</span>
                 </button>
               )}
@@ -123,7 +118,7 @@ export default function ActionDock({
                   onClick={onCheck}
                   disabled={loadingPlayer}
                 >
-                  <Leading loading={loadingPlayer}>{actionIcons.check}</Leading>
+                  <Leading loading={loadingPlayer}><IconCheck /></Leading>
                   <span className={styles.btnLabel}>Check</span>
                 </button>
               )}
@@ -134,7 +129,7 @@ export default function ActionDock({
                   onClick={onCall}
                   disabled={loadingPlayer}
                 >
-                  <Leading loading={loadingPlayer}>{actionIcons.call}</Leading>
+                  <Leading loading={loadingPlayer}><IconCall /></Leading>
                   <span className={styles.btnLabel}>Call</span>
                 </button>
               )}
@@ -144,7 +139,7 @@ export default function ActionDock({
                   className={`${styles.btn} ${styles.btnBet}`}
                   onClick={onBet}
                 >
-                  {actionIcons.bet}
+                  <IconBet />
                   <span className={styles.btnLabel}>Bet</span>
                 </button>
               )}
@@ -155,7 +150,7 @@ export default function ActionDock({
                   onClick={onShow}
                   disabled={loadingPlayer}
                 >
-                  <Leading loading={loadingPlayer}>{actionIcons.show}</Leading>
+                  <Leading loading={loadingPlayer}><IconShow /></Leading>
                   <span className={styles.btnLabel}>Show</span>
                 </button>
               )}

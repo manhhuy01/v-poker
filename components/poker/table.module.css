@@ -5,7 +5,6 @@
    ───────────────────────────────────────────────────────────── */
 
 .root {
-  composes: pk-table-root from global;
   position: relative;
   width: 100%;
   height: 100%;
@@ -19,7 +18,6 @@
 }
 
 .frame {
-  composes: pk-table-frame from global;
   position: relative;
   width: min(100%, 1680px);
   height: min(100%, 960px);
@@ -30,7 +28,6 @@
 }
 
 .stage {
-  composes: pk-stage from global;
   --card-w: clamp(24px, min(7.4cqw, 8.6cqh), 56px);
   --seat-card-w: clamp(24px, min(5.2cqw, 6.6cqh), 40px);
   --pod-w: clamp(74px, min(12.5cqw, 25cqh), 168px);
@@ -51,7 +48,6 @@
 
 /* ---------------- felt / table ---------------- */
 .felt {
-  composes: pk-felt from global;
   position: absolute;
   inset: 4% 0.8%;
   z-index: 0;
@@ -79,7 +75,6 @@
 }
 
 .feltInner {
-  composes: pk-felt-inner from global;
   position: absolute;
   inset: var(--rail);
   border-radius: inherit;
@@ -104,7 +99,6 @@
 }
 
 .feltGlow {
-  composes: pk-felt-glow from global;
   position: absolute;
   inset: 0;
   background:
@@ -113,7 +107,6 @@
 }
 
 .feltLogo {
-  composes: pk-felt-logo from global;
   position: absolute;
   left: 0;
   right: 0;
@@ -137,7 +130,6 @@
 
 /* ---------------- seat ring (ellipse) ---------------- */
 .slot {
-  composes: pk-slot from global;
   position: absolute;
   z-index: 4;
   display: flex;
@@ -171,7 +163,6 @@
 
 /* ---------------- table centre ---------------- */
 .center {
-  composes: pk-center from global;
   position: absolute;
   inset: 0;
   z-index: 3;
@@ -191,7 +182,6 @@
 
 /* ---------------- pot ---------------- */
 .centerCol {
-  composes: pk-center-col from global;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -203,7 +193,6 @@
 }
 
 .potStack {
-  composes: pk-pot-stack from global;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -211,7 +200,6 @@
 }
 
 .potPill {
-  composes: pk-pot from global;
   display: inline-flex;
   align-items: center;
   gap: 0.45em;
@@ -226,7 +214,6 @@
 }
 
 .potChip {
-  composes: pk-pot-chip from global;
   width: clamp(12px, calc(var(--card-w) * 0.42), 18px);
   height: clamp(12px, calc(var(--card-w) * 0.42), 18px);
   border-radius: 50%;
@@ -239,7 +226,6 @@
 }
 
 .potLabel {
-  composes: pk-pot-label from global;
   font-size: clamp(7px, calc(var(--card-w) * 0.21), 10px);
   font-weight: 800;
   letter-spacing: 0.16em;
@@ -248,7 +234,6 @@
 }
 
 .potValue {
-  composes: pk-pot-value from global;
   font-size: clamp(10px, calc(var(--card-w) * 0.36), 17px);
   font-weight: 900;
   letter-spacing: -0.01em;
@@ -264,7 +249,6 @@
 
 /* ---------------- community cards ---------------- */
 .board {
-  composes: pk-board from global;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -288,7 +272,6 @@
 
 /* ---------------- tip dealer ---------------- */
 .tipBtn {
-  composes: pk-tip-btn from global;
   display: inline-flex;
   align-items: center;
   gap: 0.45em;

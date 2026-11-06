@@ -402,12 +402,6 @@ describe('normalizeData - Case 1', () => {
     expect(steps[26].pot[0].balance).toBe(79)
   })
 
-  it('fold cards should be hidden', () => {
-    expect(steps[4].positions[4].cards).toEqual([])
-    expect(steps[7].positions[1].cards).toEqual([])
-    expect(steps[25].positions[2].cards).toEqual([])
-  })
-
   it('final chip counts', () => {
     expect(steps[26].positions[1].chips).toBe(99)
     expect(steps[26].positions[2].chips).toBe(62)

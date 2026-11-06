@@ -1,7 +1,6 @@
 /* Bottom command deck: dealer tools, hero actions, auto-action toggles. */
 
 .dock {
-  composes: pk-dock from global;
   position: relative;
   flex: 0 0 auto;
   z-index: 30;
@@ -28,7 +27,6 @@
 }
 
 .inner {
-  composes: pk-dock-inner from global;
   width: 100%;
   max-width: 1180px;
   margin: 0 auto;
@@ -38,7 +36,6 @@
 }
 
 .topBar {
-  composes: pk-dock-top from global;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -51,7 +48,6 @@
 }
 
 .controls {
-  composes: pk-controls from global;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -61,7 +57,6 @@
 
 /* mobile: every group owns a full row */
 .group {
-  composes: pk-group from global;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -89,7 +84,6 @@
 
 /* ---------------- buttons ---------------- */
 .btn {
-  composes: pk-btn from global;
   position: relative;
   display: inline-flex;
   flex: 1 1 0;
@@ -147,7 +141,6 @@
 }
 
 .btnLabel {
-  composes: pk-btn-label from global;
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -156,7 +149,6 @@
 
 /* dealer */
 .btnDealer {
-  composes: pk-btn-dealer from global;
   height: 42px;
   background: linear-gradient(180deg, rgba(26, 38, 56, 0.82) 0%, rgba(8, 13, 21, 0.94) 100%);
   color: #c7d3e3;
@@ -174,21 +166,18 @@
 
 /* hero actions */
 .btnFold {
-  composes: pk-btn-fold from global;
   background: linear-gradient(180deg, rgba(72, 20, 32, 0.72) 0%, rgba(28, 8, 14, 0.95) 100%);
   border-color: rgba(244, 63, 94, 0.38);
   color: #fecdd3;
 }
 
 .btnCheck {
-  composes: pk-btn-check from global;
   background: linear-gradient(180deg, rgba(6, 78, 59, 0.9) 0%, rgba(3, 40, 32, 0.98) 100%);
   border-color: rgba(52, 211, 153, 0.42);
   color: #d1fae5;
 }
 
 .btnCall {
-  composes: pk-btn-call from global;
   background: linear-gradient(180deg, #0ea5a4 0%, #0f766e 52%, #115e59 100%);
   border-color: rgba(94, 234, 212, 0.45);
   color: #f0fdfa;
@@ -198,7 +187,6 @@
 }
 
 .btnBet {
-  composes: pk-btn-bet from global;
   background: linear-gradient(180deg, #f8d98a 0%, #e2b34c 46%, #b9822a 100%);
   border-color: rgba(255, 244, 205, 0.65);
   color: #2b1a02;
@@ -208,7 +196,6 @@
 }
 
 .btnShow {
-  composes: pk-btn-show from global;
   background: linear-gradient(180deg, #8b5cf6 0%, #6d28d9 55%, #4c1d95 100%);
   border-color: rgba(196, 181, 253, 0.5);
   color: #f5f3ff;
@@ -233,7 +220,6 @@
 
 /* ---------------- auto toggles ---------------- */
 .autoBtn {
-  composes: pk-auto from global;
   display: inline-flex;
   flex: 0 1 auto;
   align-items: center;
@@ -262,7 +248,6 @@
 }
 
 .autoDot {
-  composes: pk-auto-dot from global;
   width: 6px;
   height: 6px;
   border-radius: 50%;
@@ -291,7 +276,6 @@
 
 /* ---------------- hint ---------------- */
 .hint {
-  composes: pk-dock-hint from global;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -309,7 +293,6 @@
 }
 
 .hintDot {
-  composes: pk-dock-hint-dot from global;
   width: 5px;
   height: 5px;
   border-radius: 50%;

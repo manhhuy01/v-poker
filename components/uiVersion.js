@@ -14,37 +14,22 @@ export function UiVersionProvider({ userName, children }) {
   const [version, setVersionState] = useState(DEFAULT_UI_VERSION)
   const [ready, setReady] = useState(false)
 
-  const applyDocumentVersion = useCallback((nextVersion) => {
-    if (typeof document === 'undefined') return
-    document.documentElement.dataset.uiVersion = nextVersion
-  }, [])
-
   useEffect(() => {
-    const storedVersion = readUiVersion(userName)
-    applyDocumentVersion(storedVersion)
-    setVersionState(storedVersion)
+    setVersionState(readUiVersion(userName))
     setReady(true)
 
     const onStorage = (event) => {
       if (event.key !== uiVersionStorageKey(userName)) return
-      const nextVersion = normalizeUiVersion(event.newValue)
-      applyDocumentVersion(nextVersion)
-      setVersionState(nextVersion)
+      setVersionState(normalizeUiVersion(event.newValue))
     }
 
     window.addEventListener('storage', onStorage)
-    return () => {
-      window.removeEventListener('storage', onStorage)
-      if (typeof document !== 'undefined') delete document.documentElement.dataset.uiVersion
-    }
-  }, [userName, applyDocumentVersion])
+    return () => window.removeEventListener('storage', onStorage)
+  }, [userName])
 
   const setVersion = useCallback((nextVersion) => {
-    const savedVersion = writeUiVersion(userName, nextVersion)
-    // Apply before the state update so the new skin never flashes the old one.
-    applyDocumentVersion(savedVersion)
-    setVersionState(savedVersion)
-  }, [userName, applyDocumentVersion])
+    setVersionState(writeUiVersion(userName, nextVersion))
+  }, [userName])
 
   const value = useMemo(() => ({ version, setVersion, ready }), [version, setVersion, ready])
 

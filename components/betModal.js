@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import Modal from './modal'
 import styles from './poker/betModal.module.css'
 
-export default function BetModal({ isOpen, onClose, onConfirm, loading, data, theme }) {
+export default function BetModal({ isOpen, onClose, onConfirm, loading, data }) {
   const [betValue, setBetValue] = useState(0)
   const [sliderIndex, setSliderIndex] = useState(0)
   const betInputRef = useRef(null)
@@ -65,7 +65,6 @@ export default function BetModal({ isOpen, onClose, onConfirm, loading, data, th
       onCancel={onClose}
       onConfirm={handleConfirm}
       position="top"
-      theme={theme}
     >
       <div className={styles.body}>
         <div className={styles.head}>

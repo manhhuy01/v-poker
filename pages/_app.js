@@ -1,6 +1,5 @@
 
 import '../styles/globals.css';
-import '../styles/theme-v3.css';
 
 import { ToastProvider } from 'react-toast-notifications';
 

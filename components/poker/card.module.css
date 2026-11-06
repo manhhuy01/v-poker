@@ -2,7 +2,6 @@
    --seat-card-w (player seats) inherited from the table stage. */
 
 .card {
-  composes: pk-card from global;
   --w: var(--card-w, 36px);
   position: relative;
   width: var(--w);
@@ -39,7 +38,6 @@
 
 /* ---------- front ---------- */
 .face {
-  composes: pk-face from global;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -59,20 +57,26 @@
 }
 
 .faceRed {
-  composes: pk-face-red from global;
   color: #d71f3f;
 }
 
 .faceBlack {
-  composes: pk-face-black from global;
   color: #111827;
 }
 
+/* Four-colour deck: diamonds are blue, clubs are green. */
+.faceBlue {
+  color: #1d4ed8;
+}
+
+.faceGreen {
+  color: #15803d;
+}
+
 .rank {
-  composes: pk-rank from global;
   position: relative;
   z-index: 1;
-  font-size: calc(var(--w) * 0.52);
+  font-size: calc(var(--w) * 0.46);
   line-height: 0.92;
   font-weight: 900;
   letter-spacing: -0.05em;
@@ -80,22 +84,22 @@
 }
 
 .rankSmall {
-  composes: pk-rank-small from global;
-  font-size: calc(var(--w) * 0.43);
+  font-size: calc(var(--w) * 0.4);
   letter-spacing: -0.07em;
 }
 
+/* Main suit pip: 1.7x the original size, horizontally centred and resting on
+   the lower edge of the card so the face keeps a natural layout. */
 .suit {
-  composes: pk-suit from global;
   position: relative;
   z-index: 1;
-  align-self: flex-end;
-  font-size: calc(var(--w) * 0.46);
+  align-self: center;
+  font-size: calc(var(--w) * 0.782);
   line-height: 0.8;
+  pointer-events: none;
 }
 
 .suitCorner {
-  composes: pk-suit-corner from global;
   position: absolute;
   z-index: 1;
   right: calc(var(--w) * 0.1);
@@ -107,7 +111,6 @@
 
 /* ---------- back ---------- */
 .back {
-  composes: pk-back from global;
   transform: rotateY(180deg);
   background:
     radial-gradient(circle at 50% 42%, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0) 58%),
@@ -146,7 +149,6 @@
 
 /* dim / folded cards */
 .folded {
-  composes: pk-folded from global;
   opacity: 0.5;
   filter: grayscale(0.55) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.4));
 }

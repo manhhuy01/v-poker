@@ -1,7 +1,6 @@
 export const UI_VERSIONS = {
   V1: 'v1',
   V2: 'v2',
-  V3: 'v3',
 }
 
 export const UI_VERSION_VALUES = Object.values(UI_VERSIONS)
@@ -10,6 +9,9 @@ export const DEFAULT_UI_VERSION = UI_VERSIONS.V1
 
 export const UI_VERSION_STORAGE_PREFIX = 'v-poker:ui-version'
 
+// Retired skins (e.g. the old V3 "Ngọt ngào" table) are no longer valid values,
+// so a saved version that no longer exists falls back to the default instead of
+// leaving the user on a table that has no stylesheet.
 export function normalizeUiVersion(value) {
   return UI_VERSION_VALUES.includes(value) ? value : DEFAULT_UI_VERSION
 }

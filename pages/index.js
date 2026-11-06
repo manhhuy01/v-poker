@@ -261,7 +261,6 @@ function HomeContent({ user, token }) {
             {ready && (
               <GameView
                 key={version}
-                uiVersion={version}
                 data={data}
                 user={user}
                 onEditClick={onEditClick}

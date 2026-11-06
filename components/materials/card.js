@@ -5,9 +5,16 @@ const REGEX = /(.*)(s|h|c|d)/
 
 const SUITS = {
   s: { symbol: '♠', tone: 'black' },
-  c: { symbol: '♣', tone: 'black' },
+  c: { symbol: '♣', tone: 'green' },
   h: { symbol: '♥', tone: 'red' },
-  d: { symbol: '♦', tone: 'red' },
+  d: { symbol: '♦', tone: 'blue' },
+}
+
+const TONE_CLASSES = {
+  black: styles.faceBlack,
+  red: styles.faceRed,
+  blue: styles.faceBlue,
+  green: styles.faceGreen,
 }
 
 export default function Card({ data = 'u', isFold, isHidden }) {
@@ -44,7 +51,7 @@ export default function Card({ data = 'u', isFold, isHidden }) {
 
   const num = match[1]
   const suit = SUITS[match[2]] || SUITS.s
-  const toneClass = suit.tone === 'red' ? styles.faceRed : styles.faceBlack
+  const toneClass = TONE_CLASSES[suit.tone] || styles.faceBlack
   const faceClass = [styles.face, toneClass].join(' ')
 
   return (

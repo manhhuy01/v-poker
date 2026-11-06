@@ -22,7 +22,7 @@ function MockContent() {
   const [error, setError] = useState('')
   const { version, ready, setVersion } = useUiVersion()
 
-  // Dev convenience: /mock?ui=v3 previews a skin without touching the menu.
+  // Dev convenience: /mock?ui=v2 previews a table version without touching the menu.
   useEffect(() => {
     const fromQuery = router.query?.ui
     if (typeof fromQuery === 'string' && UI_VERSION_VALUES.includes(fromQuery)) {
@@ -91,7 +91,6 @@ function MockContent() {
             {ready && (
               <GameView
                 key={version}
-                uiVersion={version}
                 data={data}
                 user={user}
                 onEditClick={noop}
