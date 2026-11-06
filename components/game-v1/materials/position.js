@@ -1,6 +1,7 @@
 import Card from './card'
 import CharmBadge from '../../charm/charmBadge'
 import { IconEye, IconEyeOff } from '../../poker/icons'
+import { positionName } from '../../../utils/positions'
 
 const MAP_RS = {
   'highHand': 'Bluff',
@@ -12,6 +13,19 @@ const MAP_RS = {
   'straight': 'Sảnh',
   'flush': 'Thùng',
   'straightFlush': 'Thùng fá Sảnh'
+}
+
+// Mỗi vị trí một màu để nhìn bàn là biết ngay ai đang ở đâu.
+const POSITION_COLORS = {
+  D: 'bg-yellow-300 text-yellow-700',
+  SB: 'bg-blue-300 text-blue-700',
+  BB: 'bg-red-300 text-red-700',
+  CO: 'bg-violet-300 text-violet-800',
+  UTG: 'bg-emerald-300 text-emerald-800',
+  HJ: 'bg-orange-300 text-orange-800',
+  LJ: 'bg-pink-300 text-pink-800',
+  'UTG+1': 'bg-teal-300 text-teal-800',
+  'UTG+2': 'bg-indigo-300 text-indigo-800',
 }
 
 export default function position({
@@ -184,21 +198,7 @@ export default function position({
     }
   }
 
-  let posClassName
-  switch (namePos) {
-    case 'D':
-      posClassName = 'bg-yellow-300 text-yellow-700'
-      break;
-    case 'SB':
-      posClassName = 'bg-blue-300 text-blue-700'
-      break;
-    case 'BB':
-      posClassName = 'bg-red-300 text-red-700'
-      break
-    default:
-      break;
-
-  }
+  const posClassName = POSITION_COLORS[namePos] || 'bg-gray-200 text-gray-800'
   const visibleAction = action && action !== 'fold' ? action : '';
   const actionClassName = {
     'all-in': 'bg-red-600 text-white border-red-200 shadow-red-900/80',
@@ -232,7 +232,14 @@ export default function position({
             }
             <div onClick={() => onEditClick(userName)} className="text-white pr-1 pl-1 rounded border-yellow-600 border bg-gray-900 text-xs z-10 cursor-pointer">{userName}</div>
             {
-              !!namePos && <div className={`${posClassName} absolute font-extrabold text-xs z-10 pl-1 pr-1 rounded -bottom-12`} >{namePos}</div>
+              !!namePos && (
+                <div
+                  title={positionName(namePos) || undefined}
+                  className={`${posClassName} absolute font-extrabold text-xs z-10 pl-1 pr-1 rounded -bottom-12`}
+                >
+                  {namePos}
+                </div>
+              )
             }
             <div className="bg-gray-900 text-blue-400 pr-2 pl-2 rounded z-10 text-xs w-max">${isPlaying && !balance && start ? 'ALL IN' : balance}</div>
             {isUserPlaying && (

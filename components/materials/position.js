@@ -1,6 +1,7 @@
 import Card from './card'
 import CharmBadge from '../charm/charmBadge'
 import { IconPlus } from '../poker/icons'
+import { positionName } from '../../utils/positions'
 import styles from '../poker/seat.module.css'
 
 const MAP_RS = {
@@ -122,7 +123,11 @@ export default function Position({
                 {isAllIn ? 'ALL IN' : `$${formatMoney(balance)}`}
               </span>
               {!!namePos && (
-                <span className={styles.pos} data-pos={namePos}>
+                <span
+                  className={styles.pos}
+                  data-pos={namePos}
+                  title={positionName(namePos) || undefined}
+                >
                   {namePos}
                 </span>
               )}

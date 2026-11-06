@@ -230,6 +230,7 @@
   font-weight: 900;
   line-height: 1;
   letter-spacing: 0.04em;
+  white-space: nowrap;
 }
 
 .pos[data-pos='D'] {
@@ -238,6 +239,7 @@
   box-shadow: 0 0 10px rgba(233, 196, 106, 0.4);
 }
 
+/* Mỗi vị trí một màu tươi để đọc bàn nhanh; D vẫn nổi nhất nhờ viền sáng. */
 .pos[data-pos='SB'] {
   background: linear-gradient(180deg, #a5e3ff 0%, #1d9bd1 100%);
   color: #052638;
@@ -246,6 +248,44 @@
 .pos[data-pos='BB'] {
   background: linear-gradient(180deg, #ffb3c1 0%, #e11d48 100%);
   color: #3d0614;
+}
+
+.pos[data-pos='CO'] {
+  background: linear-gradient(180deg, #d8b4fe 0%, #8b5cf6 100%);
+  color: #1e0b3d;
+}
+
+.pos[data-pos='UTG'] {
+  background: linear-gradient(180deg, #a7f3d0 0%, #10b981 100%);
+  color: #04231a;
+}
+
+.pos[data-pos='HJ'] {
+  background: linear-gradient(180deg, #fed7aa 0%, #f97316 100%);
+  color: #3a1403;
+}
+
+.pos[data-pos='LJ'] {
+  background: linear-gradient(180deg, #fbcfe8 0%, #ec4899 100%);
+  color: #3d0724;
+}
+
+.pos[data-pos='UTG+1'] {
+  background: linear-gradient(180deg, #99f6e4 0%, #14b8a6 100%);
+  color: #04231f;
+}
+
+.pos[data-pos='UTG+2'] {
+  background: linear-gradient(180deg, #c7d2fe 0%, #6366f1 100%);
+  color: #14103d;
+}
+
+/* UTG+1 / UTG+2 dài hơn các ký hiệu khác nên thu nhỏ chữ cho vừa ghế. */
+.pos[data-pos='UTG+1'],
+.pos[data-pos='UTG+2'] {
+  padding: 2px 3px;
+  font-size: calc(var(--font-badge, 8px) * 0.82);
+  letter-spacing: 0;
 }
 
 /* ---------------- status pills ---------------- */
