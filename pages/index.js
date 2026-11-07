@@ -68,10 +68,6 @@ function HomeContent({ user, token }) {
   const [playTipSound] = useSound('/tip.mp3');
   const [playCashSound] = useSound('/cash.mp3');
   const [playShuffleSound] = useSound('/shuffle.mp3');
-  let betSounds = [1, 2, 3, 4, 5, 6, 7].map(i => {
-    const [playGGSound] = useSound(`/bet_${i}.mp3`);
-    return playGGSound
-  })
   const [openLobby, setOpenLobby] = useState(false);
   const [openChat, setOpenChat] = useState(false);
   const { addToast } = useToasts()
@@ -165,9 +161,6 @@ function HomeContent({ user, token }) {
     switch (notification.action) {
       case 'BET':
         playChipSound();
-        setTimeout(() => {
-          betSounds[notification.indexSound % 7 || 0]();
-        }, 500);
         break;
       case 'CALL':
         playChipSound();
