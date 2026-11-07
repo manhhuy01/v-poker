@@ -909,3 +909,10 @@
   bottom: calc(100% - var(--seat-card-h) * var(--cards-overlap, 0.18));
   margin-left: -17px;
 }
+
+/* The hero is looking at their own hole cards: stand the charm just to the
+   right of them instead, bottom-aligned with the cards. */
+.seat[data-hero='true'] .charm {
+  left: calc(50% + var(--seat-card-w) + 6px);
+  margin-left: 0;
+}

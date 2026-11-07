@@ -224,8 +224,16 @@ export default function position({
                   return <Card data={c} key={i} isFold={isFold} isHidden={isHiddenCard && isUserPlaying} />
                 })
               }
-              {/* The charm stands right on top of the cards: it only shows for a few seconds. */}
-              {!!charm && <CharmBadge key={charm.id} type={charm.type} value={charm.value} className="left-1/2 -ml-[17px] bottom-0" />}
+              {/* The charm stands right on top of the cards: it only shows for a few seconds.
+                  On the hero's own seat it stands just to the right so their hole cards stay visible. */}
+              {!!charm && (
+                <CharmBadge
+                  key={charm.id}
+                  type={charm.type}
+                  value={charm.value}
+                  className={isUserPlaying ? 'left-full ml-1.5 bottom-0' : 'left-1/2 -ml-[17px] bottom-0'}
+                />
+              )}
             </div>
             {
               !!result && !isFold && !isHiddenCard && <span className="whitespace-nowrap z-20 rounded pl-1 pr-1 absolute -bottom-16 bg-blue-900 text-white bg-opacity-70 font-bold">{MAP_RS[result]}</span>
