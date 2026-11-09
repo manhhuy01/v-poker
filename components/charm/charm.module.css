@@ -58,9 +58,10 @@
   animation: emberGlow 1.2s ease-in-out infinite alternate;
 }
 
+/* Opacity/fill only: an animated drop-shadow is re-rendered every frame. */
 @keyframes emberGlow {
-  from { fill: #ea580c; filter: drop-shadow(0 0 1px #f97316); }
-  to { fill: #fde047; filter: drop-shadow(0 0 3px #fb923c); }
+  from { fill: #ea580c; opacity: 0.8; }
+  to { fill: #fde047; opacity: 1; }
 }
 
 /* ---------------- clover: swaying ---------------- */
@@ -102,9 +103,10 @@
   animation: auraPulse 1.4s ease-in-out infinite alternate;
 }
 
+/* Was filter: brightness(), which re-filters the whole group every frame. */
 @keyframes auraPulse {
-  from { filter: brightness(0.95); }
-  to { filter: brightness(1.2); }
+  from { opacity: 0.85; }
+  to { opacity: 1; }
 }
 
 /* ---------------- money: bills raining onto the pile ---------------- */

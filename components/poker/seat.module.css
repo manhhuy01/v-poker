@@ -88,11 +88,23 @@
 }
 
 .seat[data-thinking='true'] .pod {
-  border-color: rgba(251, 191, 36, 0.65);
+  border-color: rgba(251, 191, 36, 0.5);
   box-shadow:
     0 12px 24px -12px rgba(0, 0, 0, 0.95),
     0 0 0 1px rgba(251, 191, 36, 0.25),
     0 0 22px -2px rgba(251, 191, 36, 0.4);
+}
+
+/* The pulsing border is an overlay that only fades in and out: animating
+   `border-color` on the pod itself repaints it (and its backdrop blur) every
+   frame for as long as someone is thinking, which keeps the CPU/GPU busy. */
+.seat[data-thinking='true'] .pod::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  border: 1px solid rgba(251, 191, 36, 0.9);
+  pointer-events: none;
   animation: thinkingPulse 1.8s ease-in-out infinite;
 }
 
@@ -525,7 +537,10 @@
   .seat[data-hero='true'] .pod,
   .seat[data-thinking='true'] .pod {
     box-shadow: none;
-    animation: none;
+  }
+
+  .seat[data-thinking='true'] .pod::after {
+    display: none;
   }
 
   .avatar {
@@ -813,10 +828,10 @@
 @keyframes thinkingPulse {
   0%,
   100% {
-    border-color: rgba(251, 191, 36, 0.5);
+    opacity: 0;
   }
   50% {
-    border-color: rgba(251, 191, 36, 0.9);
+    opacity: 1;
   }
 }
 
@@ -856,7 +871,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .seat[data-thinking='true'] .pod,
+  .seat[data-thinking='true'] .pod::after,
   .seat[data-thinking='true'] .avatarWrap::after,
   .thinking i,
   .action,
