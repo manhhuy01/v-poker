@@ -200,6 +200,7 @@ export default function position({
 
   const posClassName = POSITION_COLORS[namePos] || 'bg-gray-200 text-gray-800'
   const visibleAction = action && action !== 'fold' ? action : '';
+  const showResult = !!result && !isFold && !isHiddenCard;
   const actionClassName = {
     'all-in': 'bg-red-600 text-white border-red-200 shadow-red-900/80',
     raise: 'bg-yellow-400 text-black border-yellow-100 shadow-yellow-900/70',
@@ -235,20 +236,25 @@ export default function position({
                 />
               )}
             </div>
-            {
-              !!result && !isFold && !isHiddenCard && <span className="whitespace-nowrap z-20 rounded pl-1 pr-1 absolute -bottom-16 bg-blue-900 text-white bg-opacity-70 font-bold">{MAP_RS[result]}</span>
-            }
             <div onClick={() => onEditClick(userName)} className="text-white pr-1 pl-1 rounded border-yellow-600 border bg-gray-900 text-xs z-10 cursor-pointer">{userName}</div>
-            {
-              !!namePos && (
-                <div
-                  title={positionName(namePos) || undefined}
-                  className={`${posClassName} absolute font-extrabold text-xs z-10 pl-1 pr-1 rounded -bottom-12`}
-                >
-                  {namePos}
-                </div>
-              )
-            }
+            {/* Position name and hand result share one row so they can't overlap. */}
+            {(!!namePos || showResult) && (
+              <div className="absolute top-8 z-20 flex items-center gap-1">
+                {
+                  !!namePos && (
+                    <div
+                      title={positionName(namePos) || undefined}
+                      className={`${posClassName} font-extrabold text-xs pl-1 pr-1 rounded`}
+                    >
+                      {namePos}
+                    </div>
+                  )
+                }
+                {
+                  showResult && <span className="whitespace-nowrap rounded pl-1 pr-1 bg-blue-900 text-white bg-opacity-70 font-bold">{MAP_RS[result]}</span>
+                }
+              </div>
+            )}
             <div className="bg-gray-900 text-blue-400 pr-2 pl-2 rounded z-10 text-xs w-max">${isPlaying && !balance && start ? 'ALL IN' : balance}</div>
             {isUserPlaying && (
               <button
